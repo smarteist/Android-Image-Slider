@@ -4,7 +4,7 @@ You can easily load images from an internet URL, drawable, or file. And there ar
 
 <img src="https://raw.githubusercontent.com/smarteist/android-image-slider/master/ezgif-4-1091d2bf4b.gif" alt="Auto Image Slider" width="300px" style="max-width:100%;">
 
-To add pageindicatorview to your project, first make sure in root build.gradle you have specified the following repository:
+To add sliderview to your project, first make sure in root build.gradle you have specified the following repository:
 
     repositories { 
     mavenCentral()
