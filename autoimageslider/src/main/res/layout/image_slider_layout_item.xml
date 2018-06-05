@@ -18,14 +18,22 @@
             android:src="@mipmap/ic_launcher" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_auto_image_slider"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@drawable/bg_overlay"
-        android:padding="4dp"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        tools:text="This is for Test" />
+        android:background="@drawable/bg_overlay">
+
+        <TextView
+            android:id="@+id/tv_auto_image_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25dp"
+            android:layout_marginTop="8dp"
+            android:padding="6dp"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            tools:text="This is for Test" />
+
+    </FrameLayout>
 </FrameLayout>

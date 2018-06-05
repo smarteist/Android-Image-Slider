@@ -1,9 +1,35 @@
 apply plugin: 'com.android.library'
 
+ext {
+
+    //For bintray and jcenter distribution
+    bintrayRepo = 'android'
+    bintrayName = 'androidautoimageslider'
+
+    publishedGroupId = 'com.github.smarteist'
+    libraryName = 'autoimageslider'
+    artifact = 'autoimageslider' //This artifact name should be the same with library module name
+
+    libraryDescription = 'Simple, android image slider'
+
+    siteUrl = 'https://github.com/smarteist'
+    gitUrl = 'https://github.com/smarteist/android-image-slider.git'
+
+    libraryVersion = '1.2.0'
+
+    developerId = 'smarteist'
+    developerName = 'Ali Hn'
+    developerEmail = 'ali.hosseini.sr@gmail.com'
+    organization = 'smarteistbintray' // if you push to organization's repository.
+    licenseName = 'The Apache Software License, Version 2.0'  //Example for license
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+
+}
+
+
 android {
     compileSdkVersion 27
-
-
 
     defaultConfig {
         minSdkVersion 17
@@ -27,9 +53,16 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.android.support:appcompat-v7:27.1.0'
+    //noinspection GradleCompatible
+    implementation 'com.android.support:appcompat-v7:27.1.1'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile 'com.romandanylyk:pageindicatorview:1.0.0'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.romandanylyk:pageindicatorview:1.0.0'
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
 }
+
+
+apply from: 'https://raw.githubusercontent.com/quangctkm9207/template-files/master/android/gradle/install.gradle'
+apply from: 'https://raw.githubusercontent.com/quangctkm9207/template-files/master/android/gradle/bintray.gradle'

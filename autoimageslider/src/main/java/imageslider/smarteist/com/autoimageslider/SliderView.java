@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
 import android.text.TextUtils;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.smarteist.autoimageslider.R;
 
 import java.io.ByteArrayOutputStream;
@@ -26,6 +28,7 @@ public class SliderView {
     private OnSliderClickListener onSliderClickListener;
 
     private String description;
+    private int descriptionTextColor = Color.WHITE;
 
     @DrawableRes
     private int imageRes = 0;
@@ -45,6 +48,11 @@ public class SliderView {
 
     public SliderView setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public SliderView setDescriptionTextColor (int descriptionTextColor) {
+        this.descriptionTextColor = descriptionTextColor;
         return this;
     }
 
@@ -68,7 +76,6 @@ public class SliderView {
         ContextWrapper wrapper = new ContextWrapper(context);
         File file = new File(wrapper.getCacheDir().getAbsolutePath(),"Cached"+System.currentTimeMillis()+".jpeg");
         Bitmap bitmap = BitmapFactory.decodeByteArray(imageByte, 0,imageByte.length);
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(file);
@@ -109,9 +116,10 @@ public class SliderView {
         @SuppressLint("InflateParams")
         View v = LayoutInflater.from(context).inflate(R.layout.image_slider_layout_item, null, true);
         ImageView autoSliderImage = v.findViewById(R.id.iv_auto_image_slider);
-        TextView description = v.findViewById(R.id.tv_auto_image_slider);
-        description.getBackground();
-        description.setText(getDescription());
+        TextView tv_description = v.findViewById(R.id.tv_auto_image_slider);
+        tv_description.getBackground();
+        tv_description.setTextColor(descriptionTextColor);
+        tv_description.setText(getDescription());
         bindData(v, autoSliderImage);
         return v;
     }
@@ -134,10 +142,10 @@ public class SliderView {
         try {
             autoSliderImage.setScaleType(getScaleType());
             if (imageUrl != null) {
-                autoSliderImage.setImageURI(Uri.parse(imageUrl));
+                Glide.with(context).asDrawable().load(imageUrl).into(autoSliderImage);
             }
             if (imageRes != 0){
-                autoSliderImage.setImageResource(imageRes);
+                Glide.with(context).asDrawable().load(imageRes).into(autoSliderImage);
             }
         } catch (Exception exception) {
             Log.d("Exception", exception.getMessage());

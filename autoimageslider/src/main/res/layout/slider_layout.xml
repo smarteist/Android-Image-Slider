@@ -12,8 +12,7 @@
     <com.rd.PageIndicatorView
         android:id="@+id/pager_indicator"
         android:layout_width="wrap_content"
-        android:layout_height="32dp"
+        android:layout_height="25dp"
         android:layout_gravity="bottom|center"
-        android:layout_margin="2dp"
         android:gravity="center" />
 </FrameLayout>
