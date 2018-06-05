@@ -29,6 +29,7 @@ public class SliderView {
 
     private String description;
     private int descriptionTextColor = Color.WHITE;
+    private float descriptionTextSize = 1;
 
     @DrawableRes
     private int imageRes = 0;
@@ -53,6 +54,11 @@ public class SliderView {
 
     public SliderView setDescriptionTextColor (int descriptionTextColor) {
         this.descriptionTextColor = descriptionTextColor;
+        return this;
+    }
+
+    public SliderView setDescriptionTextSize (float descriptionTextSize) {
+        this.descriptionTextSize = descriptionTextSize;
         return this;
     }
 
@@ -118,6 +124,9 @@ public class SliderView {
         ImageView autoSliderImage = v.findViewById(R.id.iv_auto_image_slider);
         TextView tv_description = v.findViewById(R.id.tv_auto_image_slider);
         tv_description.getBackground();
+        if (descriptionTextSize != 1) {
+            tv_description.setTextSize(descriptionTextSize);
+        }
         tv_description.setTextColor(descriptionTextColor);
         tv_description.setText(getDescription());
         bindData(v, autoSliderImage);
