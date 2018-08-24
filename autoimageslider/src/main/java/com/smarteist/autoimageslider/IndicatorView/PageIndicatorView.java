@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
 import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.BaseAnimation;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.ColorAnimation;
@@ -134,10 +135,10 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
 
     @Override
     public void onPageScrollStateChanged(int state) {
-		if (state == ViewPager.SCROLL_STATE_IDLE) {
-			manager.indicator().setInteractiveAnimation(isInteractionEnabled);
-		}
-	}
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+            manager.indicator().setInteractiveAnimation(isInteractionEnabled);
+        }
+    }
 
     @Override
     public void onAdapterChanged(@NonNull ViewPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
@@ -252,7 +253,6 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
         manager.indicator().setStroke((int) strokePx);
         invalidate();
     }
-
 
 
     public void setStrokeWidth(int strokeDp) {
@@ -574,7 +574,7 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
         }
     }
 
-	private void onPageScroll(int position, float positionOffset) {
+    private void onPageScroll(int position, float positionOffset) {
         Indicator indicator = manager.indicator();
         AnimationType animationType = indicator.getAnimationType();
         boolean interactiveAnimation = indicator.isInteractiveAnimation();
@@ -642,7 +642,7 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
         }
     }
 
-    private int adjustPosition(int position){
+    private int adjustPosition(int position) {
         Indicator indicator = manager.indicator();
         int count = indicator.getCount();
         int lastPosition = count - 1;

@@ -149,10 +149,10 @@ public class SliderView {
         try {
             autoSliderImage.setScaleType(getScaleType());
             if (imageUrl != null) {
-                Glide.with(context).asDrawable().load(imageUrl).into(autoSliderImage);
+                Glide.with(context).load(imageUrl).into(autoSliderImage);
             }
             if (imageRes != 0){
-                Glide.with(context).asDrawable().load(imageRes).into(autoSliderImage);
+                Glide.with(context).load(imageRes).into(autoSliderImage);
             }
         } catch (Exception exception) {
             Log.d("Exception", exception.getMessage());
