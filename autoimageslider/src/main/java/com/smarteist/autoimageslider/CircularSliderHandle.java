@@ -61,10 +61,6 @@ class CircularSliderHandle implements ViewPager.OnPageChangeListener {
 //            if (previousState == 1 && mCurrentPosition == 0){
 //                mViewPager.setCurrentItem(currentPage == 0 ? mViewPager.getAdapter().getCount()-1 : 0);
 //            }
-//            boolean leftSwipe = mPreviousPosition==
-//            if (state == ViewPager.SCROLL_STATE_SETTLING){
-//                mViewPager.setCurrentItem(currentPage == 0 ? mViewPager.getAdapter().getCount()-1 : 0);
-//            }
 //        }
         handleScrollState(state);
         mScrollState = state;
