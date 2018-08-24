@@ -1,9 +1,6 @@
 package com.smarteist.autoimageslider;
 
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-
-import static android.content.ContentValues.TAG;
 
 class CircularSliderHandle implements ViewPager.OnPageChangeListener {
     private ViewPager mViewPager;
@@ -53,15 +50,6 @@ class CircularSliderHandle implements ViewPager.OnPageChangeListener {
 
     @Override
     public void onPageScrollStateChanged(final int state) {
-        Log.d(TAG, "onPageScrollStateChanged: " + state + "   " + mCurrentPosition);
-//        int currentPage = mViewPager.getCurrentItem();
-//        if (currentPage == mViewPager.getAdapter().getCount()-1 || currentPage == 0){
-//            int previousState = mCurrentPosition;
-//            mCurrentPosition = state;
-//            if (previousState == 1 && mCurrentPosition == 0){
-//                mViewPager.setCurrentItem(currentPage == 0 ? mViewPager.getAdapter().getCount()-1 : 0);
-//            }
-//        }
         handleScrollState(state);
         mScrollState = state;
     }
