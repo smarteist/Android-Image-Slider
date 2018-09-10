@@ -21,13 +21,13 @@ public class MainActivity extends AppCompatActivity {
         sliderLayout = findViewById(R.id.imageSlider);
         sliderLayout.setIndicatorAnimation(SliderLayout.Animations.FILL); //set indicator animation by using SliderLayout.Animations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
         sliderLayout.setScrollTimeInSec(1); //set scroll delay in seconds :
-
+        sliderLayout.enableAutoScrolling(false);//enable or disable auto scrolling
         setSliderViews();
     }
 
     private void setSliderViews() {
 
-        for (int i = 0; i <= 1; i++) {
+        for (int i = 0; i <= 3; i++) {
 
             SliderView sliderView = new SliderView(this);
 
@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
             //at last add this view in your layout :
             sliderLayout.addSliderView(sliderView);
+//            sliderLayout.enableAutoScrolling(false);
         }
 
     }

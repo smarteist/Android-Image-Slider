@@ -1,6 +1,7 @@
 package com.smarteist.autoimageslider;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -32,23 +33,24 @@ public class SliderLayout extends FrameLayout implements CircularSliderHandle.Cu
     private PageIndicatorView pagerIndicator;
 
     private int scrollTimeInSec = 2;
+    private boolean scrollingEnabled = true;
 
     private Handler handler = new Handler();
     private Timer flippingTimer;
 
     public SliderLayout(Context context) {
         super(context);
-        setLayout(context);
+        setLayout(context, null);
     }
 
     public SliderLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setLayout(context);
+        setLayout(context, attrs);
     }
 
     public SliderLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setLayout(context);
+        setLayout(context, attrs);
     }
 
     public enum Animations {
@@ -123,7 +125,10 @@ public class SliderLayout extends FrameLayout implements CircularSliderHandle.Cu
     }
 
 
-    private void setLayout(Context context) {
+    private void setLayout(Context context, AttributeSet attrs) {
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PageIndicatorView, 0, 0);
+        scrollingEnabled = typedArray.getBoolean(R.styleable.PageIndicatorView_piv_enable_auto_scrolling, true);
+        typedArray.recycle();
         View view = LayoutInflater.from(context).inflate(R.layout.slider_layout, this, true);
         mFlippingPager = view.findViewById(R.id.vp_slider_layout);
         pagerIndicator = view.findViewById(R.id.pager_indicator);
@@ -142,6 +147,10 @@ public class SliderLayout extends FrameLayout implements CircularSliderHandle.Cu
         startAutoCycle();
     }
 
+    public void enableAutoScrolling(boolean scroll) {
+        scrollingEnabled = scroll;
+        startAutoCycle();
+    }
 
     public void addSliderView(SliderView sliderView) {
         ((SliderAdapter) mFlippingPagerAdapter).addSliderView(sliderView);
@@ -152,27 +161,30 @@ public class SliderLayout extends FrameLayout implements CircularSliderHandle.Cu
 
 
     private void startAutoCycle() {
+
         if (!(flippingTimer == null)) {
             flippingTimer.cancel();
         }
         //Cancel If Thread is Running
-        final Runnable Update = new Runnable() {
-            public void run() {
-                if (currentPage == getFlippingPagerAdapter().getCount()) {
-                    currentPage = 0;
+        if (scrollingEnabled) {
+            final Runnable Update = new Runnable() {
+                public void run() {
+                    if (currentPage == getFlippingPagerAdapter().getCount()) {
+                        currentPage = 0;
+                    }
+                    // true set for smooth transition between pager
+                    mFlippingPager.setCurrentItem(currentPage++, true);
                 }
-                // true set for smooth transition between pager
-                mFlippingPager.setCurrentItem(currentPage++, true);
-            }
-        };
+            };
 
-        flippingTimer = new Timer();
-        flippingTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                handler.post(Update);
-            }
-        }, DELAY_MS, scrollTimeInSec * 1000);
+            flippingTimer = new Timer();
+            flippingTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    handler.post(Update);
+                }
+            }, DELAY_MS, scrollTimeInSec * 1000);
+        }
     }
 
     @Override

@@ -41,6 +41,8 @@
             <enum name="off" value="1" />
             <enum name="auto" value="2" />
         </attr>
+
+        <attr name="piv_enable_auto_scrolling" format="boolean"/>
     </declare-styleable>
 
 </resources>
