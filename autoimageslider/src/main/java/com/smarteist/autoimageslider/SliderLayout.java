@@ -149,7 +149,10 @@ public class SliderLayout extends FrameLayout implements CircularSliderHandle.Cu
             pagerIndicator.setViewPager(mFlippingPager);
         }
     }
-
+    
+    public void removeAllSliderViews() {         
+        ((SliderAdapter) mFlippingPagerAdapter).removeAllSliderViews();     
+    }
 
     private void startAutoCycle() {
         if (!(flippingTimer == null)) {
