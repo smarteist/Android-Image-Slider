@@ -3,8 +3,15 @@ This is an amazing image slider for the Android .
  
 You can easily load images from an internet URL, drawable, or file. And there are many kinds of amazing animations you can choose.
 
-     implementation 'com.github.smarteist:autoimageslider:1.1.1'
+     implementation 'com.github.smarteist:autoimageslider:1.2.0'
      implementation 'com.github.bumptech.glide:glide:4.7.1'
+
+### New Feautures 
+Ability to change slide animation by using 
+		sliderLayout.setSliderTransformAnimation();
+Some issues fixed.
+Ability to implement a custom sliderView with exteding from class "SliderView"
+and change it any way you want.
 
 # Demo
 ![](https://github.com/smarteist/android-image-slider/blob/master/1.gif)
