@@ -46,6 +46,7 @@ public class SliderLayout extends FrameLayout implements CircularSliderHandle.Cu
     private CircularSliderHandle circularSliderHandle;
     private ViewPager mSliderPager;
     private PageIndicatorView pagerIndicator;
+    private int pagerIndicatorRadius = -1;
     private int scrollTimeInSec = 2;
     private Handler handler = new Handler();
     private Timer flippingTimer;
@@ -278,6 +279,16 @@ public class SliderLayout extends FrameLayout implements CircularSliderHandle.Cu
                 handler.post(scrollingThread);
             }
         }, DELAY_MS, scrollTimeInSec * 1000);
+    }
+
+    public int getPagerIndicatorRadius() {
+        return pagerIndicatorRadius;
+    }
+
+    public void setPagerIndicatorRadius(int pagerIndicatorRadius) {
+        this.pagerIndicatorRadius = pagerIndicatorRadius;
+        pagerIndicator.setRadius(pagerIndicatorRadius);
+        startAutoCycle();
     }
 
     @Override
