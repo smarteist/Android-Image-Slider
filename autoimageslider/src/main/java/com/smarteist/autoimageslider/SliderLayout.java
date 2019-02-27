@@ -46,7 +46,7 @@ public class SliderLayout extends FrameLayout implements CircularSliderHandle.Cu
     private CircularSliderHandle circularSliderHandle;
     private ViewPager mSliderPager;
     private PageIndicatorView pagerIndicator;
-    private int pagerIndicatorRadius = -1;
+    private int pagerIndicatorRadius;
     private int scrollTimeInSec = 2;
     private Handler handler = new Handler();
     private Timer flippingTimer;
