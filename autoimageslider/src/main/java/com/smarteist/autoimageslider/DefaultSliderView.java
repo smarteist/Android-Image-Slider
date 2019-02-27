@@ -6,12 +6,14 @@ import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,19 +28,25 @@ public class DefaultSliderView extends SliderView {
     private String description;
     private int descriptionTextColor = Color.WHITE;
     private float descriptionTextSize = 1;
+    private Boolean showShadow = true;
 
     @Override
     public View getView() {
         @SuppressLint("InflateParams")
         View v = LayoutInflater.from(context).inflate(R.layout.image_slider_layout_item, null, true);
         ImageView autoSliderImage = v.findViewById(R.id.iv_auto_image_slider);
+        FrameLayout shadowContainer = v.findViewById(R.id.fl_shadow_container);
         TextView tv_description = v.findViewById(R.id.tv_auto_image_slider);
-        tv_description.getBackground();
         if (descriptionTextSize != 1) {
             tv_description.setTextSize(descriptionTextSize);
         }
         tv_description.setTextColor(descriptionTextColor);
         tv_description.setText(getDescription());
+        if(showShadow){
+            shadowContainer.setBackgroundResource(R.drawable.bg_overlay);
+        } else {
+            shadowContainer.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
         bindViewData(v, autoSliderImage);
         return v;
     }
@@ -87,4 +95,11 @@ public class DefaultSliderView extends SliderView {
         this.descriptionTextSize = descriptionTextSize;
     }
 
+    public Boolean getShowShadow() {
+        return showShadow;
+    }
+
+    public void setShowShadow(Boolean showShadow) {
+        this.showShadow = showShadow;
+    }
 }
