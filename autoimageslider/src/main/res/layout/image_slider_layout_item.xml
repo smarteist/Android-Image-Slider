@@ -8,14 +8,13 @@
         android:id="@+id/iv_auto_image_slider"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/ic_launcher" />
+        android:scaleType="centerCrop"/>
 
     <FrameLayout
+        android:id="@+id/fl_shadow_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@drawable/bg_overlay">
+        android:layout_gravity="bottom">
 
         <TextView
             android:id="@+id/tv_auto_image_slider"
