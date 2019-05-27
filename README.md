@@ -34,7 +34,7 @@ And implement the slider with your own programming
 Here is an example of the implementation of this library in java :
 
 
-         	SliderLayout sliderLayout;
+    SliderLayout sliderLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,8 @@ Here is an example of the implementation of this library in java :
         setContentView(R.layout.activity_main);
 
         sliderLayout = findViewById(R.id.imageSlider);
-        sliderLayout.setIndicatorAnimation(SliderLayout.Animations.FILL); //set indicator animation by using SliderLayout.Animations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+        sliderLayout.setIndicatorAnimation(IndicatorAnimations.SWAP); //set indicator animation by using 	 				SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+        sliderLayout.setSliderTransformAnimation(SliderAnimations.FADETRANSFORMATION);
         sliderLayout.setScrollTimeInSec(1); //set scroll delay in seconds :
 
         setSliderViews();
@@ -52,7 +53,7 @@ Here is an example of the implementation of this library in java :
 
         for (int i = 0; i <= 3; i++) {
 
-            SliderView sliderView = new SliderView(this);
+                      DefaultSliderView sliderView = new DefaultSliderView(getContext());
 
             switch (i) {
                 case 0:
