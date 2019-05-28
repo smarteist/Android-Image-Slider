@@ -27,7 +27,25 @@ Just put the view in the layout xml like this:
         android:layout_alignParentTop="true"
         android:id="@+id/imageSlider"/>
 ```
+   
+   Or you can wrap it in a cardView :
+   
+```xml
+       <androidx.cardview.widget.CardView
+               app:cardCornerRadius="6dp"
+               android:layout_margin="16dp"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content">
        
+               <com.smarteist.autoimageslider.SliderView
+                   android:layout_width="match_parent"
+                   android:layout_height="300dp"
+                   android:layout_alignParentTop="true"
+                   android:id="@+id/imageSlider"/>
+       
+       </androidx.cardview.widget.CardView>
+```
+     
 
 The new version requires an adapter for the sliderView , Although its very similar to RecyclerAdapter , and it's easy for you to implement this adapter... but here is an example for adapter implementation :
 
