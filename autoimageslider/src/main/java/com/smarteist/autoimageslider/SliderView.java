@@ -293,6 +293,22 @@ public class SliderView extends FrameLayout implements CircularSliderHandle.Curr
         this.mPagerIndicator.setRadius(pagerIndicatorRadius);
     }
 
+    public void setSliderIndicatorSelectedColor(int color) {
+        this.mPagerIndicator.setSelectedColor(color);
+    }
+
+    public int getSliderIndicatorSelectedColor() {
+        return this.mPagerIndicator.getSelectedColor();
+    }
+
+    public void setSliderIndicatorUnselectedColor(int color) {
+        this.mPagerIndicator.setUnselectedColor(color);
+    }
+
+    public int getSliderIndicatorUnselectedColor() {
+        return this.mPagerIndicator.getUnselectedColor();
+    }
+
     @Override
     public void onCurrentPageChanged(int currentPosition) {
         this.mPagerIndicator.setSelected(currentPosition);
