@@ -32,7 +32,7 @@ Just put the view in the layout xml like this:
 The new version requires an adapter for the sliderView , Although its very similar to RecyclerAdapter , and it's easy for you to implement this adapter... but here is an example for adapter implementation :
 
 ```java	
-	public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
+public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
 
     private Context context;
 
@@ -95,8 +95,8 @@ The new version requires an adapter for the sliderView , Although its very simil
             this.itemView = itemView;
         }
     }
-    }
-    ```
+}
+```
     
 First setAdapter to Sliderview
 
