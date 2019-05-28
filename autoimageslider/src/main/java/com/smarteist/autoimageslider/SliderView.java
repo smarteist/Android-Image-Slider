@@ -1,6 +1,7 @@
 package com.smarteist.autoimageslider;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.os.Handler;
 
 import androidx.viewpager.widget.PagerAdapter;
@@ -43,6 +44,7 @@ public class SliderView extends FrameLayout implements CircularSliderHandle.Curr
     private int currentPageCounter = 0;
     private int scrollTimeInSec = 2;
     private PageIndicatorView mPagerIndicator;
+    private DataSetObserver mDataSetObserver;
     private PagerAdapter mPagerAdapter;
     private Runnable mSliderRunnable;
     private ViewPager mSliderPager;
@@ -79,10 +81,23 @@ public class SliderView extends FrameLayout implements CircularSliderHandle.Curr
 
     }
 
-    public void setSliderAdapter(PagerAdapter pagerAdapter) {
-        mSliderPager.setAdapter(pagerAdapter);
+    public void setSliderAdapter(final PagerAdapter pagerAdapter) {
+        if (mDataSetObserver != null) {
+            pagerAdapter.unregisterDataSetObserver(mDataSetObserver);
+        }
+        mDataSetObserver = new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                mPagerIndicator.setCount(pagerAdapter.getCount());
+            }
+        };
+
+        pagerAdapter.registerDataSetObserver(mDataSetObserver);
         mPagerAdapter = pagerAdapter;
         mPagerIndicator.setCount(pagerAdapter.getCount());
+        mSliderPager.setAdapter(pagerAdapter);
+
     }
 
     public PagerAdapter getSliderAdapter() {
