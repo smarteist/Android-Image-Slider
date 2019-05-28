@@ -20,17 +20,18 @@ You can easily load images from an internet URL, drawable, or file. And there ar
 
 Just put the view in the layout xml like this:
 
+```xml
         <com.smarteist.autoimageslider.SliderLayout
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_alignParentTop="true"
         android:id="@+id/imageSlider"/>
-        
+```
        
 
 The new version requires an adapter for the sliderView , Although its very similar to RecyclerAdapter , and it's easy for you to implement this adapter... but here is an example for adapter implementation :
 
-	
+```java	
 	public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
 
     private Context context;
@@ -95,18 +96,23 @@ The new version requires an adapter for the sliderView , Although its very simil
         }
     }
     }
+    ```
     
 First setAdapter to Sliderview
 
+```java
         	sliderLayout.setSliderAdapter(new SliderAdapterExample(context));
+```
 		
 Then call this method if you want the slider to start flipping automatically :
 
+```java
         sliderLayout.startAutoCycle();
+```
 
 Here is a more realistic and more complete example :
 
-
+```java
     SliderLayout sliderLayout;
 
     @Override
@@ -123,3 +129,4 @@ Here is a more realistic and more complete example :
         sliderLayout.setScrollTimeInSec(2); //set scroll delay in seconds :
         sliderLayout.startAutoCycle();
     }
+```
