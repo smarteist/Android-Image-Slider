@@ -101,13 +101,13 @@ public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample
 First setAdapter to Sliderview
 
 ```java
-        	sliderLayout.setSliderAdapter(new SliderAdapterExample(context));
+    sliderView.setSliderAdapter(new SliderAdapterExample(context));
 ```
 		
 Then call this method if you want the slider to start flipping automatically :
 
 ```java
-        sliderLayout.startAutoCycle();
+    sliderView.startAutoCycle();
 ```
 
 Here is a more realistic and more complete example :
@@ -119,14 +119,14 @@ Here is a more realistic and more complete example :
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SliderLayout sliderLayout = findViewById(R.id.imageSlider);
+        SliderView sliderView = findViewById(R.id.imageSlider);
 
-        sliderLayout.setSliderAdapter(new SliderAdapterExample(this));
+        sliderView.setSliderAdapter(new SliderAdapterExample(this));
 
-        sliderLayout.setIndicatorAnimation(IndicatorAnimations.SWAP); //set indicator animation by using 	  SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
-        sliderLayout.setSliderTransformAnimation(SliderAnimations.DEPTHTRANSFORMATION);
-        sliderLayout.setScrollTimeInSec(2); //set scroll delay in seconds :
-        sliderLayout.startAutoCycle();
+        sliderView.setIndicatorAnimation(IndicatorAnimations.SWAP); //set indicator animation by using 	  SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+        sliderView.setSliderTransformAnimation(SliderAnimations.DEPTHTRANSFORMATION);
+        sliderView.setScrollTimeInSec(2); //set scroll delay in seconds :
+        sliderView.startAutoCycle();
     }
 ```
 
