@@ -36,21 +36,16 @@ import com.smarteist.autoimageslider.Transformations.VerticalFlipTransformation;
 import com.smarteist.autoimageslider.Transformations.VerticalShutTransformation;
 import com.smarteist.autoimageslider.Transformations.ZoomOutTransformation;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class SliderView extends FrameLayout implements CircularSliderHandle.CurrentPageListener {
 
-
-    private static final long DELAY_MS = 500;
-    private PageIndicatorView mPagerIndicator;
+    private final Handler mHandler = new Handler();
     private boolean isAutoScrolling = true;
-    private PagerAdapter mPagerAdapter;
     private int currentPageCounter = 0;
     private int scrollTimeInSec = 2;
+    private PageIndicatorView mPagerIndicator;
+    private PagerAdapter mPagerAdapter;
+    private Runnable mSliderRunnable;
     private ViewPager mSliderPager;
-    private Timer flippingTimer;
-    private Handler handler;
 
 
     public SliderView(Context context) {
@@ -245,39 +240,34 @@ public class SliderView extends FrameLayout implements CircularSliderHandle.Curr
 
     public void startAutoCycle() {
 
-        if (flippingTimer != null) {
-            flippingTimer.cancel();
-            flippingTimer.purge();
+        if (mSliderRunnable != null) {
+            mHandler.removeCallbacks(mSliderRunnable);
         }
 
-        if (handler == null) {
-            handler = new Handler();
-        }
-
-        //Cancel If Thread is Running
-        final Runnable scrollingThread = new Runnable() {
-            public void run() {
-                // check is on auto scroll mode
-                if (!isAutoScrolling) {
-                    return;
-                }
-                // if is last item return to the first position
-                if (currentPageCounter == getSliderAdapter().getCount()) {
-                    currentPageCounter = 0;
-                }
-                // true set for smooth transition between pager
-                mSliderPager.setCurrentItem(currentPageCounter++, true);
-            }
-
-        };
-
-        flippingTimer = new Timer();
-        flippingTimer.schedule(new TimerTask() {
+        mSliderRunnable = new Runnable() {
             @Override
             public void run() {
-                handler.post(scrollingThread);
+
+                try {
+                    // check is on auto scroll mode
+                    if (!isAutoScrolling) {
+                        return;
+                    }
+                    // if is last item return to the first position
+                    if (currentPageCounter == getSliderAdapter().getCount()) {
+                        currentPageCounter = 0;
+                    }
+                    // true set for smooth transition between pager
+                    mSliderPager.setCurrentItem(currentPageCounter++, true);
+                } finally {
+                    mHandler.postDelayed(this, scrollTimeInSec * 1000);
+                }
+
             }
-        }, DELAY_MS, scrollTimeInSec * 1000);
+        };
+
+        mSliderRunnable.run();
+
     }
 
     public int getSliderIndicatorRadius() {

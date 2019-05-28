@@ -10,7 +10,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.smarteist.autoimageslider.SliderViewAdapter;
 
-public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
+public class SliderAdapterExample extends
+        SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
 
     private Context context;
 
@@ -56,6 +57,7 @@ public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample
 
     @Override
     public int getCount() {
+        //slider view count could be dynamic size
         return 4;
     }
 

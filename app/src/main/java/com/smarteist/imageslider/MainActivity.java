@@ -25,6 +25,10 @@ public class MainActivity extends AppCompatActivity {
         sliderLayout.setScrollTimeInSec(2); //set scroll delay in seconds :
         sliderLayout.startAutoCycle();
 
+        sliderLayout.setScrollTimeInSec(1);
+        sliderLayout.startAutoCycle();
+
+
     }
 
 }
