@@ -1,7 +1,7 @@
 package com.smarteist.autoimageslider.IndicatorView.draw.drawer.type;
 
 import android.graphics.Paint;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
 
 class BaseDrawer {

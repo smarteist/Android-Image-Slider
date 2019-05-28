@@ -1,7 +1,7 @@
 package com.smarteist.autoimageslider.IndicatorView.animation.type;
 
 import android.animation.ValueAnimator;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
 import com.smarteist.autoimageslider.IndicatorView.animation.data.type.ThinWormAnimationValue;

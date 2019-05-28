@@ -1,6 +1,6 @@
 package com.smarteist.autoimageslider.IndicatorView;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.smarteist.autoimageslider.IndicatorView.animation.AnimationManager;
 import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
 import com.smarteist.autoimageslider.IndicatorView.animation.data.Value;

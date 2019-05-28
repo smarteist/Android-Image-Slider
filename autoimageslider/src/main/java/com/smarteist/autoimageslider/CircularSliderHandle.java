@@ -1,15 +1,17 @@
 package com.smarteist.autoimageslider;
 
-import android.support.v4.view.ViewPager;
+import androidx.viewpager.widget.ViewPager;
 
 class CircularSliderHandle implements ViewPager.OnPageChangeListener {
-    private ViewPager mViewPager;
-    private int mCurrentPosition;
 
     private CurrentPageListener currentPageListener;
+    private ViewPager mViewPager;
+    private boolean mIsOnLoopEnd = false;
+    private int mCurrentPosition;
+    private int mPreviousPosition;
 
     CircularSliderHandle(final ViewPager viewPager) {
-        mViewPager = viewPager;
+        this.mViewPager = viewPager;
     }
 
     void setCurrentPageListener(CurrentPageListener currentPageListener) {
@@ -18,24 +20,49 @@ class CircularSliderHandle implements ViewPager.OnPageChangeListener {
 
     @Override
     public void onPageSelected(final int position) {
-        mCurrentPosition = position;
-        currentPageListener.onCurrentPageChanged(mCurrentPosition);
+        this.mCurrentPosition = position;
+        this.currentPageListener.onCurrentPageChanged(mCurrentPosition);
     }
 
     @Override
-    public void onPageScrollStateChanged(final int state) {
-        int currentPage = mViewPager.getCurrentItem();
-        if (currentPage == mViewPager.getAdapter().getCount()-1 || currentPage == 0){
-            int previousState = mCurrentPosition;
-            mCurrentPosition = state;
-            if (previousState == 1 && mCurrentPosition == 0){
-                mViewPager.setCurrentItem(currentPage == 0 ? mViewPager.getAdapter().getCount()-1 : 0);
+    public void onPageScrollStateChanged(int state) {
+
+        int itemsCount = getAdapterItemsCount();
+
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+
+            if (mPreviousPosition == mCurrentPosition && !mIsOnLoopEnd) {
+
+                if (mCurrentPosition == 0) {
+                    mViewPager.setCurrentItem(itemsCount - 1);
+                    mIsOnLoopEnd = true;
+
+                } else {
+                    mViewPager.setCurrentItem(0);
+                    mIsOnLoopEnd = true;
+                }
+
+            } else {
+                mIsOnLoopEnd = false;
             }
+
+            mPreviousPosition = mViewPager.getCurrentItem();
+        }
+
+    }
+
+    private int getAdapterItemsCount() {
+        try {
+            return mViewPager.getAdapter().getCount();
+        } catch (NullPointerException e) {
+            return 0;
         }
     }
 
+
     @Override
-    public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
+    public void onPageScrolled(final int position, final float positionOffset,
+                               final int positionOffsetPixels) {
     }
 
     interface CurrentPageListener {

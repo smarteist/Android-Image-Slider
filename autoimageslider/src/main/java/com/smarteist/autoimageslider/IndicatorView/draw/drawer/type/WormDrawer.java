@@ -3,7 +3,7 @@ package com.smarteist.autoimageslider.IndicatorView.draw.drawer.type;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.smarteist.autoimageslider.IndicatorView.animation.data.Value;
 import com.smarteist.autoimageslider.IndicatorView.animation.data.type.WormAnimationValue;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
