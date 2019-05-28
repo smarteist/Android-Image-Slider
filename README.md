@@ -3,15 +3,12 @@ This is an amazing image slider for the Android .
  
 You can easily load images from an internet URL, drawable, or file. And there are many kinds of amazing animations you can choose.
 
-     implementation 'com.github.smarteist:autoimageslider:1.2.0'
-     implementation 'com.github.bumptech.glide:glide:4.7.1'
+     implementation 'com.github.smarteist:autoimageslider:1.3.0'
 
 ### New Feautures 
-Ability to change slide animation by using 
-		sliderLayout.setSliderTransformAnimation();
-Some issues fixed.
-Ability to implement a custom sliderView with exteding from class "SliderView"
-and change it any way you want.
+* Added new adapter based slider view, Provides the ability to add custom views
+* Bugs fixed
+* Migrated to androidx
 
 # Demo
 ![](https://github.com/smarteist/android-image-slider/blob/master/1.gif)
@@ -29,9 +26,85 @@ Just put the view in the layout xml like this:
         android:layout_alignParentTop="true"
         android:id="@+id/imageSlider"/>
         
-        
-And implement the slider with your own programming
-Here is an example of the implementation of this library in java :
+       
+
+The new version requires an adapter for the sliderView , Although its very similar to RecyclerAdapter , and it's easy for you to implement this adapter... but here is an example for adapter implementation :
+
+	
+	public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
+
+    private Context context;
+
+    public SliderAdapterExample(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    public SliderAdapterVH onCreateViewHolder(ViewGroup parent) {
+        View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_slider_layout_item, null);
+        return new SliderAdapterVH(inflate);
+    }
+
+    @Override
+    public void onBindViewHolder(SliderAdapterVH viewHolder, int position) {
+        viewHolder.textViewDescription.setText("This is slider item " + position);
+
+        switch (position) {
+            case 0:
+                Glide.with(viewHolder.itemView)
+                        .load("https://images.pexels.com/photos/218983/pexels-photo-218983.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
+                        .into(viewHolder.imageViewBackground);
+                break;
+            case 1:
+                Glide.with(viewHolder.itemView)
+                        .load("https://images.pexels.com/photos/747964/pexels-photo-747964.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260")
+                        .into(viewHolder.imageViewBackground);
+                break;
+            case 2:
+                Glide.with(viewHolder.itemView)
+                        .load("https://images.pexels.com/photos/929778/pexels-photo-929778.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
+                        .into(viewHolder.imageViewBackground);
+                break;
+            default:
+                Glide.with(viewHolder.itemView)
+                        .load("https://images.pexels.com/photos/218983/pexels-photo-218983.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
+                        .into(viewHolder.imageViewBackground);
+                break;
+
+        }
+
+    }
+
+    @Override
+    public int getCount() {
+        //slider view count could be dynamic size
+        return 4;
+    }
+
+    class SliderAdapterVH extends SliderViewAdapter.ViewHolder {
+
+        View itemView;
+        ImageView imageViewBackground;
+        TextView textViewDescription;
+
+        public SliderAdapterVH(View itemView) {
+            super(itemView);
+            imageViewBackground = itemView.findViewById(R.id.iv_auto_image_slider);
+            textViewDescription = itemView.findViewById(R.id.tv_auto_image_slider);
+            this.itemView = itemView;
+        }
+    }
+    }
+    
+First setAdapter to Sliderview
+
+        	sliderLayout.setSliderAdapter(new SliderAdapterExample(context));
+		
+Then call this method if you want the slider to start flipping automatically :
+
+        sliderLayout.startAutoCycle();
+
+Here is a more realistic and more complete example :
 
 
     SliderLayout sliderLayout;
@@ -42,47 +115,11 @@ Here is an example of the implementation of this library in java :
         setContentView(R.layout.activity_main);
 
         sliderLayout = findViewById(R.id.imageSlider);
-        sliderLayout.setIndicatorAnimation(IndicatorAnimations.SWAP); //set indicator animation by using 	 				SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
-        sliderLayout.setSliderTransformAnimation(SliderAnimations.FADETRANSFORMATION);
-        sliderLayout.setScrollTimeInSec(1); //set scroll delay in seconds :
 
-        setSliderViews();
+        sliderLayout.setSliderAdapter(new SliderAdapterExample(this));
+
+        sliderLayout.setIndicatorAnimation(IndicatorAnimations.SWAP); //set indicator animation by using 	  SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+        sliderLayout.setSliderTransformAnimation(SliderAnimations.DEPTHTRANSFORMATION);
+        sliderLayout.setScrollTimeInSec(2); //set scroll delay in seconds :
+        sliderLayout.startAutoCycle();
     }
-
-    private void setSliderViews() {
-
-        for (int i = 0; i <= 3; i++) {
-
-                      DefaultSliderView sliderView = new DefaultSliderView(getContext());
-
-            switch (i) {
-                case 0:
-                    sliderView.setImageUrl("https://images.pexels.com/photos/547114/pexels-photo-547114.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
-                    break;
-                case 1:
-                    sliderView.setImageUrl("https://images.pexels.com/photos/218983/pexels-photo-218983.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
-                    break;
-                case 2:
-                    sliderView.setImageUrl("https://images.pexels.com/photos/747964/pexels-photo-747964.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260");
-                    break;
-                case 3:
-                    sliderView.setImageUrl("https://images.pexels.com/photos/929778/pexels-photo-929778.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
-                    break;
-            }
-
-            sliderView.setImageScaleType(ImageView.ScaleType.CENTER_CROP);
-            sliderView.setDescription("setDescription " + (i + 1));
-            final int finalI = i;
-            sliderView.setOnSliderClickListener(new SliderView.OnSliderClickListener() {
-                @Override
-                public void onSliderClick(SliderView sliderView) {
-                    Toast.makeText(MainActivity.this, "This is slider " + (finalI + 1), Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            //at last add this view in your layout :
-            sliderLayout.addSliderView(sliderView);
-        }
-	}
-
-
