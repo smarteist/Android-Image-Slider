@@ -11,9 +11,8 @@ You can easily load images from an internet URL, drawable, or file. And there ar
 * Migrated to androidx
 
 # Demo
-![](https://github.com/smarteist/android-image-slider/blob/master/1.gif)
-![](https://github.com/smarteist/android-image-slider/blob/master/2.gif)
 ![](https://github.com/smarteist/android-image-slider/blob/master/0.gif)
+![](https://github.com/smarteist/android-image-slider/blob/master/2.gif)
 ![](https://github.com/smarteist/android-image-slider/blob/master/4.gif)
 ![](https://github.com/smarteist/android-image-slider/blob/master/7.gif)
 
