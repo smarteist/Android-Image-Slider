@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.viewpager.widget.ViewPager
+    <com.smarteist.autoimageslider.SliderPager
         android:id="@+id/vp_slider_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -13,6 +13,7 @@
         android:id="@+id/pager_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:overScrollMode="never"
         android:layout_margin="12dp"
         android:layout_gravity="center|bottom" />
 

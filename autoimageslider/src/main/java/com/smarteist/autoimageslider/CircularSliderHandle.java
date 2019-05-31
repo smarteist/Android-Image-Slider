@@ -21,7 +21,9 @@ class CircularSliderHandle implements ViewPager.OnPageChangeListener {
     @Override
     public void onPageSelected(final int position) {
         this.mCurrentPosition = position;
-        this.currentPageListener.onCurrentPageChanged(mCurrentPosition);
+        if (this.currentPageListener != null) {
+            this.currentPageListener.onCurrentPageChanged(position);
+        }
     }
 
     @Override

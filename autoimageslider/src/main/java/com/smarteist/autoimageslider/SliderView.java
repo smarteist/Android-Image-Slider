@@ -14,6 +14,8 @@ import android.widget.FrameLayout;
 
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
+import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
 import com.smarteist.autoimageslider.Transformations.AntiClockSpinTransformation;
 import com.smarteist.autoimageslider.Transformations.Clock_SpinTransformation;
 import com.smarteist.autoimageslider.Transformations.CubeInDepthTransformation;
@@ -37,17 +39,17 @@ import com.smarteist.autoimageslider.Transformations.VerticalFlipTransformation;
 import com.smarteist.autoimageslider.Transformations.VerticalShutTransformation;
 import com.smarteist.autoimageslider.Transformations.ZoomOutTransformation;
 
-public class SliderView extends FrameLayout implements CircularSliderHandle.CurrentPageListener {
+public class SliderView extends FrameLayout {
 
     private final Handler mHandler = new Handler();
-    private boolean isAutoScrolling = true;
-    private int currentPageCounter = 0;
+    private boolean isAutoCycle = true;
     private int scrollTimeInSec = 2;
+    private CircularSliderHandle mCircularSliderHandle;
     private PageIndicatorView mPagerIndicator;
     private DataSetObserver mDataSetObserver;
     private PagerAdapter mPagerAdapter;
     private Runnable mSliderRunnable;
-    private ViewPager mSliderPager;
+    private SliderPager mSliderPager;
 
 
     public SliderView(Context context) {
@@ -72,44 +74,56 @@ public class SliderView extends FrameLayout implements CircularSliderHandle.Curr
                 .inflate(R.layout.slider_view, this, true);
 
         mSliderPager = wrapperView.findViewById(R.id.vp_slider_layout);
-        CircularSliderHandle circularSliderHandle = new CircularSliderHandle(mSliderPager);
-        circularSliderHandle.setCurrentPageListener(this);
-        mSliderPager.addOnPageChangeListener(circularSliderHandle);
+        mCircularSliderHandle = new CircularSliderHandle(mSliderPager);
+        mSliderPager.addOnPageChangeListener(mCircularSliderHandle);
 
         mPagerIndicator = wrapperView.findViewById(R.id.pager_indicator);
-        mPagerIndicator.setDynamicCount(true);
+        mPagerIndicator.setViewPager(mSliderPager);
+    }
 
+    public void setOnIndicatorClickListener(DrawController.ClickListener listener) {
+        mPagerIndicator.setClickListener(listener);
+    }
+
+    public void setCurrentPageListener(CircularSliderHandle.CurrentPageListener listener) {
+        mCircularSliderHandle.setCurrentPageListener(listener);
     }
 
     public void setSliderAdapter(final PagerAdapter pagerAdapter) {
+        mPagerAdapter = pagerAdapter;
+        registerDataObserver();
+        mSliderPager.setAdapter(pagerAdapter);
+        mSliderPager.setOffscreenPageLimit(pagerAdapter.getCount() - 1);
+        //setup with indicator
+        mPagerIndicator.setCount(pagerAdapter.getCount());
+        mPagerIndicator.setDynamicCount(true);
+    }
+
+    private void registerDataObserver() {
         if (mDataSetObserver != null) {
-            pagerAdapter.unregisterDataSetObserver(mDataSetObserver);
+            mPagerAdapter.unregisterDataSetObserver(mDataSetObserver);
         }
         mDataSetObserver = new DataSetObserver() {
             @Override
             public void onChanged() {
                 super.onChanged();
-                mPagerIndicator.setCount(pagerAdapter.getCount());
+                mSliderPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
             }
         };
 
-        pagerAdapter.registerDataSetObserver(mDataSetObserver);
-        mPagerAdapter = pagerAdapter;
-        mPagerIndicator.setCount(pagerAdapter.getCount());
-        mSliderPager.setAdapter(pagerAdapter);
-
+        mPagerAdapter.registerDataSetObserver(mDataSetObserver);
     }
 
     public PagerAdapter getSliderAdapter() {
         return mPagerAdapter;
     }
 
-    public boolean isAutoScrolling() {
-        return isAutoScrolling;
+    public boolean isAutoCycle() {
+        return isAutoCycle;
     }
 
-    public void setAutoScrolling(boolean autoScrolling) {
-        this.isAutoScrolling = autoScrolling;
+    public void setAutoCycle(boolean autoCycle) {
+        this.isAutoCycle = autoCycle;
     }
 
     public int getScrollTimeInSec() {
@@ -200,10 +214,36 @@ public class SliderView extends FrameLayout implements CircularSliderHandle.Curr
         mSliderPager.setPageTransformer(false, animation);
     }
 
+    public void setSliderAnimationDuration(int duration) {
+        mSliderPager.setScrollDuration(duration);
+    }
+
+    public void setIndicatorAnimationDuration(long duration) {
+        mPagerIndicator.setAnimationDuration(duration);
+    }
+
+
+    public void setIndicatorPadding(int padding) {
+        mPagerIndicator.setPadding(padding);
+    }
+
+    public void setIndicatorOrientation(Orientation orientation) {
+        mPagerIndicator.setOrientation(orientation);
+    }
+
+    public void setCurrentPagePosition(int position) {
+
+        if (getSliderAdapter() != null) {
+            mSliderPager.setCurrentItem(position, true);
+        } else {
+            throw new NullPointerException("Adapter not set");
+        }
+    }
+
     public int getCurrentPagePosition() {
 
         if (getSliderAdapter() != null) {
-            return currentPageCounter;
+            return mSliderPager.getCurrentItem();
         } else {
             throw new NullPointerException("Adapter not set");
         }
@@ -265,15 +305,20 @@ public class SliderView extends FrameLayout implements CircularSliderHandle.Curr
 
                 try {
                     // check is on auto scroll mode
-                    if (!isAutoScrolling) {
+                    if (!isAutoCycle) {
                         return;
                     }
+
+                    int currentPosition = mSliderPager.getCurrentItem();
+
                     // if is last item return to the first position
-                    if (currentPageCounter == getSliderAdapter().getCount()) {
-                        currentPageCounter = 0;
+                    if (currentPosition == getSliderAdapter().getCount() - 1) {
+                        currentPosition = 0;
+                    } else {
+                        currentPosition++;
                     }
                     // true set for smooth transition between pager
-                    mSliderPager.setCurrentItem(currentPageCounter++, true);
+                    mSliderPager.setCurrentItem(currentPosition, true);
                 } finally {
                     mHandler.postDelayed(this, scrollTimeInSec * 1000);
                 }
@@ -309,9 +354,4 @@ public class SliderView extends FrameLayout implements CircularSliderHandle.Curr
         return this.mPagerIndicator.getUnselectedColor();
     }
 
-    @Override
-    public void onCurrentPageChanged(int currentPosition) {
-        this.mPagerIndicator.setSelected(currentPosition);
-        this.currentPageCounter = currentPosition;
-    }
 }

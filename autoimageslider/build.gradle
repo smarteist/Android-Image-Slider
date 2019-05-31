@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/smarteist'
     gitUrl = 'https://github.com/smarteist/android-image-slider.git'
 
-    libraryVersion = '1.3.0'
+    libraryVersion = '1.3.1'
     organization = 'smarteistbintray' // if you push to organization's repository.
     developerId = 'smarteist'
     developerName = 'Ali Hosseini'
@@ -33,8 +33,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 3
-        versionName "1.3"
+        versionCode 4
+        versionName "1.3.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -58,10 +58,6 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //noinspection GradleCompatible
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-
 }
 
 task copyLibs(type: Copy) {
