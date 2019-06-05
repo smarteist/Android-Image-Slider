@@ -124,6 +124,10 @@ public class SliderView extends FrameLayout {
 
     public void setAutoCycle(boolean autoCycle) {
         this.isAutoCycle = autoCycle;
+        if (!isAutoCycle && mSliderRunnable != null) {
+            mHandler.removeCallbacks(mSliderRunnable);
+            mSliderRunnable = null;
+        }
     }
 
     public int getScrollTimeInSec() {
@@ -297,6 +301,7 @@ public class SliderView extends FrameLayout {
 
         if (mSliderRunnable != null) {
             mHandler.removeCallbacks(mSliderRunnable);
+            mSliderRunnable = null;
         }
 
         mSliderRunnable = new Runnable() {
@@ -311,14 +316,14 @@ public class SliderView extends FrameLayout {
 
                     int currentPosition = mSliderPager.getCurrentItem();
 
-                    // if is last item return to the first position
                     if (currentPosition == getSliderAdapter().getCount() - 1) {
-                        currentPosition = 0;
+                        // if is last item return to the first position
+                        mSliderPager.setCurrentItem(0, true);
                     } else {
-                        currentPosition++;
+                        // continue smooth transition between pager
+                        mSliderPager.setCurrentItem(++currentPosition, true);
                     }
-                    // true set for smooth transition between pager
-                    mSliderPager.setCurrentItem(currentPosition, true);
+
                 } finally {
                     mHandler.postDelayed(this, scrollTimeInSec * 1000);
                 }
@@ -326,8 +331,8 @@ public class SliderView extends FrameLayout {
             }
         };
 
-        mSliderRunnable.run();
-
+        //Run the loop for the first time
+        mHandler.postDelayed(mSliderRunnable, scrollTimeInSec * 1000);
     }
 
     public int getSliderIndicatorRadius() {
