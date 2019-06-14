@@ -1,5 +1,6 @@
 package com.smarteist.autoimageslider;
 
+import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +22,9 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
 
     private Queue<VH> destroyedItems = new LinkedList<>();
 
+    @NonNull
     @Override
-    public final Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(@NonNull ViewGroup container, int position) {
         VH viewHolder = destroyedItems.poll();
 
         if (viewHolder != null) {
@@ -39,13 +41,13 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
     }
 
     @Override
-    public final void destroyItem(ViewGroup container, int position, Object object) {
+    public final void destroyItem(ViewGroup container, int position, @NonNull Object object) {
         container.removeView(((VH) object).itemView);
         destroyedItems.add((VH) object);
     }
 
     @Override
-    public final boolean isViewFromObject(View view, Object object) {
+    public final boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
         return ((VH) object).itemView == view;
     }
 

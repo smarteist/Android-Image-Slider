@@ -3,15 +3,12 @@ package com.smarteist.autoimageslider;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.os.Handler;
-
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
@@ -42,8 +39,8 @@ import com.smarteist.autoimageslider.Transformations.ZoomOutTransformation;
 public class SliderView extends FrameLayout {
 
     private final Handler mHandler = new Handler();
-    private boolean isAutoCycle = true;
-    private int scrollTimeInSec = 2;
+    private boolean mIsAutoCycle = true;
+    private int mScrollTimeInSec = 2;
     private CircularSliderHandle mCircularSliderHandle;
     private PageIndicatorView mPagerIndicator;
     private DataSetObserver mDataSetObserver;
@@ -119,23 +116,23 @@ public class SliderView extends FrameLayout {
     }
 
     public boolean isAutoCycle() {
-        return isAutoCycle;
+        return mIsAutoCycle;
     }
 
     public void setAutoCycle(boolean autoCycle) {
-        this.isAutoCycle = autoCycle;
-        if (!isAutoCycle && mSliderRunnable != null) {
+        this.mIsAutoCycle = autoCycle;
+        if (!mIsAutoCycle && mSliderRunnable != null) {
             mHandler.removeCallbacks(mSliderRunnable);
             mSliderRunnable = null;
         }
     }
 
     public int getScrollTimeInSec() {
-        return scrollTimeInSec;
+        return mScrollTimeInSec;
     }
 
     public void setScrollTimeInSec(int time) {
-        scrollTimeInSec = time;
+        mScrollTimeInSec = time;
     }
 
     public void setSliderTransformAnimation(SliderAnimations animation) {
@@ -310,7 +307,7 @@ public class SliderView extends FrameLayout {
 
                 try {
                     // check is on auto scroll mode
-                    if (!isAutoCycle) {
+                    if (!mIsAutoCycle) {
                         return;
                     }
 
@@ -325,14 +322,14 @@ public class SliderView extends FrameLayout {
                     }
 
                 } finally {
-                    mHandler.postDelayed(this, scrollTimeInSec * 1000);
+                    mHandler.postDelayed(this, mScrollTimeInSec * 1000);
                 }
 
             }
         };
 
         //Run the loop for the first time
-        mHandler.postDelayed(mSliderRunnable, scrollTimeInSec * 1000);
+        mHandler.postDelayed(mSliderRunnable, mScrollTimeInSec * 1000);
     }
 
     public int getSliderIndicatorRadius() {

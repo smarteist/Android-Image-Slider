@@ -6,9 +6,9 @@ class CircularSliderHandle implements ViewPager.OnPageChangeListener {
 
     private CurrentPageListener currentPageListener;
     private ViewPager mViewPager;
-    private boolean mIsEndOfCycle = false;
     private int mCurrentPosition;
     private int mPreviousPosition;
+    private boolean mIsEndOfCycle;
 
     CircularSliderHandle(final ViewPager viewPager) {
         this.mViewPager = viewPager;
@@ -29,26 +29,22 @@ class CircularSliderHandle implements ViewPager.OnPageChangeListener {
     @Override
     public void onPageScrollStateChanged(int state) {
 
-        int itemsCount = getAdapterItemsCount();
-
         if (state == ViewPager.SCROLL_STATE_IDLE) {
 
             if (mPreviousPosition == mCurrentPosition && !mIsEndOfCycle) {
 
                 if (mCurrentPosition == 0) {
-                    mViewPager.setCurrentItem(itemsCount - 1);
-                    mIsEndOfCycle = true;
-
+                    mViewPager.setCurrentItem(getAdapterItemsCount() - 1);
                 } else {
                     mViewPager.setCurrentItem(0);
-                    mIsEndOfCycle = true;
                 }
 
+                mIsEndOfCycle = true;
             } else {
                 mIsEndOfCycle = false;
             }
 
-            mPreviousPosition = mViewPager.getCurrentItem();
+            mPreviousPosition = mCurrentPosition;
         }
 
     }
