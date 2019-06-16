@@ -2,7 +2,7 @@ package com.smarteist.autoimageslider;
 
 import androidx.viewpager.widget.ViewPager;
 
-class CircularSliderHandle implements ViewPager.OnPageChangeListener {
+public class CircularSliderHandle implements ViewPager.OnPageChangeListener {
 
     private CurrentPageListener currentPageListener;
     private ViewPager mViewPager;
@@ -63,7 +63,7 @@ class CircularSliderHandle implements ViewPager.OnPageChangeListener {
                                final int positionOffsetPixels) {
     }
 
-    interface CurrentPageListener {
+    public interface CurrentPageListener {
         void onCurrentPageChanged(int currentPosition);
     }
 }

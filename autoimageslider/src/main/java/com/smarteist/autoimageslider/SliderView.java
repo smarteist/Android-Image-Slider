@@ -127,6 +127,14 @@ public class SliderView extends FrameLayout {
         }
     }
 
+    public void setCircularHandlerEnabled(boolean enable) {
+        if (enable) {
+            mSliderPager.addOnPageChangeListener(mCircularSliderHandle);
+        } else {
+            mSliderPager.clearOnPageChangeListeners();
+        }
+    }
+
     public int getScrollTimeInSec() {
         return mScrollTimeInSec;
     }
