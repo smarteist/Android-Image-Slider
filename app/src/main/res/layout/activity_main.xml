@@ -18,16 +18,19 @@
             android:layout_width="match_parent"
             android:layout_height="300dp"
             app:sliderAnimationDuration="600"
-            app:sliderIndicatorAnimationDuration="600"
-            app:sliderScrollTimeInSec="1"
-            app:sliderIndicatorMargin="15dp"
-            app:sliderIndicatorPadding="2dp"
-            app:sliderIndicatorGravity="center_horizontal|bottom"
             app:sliderAutoCycleDirection="back_and_forth"
+            app:sliderAutoCycleEnabled="true"
+            app:sliderCircularHandlerEnabled="true"
+            app:sliderIndicatorAnimationDuration="600"
+            app:sliderIndicatorGravity="center_horizontal|bottom"
+            app:sliderIndicatorMargin="15dp"
             app:sliderIndicatorOrientation="horizontal"
-            app:sliderStartAutoCycle="true"
+            app:sliderIndicatorPadding="3dp"
+            app:sliderIndicatorRadius="2dp"
+            app:sliderIndicatorSelectedColor="#5A5A5A"
             app:sliderIndicatorUnselectedColor="#FFF"
-            app:sliderIndicatorSelectedColor="#5A5A5A"/>
+            app:sliderScrollTimeInSec="1"
+            app:sliderStartAutoCycle="true" />
 
     </androidx.cardview.widget.CardView>
 

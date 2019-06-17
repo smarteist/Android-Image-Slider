@@ -54,7 +54,9 @@ public class SliderView extends FrameLayout {
     public static final int AUTO_CYCLE_DIRECTION_BACK_AND_FORTH = 2;
 
     private final Handler mHandler = new Handler();
+    private boolean mFlagBackAndForth;
     private boolean mIsAutoCycle;
+    private int mAutoCycleDirection;
     private int mScrollTimeInSec;
     private CircularSliderHandle mCircularSliderHandle;
     private PageIndicatorView mPagerIndicator;
@@ -62,9 +64,6 @@ public class SliderView extends FrameLayout {
     private PagerAdapter mPagerAdapter;
     private Runnable mSliderRunnable;
     private SliderPager mSliderPager;
-    private int mAutoCycleDirection;
-    private boolean mFlagBackAndForth;
-
 
     public SliderView(Context context) {
         super(context);
@@ -100,7 +99,7 @@ public class SliderView extends FrameLayout {
         int indicatorUnselectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorUnselectedColor, Color.parseColor(ColorAnimation.DEFAULT_UNSELECTED_COLOR));
         int indicatorSelectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorSelectedColor, Color.parseColor(ColorAnimation.DEFAULT_SELECTED_COLOR));
         int indicatorAnimationDuration = typedArray.getInt(R.styleable.SliderView_sliderIndicatorAnimationDuration, BaseAnimation.DEFAULT_ANIMATION_TIME);
-        int indicatorRtlMode = typedArray.getInt(R.styleable.PageIndicatorView_piv_rtl_mode, RtlMode.Off.ordinal());
+        int indicatorRtlMode = typedArray.getInt(R.styleable.SliderView_sliderIndicatorRtlMode, RtlMode.Off.ordinal());
         RtlMode rtlMode = getRtlMode(indicatorRtlMode);
         int sliderAnimationDuration = typedArray.getInt(R.styleable.SliderView_sliderAnimationDuration, SliderPager.DEFAULT_SCROLL_DURATION);
         int sliderScrollTimeInSec = typedArray.getInt(R.styleable.SliderView_sliderScrollTimeInSec, 2);
