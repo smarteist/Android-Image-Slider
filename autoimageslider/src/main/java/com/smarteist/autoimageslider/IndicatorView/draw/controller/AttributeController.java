@@ -6,6 +6,7 @@ import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import com.smarteist.autoimageslider.IndicatorView.utils.DensityUtils;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.*;
@@ -157,7 +158,7 @@ public class AttributeController {
         return AnimationType.NONE;
     }
 
-    private RtlMode getRtlMode(int index) {
+    public static RtlMode getRtlMode(int index) {
         switch (index) {
             case 0:
                 return RtlMode.On;
@@ -169,4 +170,5 @@ public class AttributeController {
 
         return RtlMode.Auto;
     }
+
 }
