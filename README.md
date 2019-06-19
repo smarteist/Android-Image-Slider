@@ -18,10 +18,10 @@ You can easily load images with your custom layout, And there are many kinds of 
 * Migrated to androidx
 
 # Demo
-![](https://github.com/smarteist/android-image-slider/blob/master/0.gif)
-![](https://github.com/smarteist/android-image-slider/blob/master/2.gif)
-![](https://github.com/smarteist/android-image-slider/blob/master/4.gif)
-![](https://github.com/smarteist/android-image-slider/blob/master/7.gif)
+![](https://github.com/smarteist/android-image-slider/blob/master/gif/0.gif)
+![](https://github.com/smarteist/android-image-slider/blob/master/gif/8.gif)
+![](https://github.com/smarteist/android-image-slider/blob/master/gif/4.gif)
+![](https://github.com/smarteist/android-image-slider/blob/master/gif/7.gif)
 
 # Integration guide
 
