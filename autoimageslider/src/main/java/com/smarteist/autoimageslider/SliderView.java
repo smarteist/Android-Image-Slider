@@ -153,11 +153,12 @@ public class SliderView extends FrameLayout {
 
     public void setSliderAdapter(final PagerAdapter pagerAdapter) {
         mPagerAdapter = pagerAdapter;
-        registerDataObserver();
+        //set slider adapter
+        registerAdapterDataObserver();
         mSliderPager.setAdapter(pagerAdapter);
-        mSliderPager.setOffscreenPageLimit(pagerAdapter.getCount() - 1);
+        mSliderPager.setOffscreenPageLimit(getAdapterItemsCount() - 1);
         //setup with indicator
-        mPagerIndicator.setCount(pagerAdapter.getCount());
+        mPagerIndicator.setCount(getAdapterItemsCount());
         mPagerIndicator.setDynamicCount(true);
     }
 
@@ -165,15 +166,17 @@ public class SliderView extends FrameLayout {
         return mPagerAdapter;
     }
 
-    private void registerDataObserver() {
+    private void registerAdapterDataObserver() {
+
         if (mDataSetObserver != null) {
             mPagerAdapter.unregisterDataSetObserver(mDataSetObserver);
         }
+
         mDataSetObserver = new DataSetObserver() {
             @Override
             public void onChanged() {
                 super.onChanged();
-                mSliderPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
+                mSliderPager.setOffscreenPageLimit(getAdapterItemsCount() - 1);
             }
         };
 
@@ -371,6 +374,14 @@ public class SliderView extends FrameLayout {
         }
     }
 
+    private int getAdapterItemsCount() {
+        try {
+            return getSliderAdapter().getCount();
+        } catch (NullPointerException e) {
+            return 0;
+        }
+    }
+
     public void startAutoCycle() {
 
         if (mSliderRunnable != null) {
@@ -394,7 +405,7 @@ public class SliderView extends FrameLayout {
                         if (currentPosition == 0) {
                             mFlagBackAndForth = true;
                         }
-                        if (currentPosition == getSliderAdapter().getCount() - 1) {
+                        if (currentPosition == getAdapterItemsCount() - 1) {
                             mFlagBackAndForth = false;
                         }
                         if (mFlagBackAndForth) {
@@ -404,12 +415,12 @@ public class SliderView extends FrameLayout {
                         }
                     } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
                         if (currentPosition == 0) {
-                            mSliderPager.setCurrentItem(getSliderAdapter().getCount() - 1, true);
+                            mSliderPager.setCurrentItem(getAdapterItemsCount() - 1, true);
                         } else {
                             mSliderPager.setCurrentItem(--currentPosition, true);
                         }
                     } else {
-                        if (currentPosition == getSliderAdapter().getCount() - 1) {
+                        if (currentPosition == getAdapterItemsCount() - 1) {
                             // if is last item return to the first position
                             mSliderPager.setCurrentItem(0, true);
                         } else {
