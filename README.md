@@ -1,15 +1,18 @@
 # Android image slider
-[ ![Download](https://api.bintray.com/packages/smarteistbintray/android/androidautoimageslider/images/download.svg) ](https://bintray.com/smarteistbintray/android/androidautoimageslider/_latestVersion)[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Slider-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/7693)
+[ ![Download](https://api.bintray.com/packages/smarteistbintray/android/androidautoimageslider/images/download.svg) ](https://bintray.com/smarteistbintray/android/androidautoimageslider/_latestVersion)[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Slider-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/7693)  [![Apk](https://img.shields.io/badge/download-apk-yellowgreen.svg)](https://raw.githubusercontent.com/android-arsenal/apk31/master/7693/app.apk)
 
 [![API](https://img.shields.io/badge/API-15%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=15)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 
 This is an amazing image slider for the Android .
  
-You can easily load images with your custom layout, And there are many kinds of amazing animations you can choose.
+You can easily load images with your custom layout, and there are many kinds of amazing animations you can choose.
 
+```groovy
      implementation 'com.github.smarteist:autoimageslider:1.3.2'
-
+```
 ### New Feautures 
 * Added new adapter based slider view, Provides the ability to add custom views
 * Bugs fixed
@@ -25,7 +28,7 @@ You can easily load images with your custom layout, And there are many kinds of 
 
 # Integration guide
 
-Just put the view in the layout xml like this:
+First put the slider view in your layout xml :
 
 ```xml
         <com.smarteist.autoimageslider.SliderView
@@ -48,7 +51,7 @@ Just put the view in the layout xml like this:
                     app:sliderStartAutoCycle="true" />
 ```
    
-   Or you can wrap it in a cardView :
+Or you can put it inside the cardView to look more beautiful :
    
 ```xml
        <androidx.cardview.widget.CardView
@@ -79,8 +82,9 @@ Just put the view in the layout xml like this:
        </androidx.cardview.widget.CardView>
 ```
      
+# Next step 
 
-The new version requires an adapter for the sliderView , Although its very similar to RecyclerAdapter , and it's easy for you to implement this adapter... but here is an example for adapter implementation :
+The new version requires an slider adapter plus your custom layout for slider items, Although its very similar to RecyclerView & RecyclerAdapter, and it's familiar and easy to implement this adapter... here is an example for adapter implementation :
 
 ```java	
 public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
@@ -148,18 +152,23 @@ public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample
     }
 }
 ```
-    
-First setAdapter to Sliderview
+# Set the adapter to the Sliderview
+
+After the instantiating of the sliderView (inside the activity or fragment with findViewById blah blah...), set the adapter to the slider.
 
 ```java
     sliderView.setSliderAdapter(new SliderAdapterExample(context));
 ```
 		
-Then call this method if you want the slider to start flipping automatically :
+You can call this method if you want to start flipping automatically and you can also set up the slider animation :
 
 ```java
     sliderView.startAutoCycle();
+    sliderView.setIndicatorAnimation(IndicatorAnimations.WORM);
+    sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
 ```
+
+# Elaborate more?
 
 Here is a more realistic and more complete example :
 
