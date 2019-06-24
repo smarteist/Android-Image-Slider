@@ -33,8 +33,8 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
             onBindViewHolder(viewHolder, position);
         } else {
             viewHolder = onCreateViewHolder(container);
-            onBindViewHolder(viewHolder, position);
             container.addView(viewHolder.itemView);
+            onBindViewHolder(viewHolder, position);
         }
 
         return viewHolder;
