@@ -135,9 +135,10 @@ public class SliderView extends FrameLayout {
                 .from(context)
                 .inflate(R.layout.slider_view, this, true);
 
-        mSliderPager = wrapperView.findViewById(R.id.vp_slider_layout);
         mCircularSliderHandle = new CircularSliderHandle(mSliderPager);
+        mSliderPager = wrapperView.findViewById(R.id.vp_slider_layout);
         mSliderPager.addOnPageChangeListener(mCircularSliderHandle);
+        mSliderPager.setOffscreenPageLimit(4);
 
         mPagerIndicator = wrapperView.findViewById(R.id.pager_indicator);
         mPagerIndicator.setViewPager(mSliderPager);
@@ -154,9 +155,8 @@ public class SliderView extends FrameLayout {
     public void setSliderAdapter(final PagerAdapter pagerAdapter) {
         mPagerAdapter = pagerAdapter;
         //set slider adapter
-        registerAdapterDataObserver();
+        //registerAdapterDataObserver();
         mSliderPager.setAdapter(pagerAdapter);
-        mSliderPager.setOffscreenPageLimit(getAdapterItemsCount() - 1);
         //setup with indicator
         mPagerIndicator.setCount(getAdapterItemsCount());
         mPagerIndicator.setDynamicCount(true);
@@ -193,6 +193,10 @@ public class SliderView extends FrameLayout {
             mHandler.removeCallbacks(mSliderRunnable);
             mSliderRunnable = null;
         }
+    }
+
+    public void setOffscreenPageLimit(int limit) {
+        mSliderPager.setOffscreenPageLimit(limit);
     }
 
     public void setCircularHandlerEnabled(boolean enable) {
