@@ -5,13 +5,13 @@ import androidx.viewpager.widget.ViewPager;
 public class CircularSliderHandle implements ViewPager.OnPageChangeListener {
 
     private CurrentPageListener currentPageListener;
-    private ViewPager mViewPager;
+    private SliderPager mSliderPager;
     private int mCurrentPosition;
     private int mPreviousPosition;
     private boolean mIsEndOfCycle;
 
-    CircularSliderHandle(final ViewPager viewPager) {
-        this.mViewPager = viewPager;
+    CircularSliderHandle(final SliderPager sliderPager) {
+        this.mSliderPager = sliderPager;
     }
 
     void setCurrentPageListener(CurrentPageListener currentPageListener) {
@@ -34,9 +34,9 @@ public class CircularSliderHandle implements ViewPager.OnPageChangeListener {
             if (mPreviousPosition == mCurrentPosition && !mIsEndOfCycle) {
 
                 if (mCurrentPosition == 0) {
-                    mViewPager.setCurrentItem(getAdapterItemsCount() - 1);
+                    mSliderPager.setCurrentItem(getAdapterItemsCount() - 1);
                 } else {
-                    mViewPager.setCurrentItem(0);
+                    mSliderPager.setCurrentItem(0);
                 }
 
                 mIsEndOfCycle = true;
@@ -51,7 +51,7 @@ public class CircularSliderHandle implements ViewPager.OnPageChangeListener {
 
     private int getAdapterItemsCount() {
         try {
-            return mViewPager.getAdapter().getCount();
+            return mSliderPager.getAdapter().getCount();
         } catch (NullPointerException e) {
             return 0;
         }

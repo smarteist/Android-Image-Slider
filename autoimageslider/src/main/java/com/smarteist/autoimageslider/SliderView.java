@@ -135,8 +135,8 @@ public class SliderView extends FrameLayout {
                 .from(context)
                 .inflate(R.layout.slider_view, this, true);
 
-        mCircularSliderHandle = new CircularSliderHandle(mSliderPager);
         mSliderPager = wrapperView.findViewById(R.id.vp_slider_layout);
+        mCircularSliderHandle = new CircularSliderHandle(mSliderPager);
         mSliderPager.addOnPageChangeListener(mCircularSliderHandle);
         mSliderPager.setOffscreenPageLimit(4);
 
