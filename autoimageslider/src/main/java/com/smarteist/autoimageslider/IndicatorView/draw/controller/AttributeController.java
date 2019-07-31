@@ -3,10 +3,9 @@ package com.smarteist.autoimageslider.IndicatorView.draw.controller;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
 import com.smarteist.autoimageslider.IndicatorView.utils.DensityUtils;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.*;
@@ -170,5 +169,4 @@ public class AttributeController {
 
         return RtlMode.Auto;
     }
-
 }

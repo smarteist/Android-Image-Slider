@@ -11,8 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;

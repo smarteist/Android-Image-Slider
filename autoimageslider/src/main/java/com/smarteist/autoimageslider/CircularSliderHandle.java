@@ -1,6 +1,7 @@
 package com.smarteist.autoimageslider;
 
-import androidx.viewpager.widget.ViewPager;
+
+import android.support.v4.view.ViewPager;
 
 public class CircularSliderHandle implements ViewPager.OnPageChangeListener {
 

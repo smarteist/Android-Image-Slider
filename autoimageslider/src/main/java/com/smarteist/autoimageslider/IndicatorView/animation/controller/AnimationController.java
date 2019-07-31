@@ -1,6 +1,6 @@
 package com.smarteist.autoimageslider.IndicatorView.animation.controller;
 
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.BaseAnimation;

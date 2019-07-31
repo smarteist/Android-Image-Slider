@@ -2,7 +2,7 @@ package com.smarteist.autoimageslider.IndicatorView.animation.type;
 
 import android.animation.IntEvaluator;
 import android.animation.PropertyValuesHolder;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
 
 public class ScaleDownAnimation extends ScaleAnimation {

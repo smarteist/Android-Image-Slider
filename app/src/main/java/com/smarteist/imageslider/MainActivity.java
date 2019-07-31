@@ -1,12 +1,9 @@
 package com.smarteist.imageslider;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.Gravity;
-
+import android.support.v7.app.AppCompatActivity;
 import com.smarteist.autoimageslider.IndicatorAnimations;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.SliderAnimations;
@@ -24,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         sliderView = findViewById(R.id.imageSlider);
 
         final SliderAdapterExample adapter = new SliderAdapterExample(this);
-        adapter.setCount(5);
+        adapter.setCount(3);
 
         sliderView.setSliderAdapter(adapter);
 
@@ -33,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
         sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
         sliderView.setIndicatorSelectedColor(Color.WHITE);
         sliderView.setIndicatorUnselectedColor(Color.GRAY);
-        sliderView.startAutoCycle();
+        sliderView.setScrollTimeInSec(7);
+        //sliderView.startAutoCycle();
 
         sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
             @Override
