@@ -12,6 +12,11 @@ You can easily load images with your custom layout, and there are many kinds of 
 ```groovy
      implementation 'com.github.smarteist:autoimageslider:1.3.2'
 ```
+If you are using appcompat libraries
+```groovy
+     implementation 'com.github.smarteist:autoimageslider:1.3.2-appcompat'
+```
+
 ### New Feautures 
 * Added new adapter based slider view, Provides the ability to add custom views
 * Bugs fixed
