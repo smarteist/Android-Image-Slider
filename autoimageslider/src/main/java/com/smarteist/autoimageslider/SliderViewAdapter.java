@@ -13,7 +13,7 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
 
     //Default View holder class
     public static abstract class ViewHolder {
-        final View itemView;
+        public final View itemView;
 
         public ViewHolder(View itemView) {
             this.itemView = itemView;
