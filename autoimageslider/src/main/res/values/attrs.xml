@@ -54,6 +54,10 @@
         <attr name="sliderIndicatorRadius" format="dimension" />
         <attr name="sliderIndicatorPadding" format="dimension" />
         <attr name="sliderIndicatorMargin" format="dimension" />
+        <attr name="sliderIndicatorMarginLeft" format="dimension" />
+        <attr name="sliderIndicatorMarginRight" format="dimension" />
+        <attr name="sliderIndicatorMarginTop" format="dimension" />
+        <attr name="sliderIndicatorMarginBottom" format="dimension" />
 
         <attr name="sliderIndicatorGravity">
             <flag name="bottom" value="80" />

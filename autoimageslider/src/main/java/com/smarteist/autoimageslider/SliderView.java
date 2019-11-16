@@ -95,6 +95,10 @@ public class SliderView extends FrameLayout {
         int indicatorRadius = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorRadius, DensityUtils.dpToPx(2));
         int indicatorPadding = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorPadding, DensityUtils.dpToPx(3));
         int indicatorMargin = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMargin, DensityUtils.dpToPx(12));
+        int indicatorMarginLeft = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginLeft, DensityUtils.dpToPx(12));
+        int indicatorMarginTop = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginTop, DensityUtils.dpToPx(12));
+        int indicatorMarginRight = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginRight, DensityUtils.dpToPx(12));
+        int indicatorMarginBottom = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginBottom, DensityUtils.dpToPx(12));
         int indicatorGravity = typedArray.getInt(R.styleable.SliderView_sliderIndicatorGravity, Gravity.CENTER | Gravity.BOTTOM);
         int indicatorUnselectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorUnselectedColor, Color.parseColor(ColorAnimation.DEFAULT_UNSELECTED_COLOR));
         int indicatorSelectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorSelectedColor, Color.parseColor(ColorAnimation.DEFAULT_SELECTED_COLOR));
@@ -112,6 +116,9 @@ public class SliderView extends FrameLayout {
         setIndicatorRadius(indicatorRadius);
         setIndicatorPadding(indicatorPadding);
         setIndicatorMargin(indicatorMargin);
+        if(R.styleable.SliderView_sliderIndicatorMargin == null){
+            setIndicatorMarginCustom(indicatorMarginLeft,indicatorMarginTop,indicatorMarginRight,indicatorMarginBottom);
+        }
         setIndicatorGravity(indicatorGravity);
         setIndicatorUnselectedColor(indicatorUnselectedColor);
         setIndicatorSelectedColor(indicatorSelectedColor);
@@ -468,6 +475,12 @@ public class SliderView extends FrameLayout {
     public void setIndicatorMargin(int margin) {
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(margin, margin, margin, margin);
+        mPagerIndicator.setLayoutParams(layoutParams);
+    }
+    
+    public void setIndicatorMarginCustom(int left,int top,int right,int bottom) {
+        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        layoutParams.setMargins(left, top, right, bottom);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
 
