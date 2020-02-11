@@ -8,25 +8,35 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.manager.RequestManagerRetriever;
 import com.smarteist.autoimageslider.SliderViewAdapter;
+import com.smarteist.imageslider.Model.SliderItem;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SliderAdapterExample extends
         SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
 
     private Context context;
-    private int mCount;
+    private List<SliderItem> mSliderItems = new ArrayList<>();
 
     public SliderAdapterExample(Context context) {
         this.context = context;
     }
 
-    public void setCount(int count) {
-        this.mCount = count;
+    public void renewItems(List<SliderItem> sliderItems) {
+        this.mSliderItems = sliderItems;
+        notifyDataSetChanged();
+    }
+
+    public void deleteItem(int position) {
+        this.mSliderItems.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public void addItem(SliderItem sliderItem) {
+        this.mSliderItems.add(sliderItem);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -38,6 +48,15 @@ public class SliderAdapterExample extends
     @Override
     public void onBindViewHolder(SliderAdapterVH viewHolder, final int position) {
 
+        SliderItem sliderItem = mSliderItems.get(position);
+
+        viewHolder.textViewDescription.setText(sliderItem.getDescription());
+        viewHolder.textViewDescription.setTextSize(16);
+        viewHolder.textViewDescription.setTextColor(Color.WHITE);
+        Glide.with(viewHolder.itemView)
+                .load(sliderItem.getImageUrl())
+                .fitCenter()
+                .into(viewHolder.imageViewBackground);
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,62 +64,12 @@ public class SliderAdapterExample extends
                 Toast.makeText(context, "This is item in position " + position, Toast.LENGTH_SHORT).show();
             }
         });
-
-
-        switch (position) {
-            case 0:
-                viewHolder.textViewDescription.setText("This is slider item " + position);
-                viewHolder.textViewDescription.setTextSize(16);
-                viewHolder.textViewDescription.setTextColor(Color.WHITE);
-                viewHolder.imageGifContainer.setVisibility(View.GONE);
-                Glide.with(viewHolder.itemView)
-                        .load("https://images.pexels.com/photos/218983/pexels-photo-218983.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
-                        .fitCenter()
-                        .into(viewHolder.imageViewBackground);
-                break;
-            case 2:
-                viewHolder.textViewDescription.setText("This is slider item " + position);
-                viewHolder.textViewDescription.setTextSize(16);
-                viewHolder.textViewDescription.setTextColor(Color.WHITE);
-                viewHolder.imageGifContainer.setVisibility(View.GONE);
-                Glide.with(viewHolder.itemView)
-                        .load("https://images.pexels.com/photos/747964/pexels-photo-747964.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260")
-                        .fitCenter()
-                        .into(viewHolder.imageViewBackground);
-                break;
-            case 4:
-                viewHolder.textViewDescription.setText("This is slider item " + position);
-                viewHolder.textViewDescription.setTextSize(16);
-                viewHolder.textViewDescription.setTextColor(Color.WHITE);
-                viewHolder.imageGifContainer.setVisibility(View.GONE);
-                Glide.with(viewHolder.itemView)
-                        .load("https://images.pexels.com/photos/929778/pexels-photo-929778.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
-                        .fitCenter()
-                        .into(viewHolder.imageViewBackground);
-                break;
-            default:
-                viewHolder.textViewDescription.setTextSize(29);
-                viewHolder.textViewDescription.setTextColor(Color.WHITE);
-                viewHolder.textViewDescription.setText("Ohhhh! look at this!");
-                viewHolder.imageGifContainer.setVisibility(View.VISIBLE);
-                Glide.with(viewHolder.itemView)
-                        .load(R.drawable.puma_offer)
-                        .fitCenter()
-                        .into(viewHolder.imageViewBackground);
-                Glide.with(viewHolder.itemView)
-                        .asGif()
-                        .load(R.drawable.oh_look_at_this)
-                        .into(viewHolder.imageGifContainer);
-                break;
-
-        }
-
     }
 
     @Override
     public int getCount() {
         //slider view count could be dynamic size
-        return mCount;
+        return mSliderItems.size();
     }
 
     class SliderAdapterVH extends SliderViewAdapter.ViewHolder {
@@ -118,6 +87,5 @@ public class SliderAdapterExample extends
             this.itemView = itemView;
         }
     }
-
 
 }

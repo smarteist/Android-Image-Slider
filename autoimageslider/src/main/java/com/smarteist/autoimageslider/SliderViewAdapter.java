@@ -51,6 +51,11 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
         return ((VH) object).itemView == view;
     }
 
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
+
     /**
      * Create a new view holder
      * @param parent wrapper view

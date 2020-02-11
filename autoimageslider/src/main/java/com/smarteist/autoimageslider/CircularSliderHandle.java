@@ -10,11 +10,11 @@ public class CircularSliderHandle implements ViewPager.OnPageChangeListener {
     private int mPreviousPosition;
     private boolean mIsEndOfCycle;
 
-    CircularSliderHandle(final SliderPager sliderPager) {
+    public CircularSliderHandle(final SliderPager sliderPager) {
         this.mSliderPager = sliderPager;
     }
 
-    void setCurrentPageListener(CurrentPageListener currentPageListener) {
+    public void setCurrentPageListener(CurrentPageListener currentPageListener) {
         this.currentPageListener = currentPageListener;
     }
 
@@ -34,9 +34,9 @@ public class CircularSliderHandle implements ViewPager.OnPageChangeListener {
             if (mPreviousPosition == mCurrentPosition && !mIsEndOfCycle) {
 
                 if (mCurrentPosition == 0) {
-                    mSliderPager.setCurrentItem(getAdapterItemsCount() - 1);
+                    mSliderPager.setCurrentItem(getAdapterItemsCount() - 1, true);
                 } else {
-                    mSliderPager.setCurrentItem(0);
+                    mSliderPager.setCurrentItem(0, true);
                 }
 
                 mIsEndOfCycle = true;
@@ -57,9 +57,9 @@ public class CircularSliderHandle implements ViewPager.OnPageChangeListener {
         }
     }
 
-
     @Override
-    public void onPageScrolled(final int position, final float positionOffset,
+    public void onPageScrolled(final int position,
+                               final float positionOffset,
                                final int positionOffsetPixels) {
     }
 

@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cv_slider_mainActivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -19,7 +20,7 @@
             android:layout_height="300dp"
             app:sliderAnimationDuration="600"
             app:sliderAutoCycleDirection="back_and_forth"
-            app:sliderAutoCycleEnabled="true"
+            app:sliderAutoCycleEnabled="false"
             app:sliderCircularHandlerEnabled="true"
             app:sliderIndicatorAnimationDuration="600"
             app:sliderIndicatorGravity="center_horizontal|bottom"
@@ -33,5 +34,32 @@
             app:sliderStartAutoCycle="true" />
 
     </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cv_slider_mainActivity"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="addNewItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add An Item" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="removeLastItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rmove Last Item" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="renewItems"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Renew Items" />
+
+    </LinearLayout>
 
 </android.widget.RelativeLayout>
