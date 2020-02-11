@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -343,6 +344,15 @@ public class SliderView extends FrameLayout implements Runnable {
      */
     public void setSliderAnimationDuration(int duration) {
         mSliderPager.setScrollDuration(duration);
+    }
+
+    /**
+     * @param duration changes slider animation duration.
+     * @param interpolator its animation duration accelerator
+     *                     An interpolator defines the rate of change of an animation
+     */
+    public void setSliderAnimationDuration(int duration, Interpolator interpolator) {
+        mSliderPager.setScrollDuration(duration , interpolator);
     }
 
     /**

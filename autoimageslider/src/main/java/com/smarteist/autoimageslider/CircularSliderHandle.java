@@ -34,9 +34,9 @@ public class CircularSliderHandle implements ViewPager.OnPageChangeListener {
             if (mPreviousPosition == mCurrentPosition && !mIsEndOfCycle) {
 
                 if (mCurrentPosition == 0) {
-                    mSliderPager.setCurrentItem(getAdapterItemsCount() - 1);
+                    mSliderPager.setCurrentItem(getAdapterItemsCount() - 1, true);
                 } else {
-                    mSliderPager.setCurrentItem(0);
+                    mSliderPager.setCurrentItem(0, true);
                 }
 
                 mIsEndOfCycle = true;
