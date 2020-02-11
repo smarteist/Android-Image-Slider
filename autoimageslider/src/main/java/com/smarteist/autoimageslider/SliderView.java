@@ -576,7 +576,7 @@ public class SliderView extends FrameLayout implements Runnable {
 
     /**
      * This method handles sliding behaviors
-     * which passed into {@link this.mHandler}
+     * which passed into {@link SliderView#mHandler}
      *
      * @see {@link SliderView#startAutoCycle()}
      */
