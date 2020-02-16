@@ -12,6 +12,7 @@ import com.smarteist.autoimageslider.SliderViewAdapter;
 
 public class InfinitePagerAdapter extends PagerAdapter {
 
+    // Warning: it should be an even number.
     public static final int INFINITE_SCROLL_LIMIT = 32400;
     private static final String TAG = "InfinitePagerAdapter";
 
@@ -28,7 +29,7 @@ public class InfinitePagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        if (getRealAdapter().getCount() < 1) {
+        if (getRealCount() < 1) {
             return 0;
         }
         // warning: infinite scroller actually is not infinite!
@@ -40,7 +41,13 @@ public class InfinitePagerAdapter extends PagerAdapter {
      * @return the {@link #getCount()} result of the wrapped adapter
      */
     public int getRealCount() {
-        return adapter.getCount();
+        int count;
+        try {
+            count = getRealAdapter().getCount();
+        } catch (Exception e) {
+            count = 0;
+        }
+        return count;
     }
 
     @NonNull
