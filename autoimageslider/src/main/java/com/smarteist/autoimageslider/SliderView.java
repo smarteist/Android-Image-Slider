@@ -1,5 +1,6 @@
 package com.smarteist.autoimageslider;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -8,13 +9,13 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
@@ -24,6 +25,7 @@ import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawControlle
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.RtlMode;
 import com.smarteist.autoimageslider.IndicatorView.utils.DensityUtils;
+import com.smarteist.autoimageslider.InfiniteAdapter.InfinitePagerAdapter;
 import com.smarteist.autoimageslider.Transformations.AntiClockSpinTransformation;
 import com.smarteist.autoimageslider.Transformations.Clock_SpinTransformation;
 import com.smarteist.autoimageslider.Transformations.CubeInDepthTransformation;
@@ -49,7 +51,9 @@ import com.smarteist.autoimageslider.Transformations.ZoomOutTransformation;
 
 import static com.smarteist.autoimageslider.IndicatorView.draw.controller.AttributeController.getRtlMode;
 
-public class SliderView extends FrameLayout implements Runnable {
+public class SliderView extends FrameLayout
+        implements Runnable, View.OnTouchListener,
+        SliderViewAdapter.DataSetListener, SliderPager.OnPageChangeListener {
 
     public static final int AUTO_CYCLE_DIRECTION_RIGHT = 0;
     public static final int AUTO_CYCLE_DIRECTION_LEFT = 1;
@@ -60,11 +64,13 @@ public class SliderView extends FrameLayout implements Runnable {
     private boolean mFlagBackAndForth;
     private boolean mIsAutoCycle;
     private int mAutoCycleDirection;
-    private int mScrollTimeInSec;
-    private CircularSliderHandle mEndlessSliderHandle;
+    private int mScrollTimeInMillis;
     private PageIndicatorView mPagerIndicator;
-    private PagerAdapter mPagerAdapter;
+    private SliderViewAdapter mPagerAdapter;
     private SliderPager mSliderPager;
+    private InfinitePagerAdapter mInfinitePagerAdapter;
+    private boolean mPausedSliding = false;
+    private OnSliderPageListener mPageListener;
 
     /*Constructor*/
     public SliderView(Context context) {
@@ -116,7 +122,6 @@ public class SliderView extends FrameLayout implements Runnable {
         RtlMode rtlMode = getRtlMode(indicatorRtlMode);
         int sliderAnimationDuration = typedArray.getInt(R.styleable.SliderView_sliderAnimationDuration, SliderPager.DEFAULT_SCROLL_DURATION);
         int sliderScrollTimeInSec = typedArray.getInt(R.styleable.SliderView_sliderScrollTimeInSec, 2);
-        boolean sliderCircularHandlerEnabled = typedArray.getBoolean(R.styleable.SliderView_sliderCircularHandlerEnabled, true);
         boolean sliderAutoCycleEnabled = typedArray.getBoolean(R.styleable.SliderView_sliderAutoCycleEnabled, true);
         boolean sliderStartAutoCycle = typedArray.getBoolean(R.styleable.SliderView_sliderStartAutoCycle, false);
         int sliderAutoCycleDirection = typedArray.getInt(R.styleable.SliderView_sliderAutoCycleDirection, AUTO_CYCLE_DIRECTION_RIGHT);
@@ -133,12 +138,9 @@ public class SliderView extends FrameLayout implements Runnable {
         setIndicatorRtlMode(rtlMode);
         setSliderAnimationDuration(sliderAnimationDuration);
         setScrollTimeInSec(sliderScrollTimeInSec);
-        setCircularHandlerEnabled(sliderCircularHandlerEnabled);
         setAutoCycle(sliderAutoCycleEnabled);
         setAutoCycleDirection(sliderAutoCycleDirection);
-        if (sliderStartAutoCycle) {
-            startAutoCycle();
-        }
+        setAutoCycle(sliderStartAutoCycle);
 
         typedArray.recycle();
     }
@@ -149,6 +151,7 @@ public class SliderView extends FrameLayout implements Runnable {
      *
      * @param context its android main context which is needed.
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void setupSlideView(Context context) {
 
         View wrapperView = LayoutInflater
@@ -156,12 +159,13 @@ public class SliderView extends FrameLayout implements Runnable {
                 .inflate(R.layout.slider_view, this, true);
 
         mSliderPager = wrapperView.findViewById(R.id.vp_slider_layout);
-        mEndlessSliderHandle = new CircularSliderHandle(mSliderPager);
-        mSliderPager.addOnPageChangeListener(mEndlessSliderHandle);
-        mSliderPager.setOffscreenPageLimit(3);
+        mSliderPager.setOnTouchListener(this);
+        mSliderPager.addOnPageChangeListener(this);
 
         mPagerIndicator = wrapperView.findViewById(R.id.pager_indicator);
         mPagerIndicator.setViewPager(mSliderPager);
+
+
     }
 
     /**
@@ -174,19 +178,21 @@ public class SliderView extends FrameLayout implements Runnable {
     /**
      * @param listener is a callback of current item in sliderView.
      */
-    public void setCurrentPageListener(CircularSliderHandle.CurrentPageListener listener) {
-        mEndlessSliderHandle.setCurrentPageListener(listener);
+    public void setCurrentPageListener(OnSliderPageListener listener) {
+        this.mPageListener = listener;
     }
 
     /**
      * @param pagerAdapter Set a SliderAdapter that will supply views
      *                     for this slider as needed.
      */
-    public void setSliderAdapter(final PagerAdapter pagerAdapter) {
+    public void setSliderAdapter(final SliderViewAdapter pagerAdapter) {
         mPagerAdapter = pagerAdapter;
         //set slider adapter
+        mInfinitePagerAdapter = new InfinitePagerAdapter(pagerAdapter);
         //registerAdapterDataObserver();
-        mSliderPager.setAdapter(pagerAdapter);
+        mSliderPager.setAdapter(mInfinitePagerAdapter);
+        mPagerAdapter.dataSetChangedListener(this);
         //setup with indicator
         mPagerIndicator.setCount(getAdapterItemsCount());
         mPagerIndicator.setDynamicCount(true);
@@ -215,11 +221,6 @@ public class SliderView extends FrameLayout implements Runnable {
 
     public void setAutoCycle(boolean autoCycle) {
         this.mIsAutoCycle = autoCycle;
-        if (mIsAutoCycle) {
-            startAutoCycle();
-        } else {
-            mHandler.removeCallbacks(this);
-        }
     }
 
     /**
@@ -232,27 +233,25 @@ public class SliderView extends FrameLayout implements Runnable {
     }
 
     /**
-     * @param enable circular endless scrolling in slider.
-     */
-    public void setCircularHandlerEnabled(boolean enable) {
-        mSliderPager.clearOnPageChangeListeners();
-        if (enable) {
-            mSliderPager.addOnPageChangeListener(mEndlessSliderHandle);
-        }
-    }
-
-    /**
      * @return sliding delay in seconds.
      */
     public int getScrollTimeInSec() {
-        return mScrollTimeInSec;
+        return mScrollTimeInMillis * 1000;
     }
 
     /**
      * @param time of sliding delay in seconds.
      */
     public void setScrollTimeInSec(int time) {
-        mScrollTimeInSec = time;
+        mScrollTimeInMillis = time * 1000;
+    }
+
+    public int getScrollTimeInMillis() {
+        return mScrollTimeInMillis;
+    }
+
+    public void setScrollTimeInMillis(int millis) {
+        this.mScrollTimeInMillis = millis;
     }
 
     /**
@@ -331,11 +330,21 @@ public class SliderView extends FrameLayout implements Runnable {
 
     }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            mPausedSliding = true;
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            mPausedSliding = false;
+        }
+        return false;
+    }
+
     /**
      * @param animation set slider animation manually .
-     *                  it accepts {@link ViewPager.PageTransformer} animation classes.
+     *                  it accepts {@link SliderPager.PageTransformer} animation classes.
      */
-    public void setCustomSliderTransformAnimation(ViewPager.PageTransformer animation) {
+    public void setCustomSliderTransformAnimation(SliderPager.PageTransformer animation) {
         mSliderPager.setPageTransformer(false, animation);
     }
 
@@ -347,12 +356,12 @@ public class SliderView extends FrameLayout implements Runnable {
     }
 
     /**
-     * @param duration changes slider animation duration.
+     * @param duration     changes slider animation duration.
      * @param interpolator its animation duration accelerator
      *                     An interpolator defines the rate of change of an animation
      */
     public void setSliderAnimationDuration(int duration, Interpolator interpolator) {
-        mSliderPager.setScrollDuration(duration , interpolator);
+        mSliderPager.setScrollDuration(duration, interpolator);
     }
 
     /**
@@ -374,7 +383,7 @@ public class SliderView extends FrameLayout implements Runnable {
     public int getCurrentPagePosition() {
 
         if (getSliderAdapter() != null) {
-            return mSliderPager.getCurrentItem();
+            return getSliderPager().getCurrentItem() % mPagerAdapter.getCount();
         } else {
             throw new NullPointerException("Adapter not set");
         }
@@ -488,14 +497,22 @@ public class SliderView extends FrameLayout implements Runnable {
     }
 
     /**
-     * This method stars auto cycling
+     * This method stars the auto cycling
      */
     public void startAutoCycle() {
-
+        //clean previous callbacks
         mHandler.removeCallbacks(this);
 
         //Run the loop for the first time
-        mHandler.postDelayed(this, mScrollTimeInSec * 1000);
+        mHandler.postDelayed(this, mScrollTimeInMillis);
+    }
+
+    /**
+     * This method cancels the auto cycling
+     */
+    public void stopAutoCycle() {
+        //clean callback
+        mHandler.removeCallbacks(this);
     }
 
     /**
@@ -582,47 +599,73 @@ public class SliderView extends FrameLayout implements Runnable {
      */
     @Override
     public void run() {
-
         try {
-            // check is on auto scroll mode
-            if (!mIsAutoCycle) {
-                mHandler.removeCallbacks(this);
-                return;
+            if (!mPausedSliding) {
+                // slide to next if not paused
+                slideToNextPosition();
             }
-
-            int currentPosition = mSliderPager.getCurrentItem();
-
-            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH) {
-                if (currentPosition == 0) {
-                    mFlagBackAndForth = true;
-                }
-                if (currentPosition == getAdapterItemsCount() - 1) {
-                    mFlagBackAndForth = false;
-                }
-                if (mFlagBackAndForth) {
-                    mSliderPager.setCurrentItem(++currentPosition, true);
-                } else {
-                    mSliderPager.setCurrentItem(--currentPosition, true);
-                }
-            } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-                if (currentPosition == 0) {
-                    mSliderPager.setCurrentItem(getAdapterItemsCount() - 1, true);
-                } else {
-                    mSliderPager.setCurrentItem(--currentPosition, true);
-                }
-            } else {
-                if (currentPosition == getAdapterItemsCount() - 1) {
-                    // if is last item return to the first position
-                    mSliderPager.setCurrentItem(0, true);
-                } else {
-                    // continue smooth transition between pager
-                    mSliderPager.setCurrentItem(++currentPosition, true);
-                }
-            }
-
-
         } finally {
-            mHandler.postDelayed(this, mScrollTimeInSec * 1000);
+            if (mIsAutoCycle) {
+                // continue the loop
+                mHandler.postDelayed(this, mScrollTimeInMillis);
+            }
         }
+    }
+
+    public void slideToNextPosition() {
+
+        int currentPosition = mSliderPager.getCurrentItem();
+        int adapterItemsCount = getAdapterItemsCount();
+
+        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 0) {
+            if (currentPosition % (adapterItemsCount - 1) == 0) {
+                mFlagBackAndForth = !mFlagBackAndForth;
+            }
+            if (mFlagBackAndForth) {
+                mSliderPager.setCurrentItem(++currentPosition, true);
+            } else {
+                mSliderPager.setCurrentItem(--currentPosition, true);
+            }
+        } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
+            mSliderPager.setCurrentItem(--currentPosition, true);
+        } else {
+            mSliderPager.setCurrentItem(++currentPosition, true);
+        }
+    }
+
+    //sync infinite pager adapter with real one
+    @Override
+    public void dataSetChanged() {
+        mInfinitePagerAdapter.notifyDataSetChanged();
+        mSliderPager.setCurrentItem((getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2), false);
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        // nothing to do
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if (mPageListener != null) {
+            mPageListener.onSliderPageChanged(position);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        // nothing to do
+    }
+
+    public interface OnSliderPageListener {
+
+        /**
+         * This method will be invoked when a new page becomes selected. Animation is not
+         * necessarily complete.
+         *
+         * @param position Position index of the new selected page.
+         */
+        void onSliderPageChanged(int position);
+
     }
 }

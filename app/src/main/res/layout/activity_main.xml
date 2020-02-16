@@ -20,8 +20,6 @@
             android:layout_height="300dp"
             app:sliderAnimationDuration="600"
             app:sliderAutoCycleDirection="back_and_forth"
-            app:sliderAutoCycleEnabled="false"
-            app:sliderCircularHandlerEnabled="true"
             app:sliderIndicatorAnimationDuration="600"
             app:sliderIndicatorGravity="center_horizontal|bottom"
             app:sliderIndicatorMargin="15dp"
@@ -30,8 +28,7 @@
             app:sliderIndicatorRadius="2dp"
             app:sliderIndicatorSelectedColor="#5A5A5A"
             app:sliderIndicatorUnselectedColor="#FFF"
-            app:sliderScrollTimeInSec="1"
-            app:sliderStartAutoCycle="true" />
+            app:sliderScrollTimeInSec="1" />
 
     </androidx.cardview.widget.CardView>
 
@@ -42,19 +39,19 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.AppCompatButton
+        <Button
             android:onClick="addNewItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add An Item" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <Button
             android:onClick="removeLastItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Rmove Last Item" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <Button
             android:onClick="renewItems"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

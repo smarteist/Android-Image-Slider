@@ -1,10 +1,10 @@
 package com.smarteist.autoimageslider.Transformations;
 
-import androidx.viewpager.widget.ViewPager;
+import com.smarteist.autoimageslider.SliderPager;
 
 import android.view.View;
 
-public class Clock_SpinTransformation implements ViewPager.PageTransformer {
+public class Clock_SpinTransformation implements SliderPager.PageTransformer {
     @Override
     public void transformPage(View page, float position) {
 
