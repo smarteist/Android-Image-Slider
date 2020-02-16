@@ -12,7 +12,7 @@ import com.smarteist.autoimageslider.SliderViewAdapter;
 
 public class InfinitePagerAdapter extends PagerAdapter {
 
-    public static final int INFINITE_SCROLL_LIMIT = 40000;
+    public static final int INFINITE_SCROLL_LIMIT = 32400;
     private static final String TAG = "InfinitePagerAdapter";
 
     private SliderViewAdapter adapter;

@@ -342,7 +342,7 @@ public class SliderView extends FrameLayout
 
     /**
      * @param animation set slider animation manually .
-     *                  it accepts {@link SliderPager.PageTransformer} animation classes.
+     *                  it accepts {@link ##PageTransformer} animation classes.
      */
     public void setCustomSliderTransformAnimation(SliderPager.PageTransformer animation) {
         mSliderPager.setPageTransformer(false, animation);
@@ -397,7 +397,7 @@ public class SliderView extends FrameLayout
     }
 
     /**
-     * @param gravity {@link View} integer gravity of indicator dots.
+     * @param gravity {@link #View} integer gravity of indicator dots.
      */
     public void setIndicatorGravity(int gravity) {
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
@@ -434,7 +434,7 @@ public class SliderView extends FrameLayout
     }
 
     /**
-     * @param animations {@link IndicatorAnimations} of indicator dots
+     * @param animations {@link #SliderView#IndicatorAnimations} of indicator dots
      */
     public void setIndicatorAnimation(IndicatorAnimations animations) {
 
@@ -484,7 +484,7 @@ public class SliderView extends FrameLayout
     }
 
     /**
-     * @return number of items in {@link SliderViewAdapter}
+     * @return number of items in {@link #SliderView#SliderViewAdapter)}
      */
     private int getAdapterItemsCount() {
         try {
@@ -517,7 +517,7 @@ public class SliderView extends FrameLayout
 
     /**
      * This method setting direction of sliders auto cycling
-     * accepts constant values defined in {@link SliderView} class
+     * accepts constant values defined in {@link #SliderView} class
      * {@value AUTO_CYCLE_DIRECTION_LEFT}
      * {@value AUTO_CYCLE_DIRECTION_RIGHT}
      * {@value AUTO_CYCLE_DIRECTION_BACK_AND_FORTH}
@@ -593,9 +593,9 @@ public class SliderView extends FrameLayout
 
     /**
      * This method handles sliding behaviors
-     * which passed into {@link SliderView#mHandler}
+     * which passed into {@link #SliderView#mHandler}
      *
-     * @see {@link SliderView#startAutoCycle()}
+     * see {@link #SliderView#startAutoCycle()}
      */
     @Override
     public void run() {
@@ -617,7 +617,7 @@ public class SliderView extends FrameLayout
         int currentPosition = mSliderPager.getCurrentItem();
         int adapterItemsCount = getAdapterItemsCount();
 
-        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 0) {
+        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 1) {
             if (currentPosition % (adapterItemsCount - 1) == 0) {
                 mFlagBackAndForth = !mFlagBackAndForth;
             }

@@ -264,9 +264,9 @@ public class SliderPager extends ViewGroup {
     }
 
     /**
-     * Simple implementation of the {@link OnPageChangeListener} interface with stub
+     * Simple implementation of the {@link ##OnPageChangeListener} interface with stub
      * implementations of each method. Extend this if you do not intend to override
-     * every method of {@link OnPageChangeListener}.
+     * every method of {@link ##OnPageChangeListener}.
      */
     public static class SimpleOnPageChangeListener implements OnPageChangeListener {
         @Override
@@ -326,10 +326,10 @@ public class SliderPager extends ViewGroup {
      * pager.
      *
      * <p>Views marked with this annotation can be added to the view pager with a layout resource.
-     * An example being {@link PagerTitleStrip}.</p>
+     * An example being {@link ##PagerTitleStrip}.</p>
      *
      * <p>You can also control whether a view is a decor view but setting
-     * {@link LayoutParams#isDecor} on the child's layout params.</p>
+     * {@link ##LayoutParams#isDecor} on the child's layout params.</p>
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
@@ -662,7 +662,7 @@ public class SliderPager extends ViewGroup {
 
     /**
      * Set a listener that will be invoked whenever the page changes or is incrementally
-     * scrolled. See {@link OnPageChangeListener}.
+     * scrolled. See {@link ##OnPageChangeListener}.
      *
      * @param listener Listener to set
      * @deprecated Use {@link #addOnPageChangeListener(OnPageChangeListener)}
@@ -675,7 +675,7 @@ public class SliderPager extends ViewGroup {
 
     /**
      * Add a listener that will be invoked whenever the page changes or is incrementally
-     * scrolled. See {@link OnPageChangeListener}.
+     * scrolled. See {@link ##OnPageChangeListener}.
      *
      * <p>Components that add a listener should take care to remove it when finished.
      * Other components that take ownership of a view may call {@link #clearOnPageChangeListeners()}
@@ -712,17 +712,17 @@ public class SliderPager extends ViewGroup {
     }
 
     /**
-     * Sets a {@link PageTransformer} that will be called for each attached page whenever
+     * Sets a {@link ##PageTransformer} that will be called for each attached page whenever
      * the scroll position is changed. This allows the application to apply custom property
      * transformations to each page, overriding the default sliding behavior.
      *
      * <p><em>Note:</em> By default, calling this method will cause contained pages to use
-     * {@link View#LAYER_TYPE_HARDWARE}. This layer type allows custom alpha transformations,
-     * but it will cause issues if any of your pages contain a {@link android.view.SurfaceView}
-     * and you have not called {@link android.view.SurfaceView#setZOrderOnTop(boolean)} to put that
-     * {@link android.view.SurfaceView} above your app content. To disable this behavior, call
+     * {@link #View#LAYER_TYPE_HARDWARE}. This layer type allows custom alpha transformations,
+     * but it will cause issues if any of your pages contain a {@link ##android.view.SurfaceView}
+     * and you have not called {@link ##android.view.SurfaceView#setZOrderOnTop(boolean)} to put that
+     * {@link ##android.view.SurfaceView} above your app content. To disable this behavior, call
      * {@link #setPageTransformer(boolean, PageTransformer, int)} and pass
-     * {@link View#LAYER_TYPE_NONE} for {@code pageLayerType}.</p>
+     * {@link #View#LAYER_TYPE_NONE} for {@code pageLayerType}.</p>
      *
      * @param reverseDrawingOrder true if the supplied PageTransformer requires page views
      *                            to be drawn from last to first instead of first to last.
@@ -734,7 +734,7 @@ public class SliderPager extends ViewGroup {
     }
 
     /**
-     * Sets a {@link PageTransformer} that will be called for each attached page whenever
+     * Sets a {@link ##PageTransformer} that will be called for each attached page whenever
      * the scroll position is changed. This allows the application to apply custom property
      * transformations to each page, overriding the default sliding behavior.
      *
@@ -742,9 +742,9 @@ public class SliderPager extends ViewGroup {
      *                            to be drawn from last to first instead of first to last.
      * @param transformer         PageTransformer that will modify each page's animation properties
      * @param pageLayerType       View layer type that should be used for SliderPager pages. It should be
-     *                            either {@link View#LAYER_TYPE_HARDWARE},
-     *                            {@link View#LAYER_TYPE_SOFTWARE}, or
-     *                            {@link View#LAYER_TYPE_NONE}.
+     *                            either {@link #View#LAYER_TYPE_HARDWARE},
+     *                            {@link #View#LAYER_TYPE_SOFTWARE}, or
+     *                            {@link #View#LAYER_TYPE_NONE}.
      */
     public void setPageTransformer(boolean reverseDrawingOrder,
                                    @Nullable PageTransformer transformer, int pageLayerType) {
@@ -908,7 +908,7 @@ public class SliderPager extends ViewGroup {
     }
 
     /**
-     * Like {@link View#scrollBy}, but scroll smoothly instead of immediately.
+     * Like {@link #View#scrollBy}, but scroll smoothly instead of immediately.
      *
      * @param x the number of pixels to scroll by on the X axis
      * @param y the number of pixels to scroll by on the Y axis
@@ -918,7 +918,7 @@ public class SliderPager extends ViewGroup {
     }
 
     /**
-     * Like {@link View#scrollBy}, but scroll smoothly instead of immediately.
+     * Like {@link #View#scrollBy}, but scroll smoothly instead of immediately.
      *
      * @param x        the number of pixels to scroll by on the X axis
      * @param y        the number of pixels to scroll by on the Y axis
@@ -2785,7 +2785,7 @@ public class SliderPager extends ViewGroup {
      * Handle scrolling in response to a left or right arrow click.
      *
      * @param direction The direction corresponding to the arrow key that was pressed. It should be
-     *                  either {@link View#FOCUS_LEFT} or {@link View#FOCUS_RIGHT}.
+     *                  either {@link #View#FOCUS_LEFT} or {@link #View#FOCUS_RIGHT}.
      * @return Whether the scrolling was handled successfully.
      */
     public boolean arrowScroll(int direction) {
@@ -3139,7 +3139,7 @@ public class SliderPager extends ViewGroup {
         /**
          * Gravity setting for use on decor views only:
          * Where to position the view page within the overall SliderPager
-         * container; constants are defined in {@link Gravity}.
+         * container; constants are defined in {@link ##Gravity}.
          */
         public int gravity;
 
