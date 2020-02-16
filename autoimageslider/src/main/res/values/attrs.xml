@@ -88,8 +88,6 @@
         </attr>
 
         <attr name="sliderScrollTimeInSec" format="integer" />
-
-        <attr name="sliderCircularHandlerEnabled" format="boolean" />
         <attr name="sliderAutoCycleEnabled" format="boolean" />
         <attr name="sliderStartAutoCycle" format="boolean" />
 
