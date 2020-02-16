@@ -7,18 +7,21 @@ import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.text.TextUtilsCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.core.view.ViewCompat;
 import androidx.viewpager.widget.ViewPager;
+
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
 import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.ScaleAnimation;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
@@ -29,12 +32,14 @@ import com.smarteist.autoimageslider.IndicatorView.draw.data.RtlMode;
 import com.smarteist.autoimageslider.IndicatorView.utils.CoordinatesUtils;
 import com.smarteist.autoimageslider.IndicatorView.utils.DensityUtils;
 import com.smarteist.autoimageslider.IndicatorView.utils.IdUtils;
+import com.smarteist.autoimageslider.InfiniteAdapter.InfinitePagerAdapter;
+import com.smarteist.autoimageslider.SliderPager;
 
-public class PageIndicatorView extends View implements ViewPager.OnPageChangeListener, IndicatorManager.Listener, ViewPager.OnAdapterChangeListener {
+public class PageIndicatorView extends View implements SliderPager.OnPageChangeListener, IndicatorManager.Listener, SliderPager.OnAdapterChangeListener {
 
     private IndicatorManager manager;
     private DataSetObserver setObserver;
-    private ViewPager viewPager;
+    private SliderPager viewPager;
     private boolean isInteractionEnabled;
 
     public PageIndicatorView(Context context) {
@@ -131,13 +136,13 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
 
     @Override
     public void onPageScrollStateChanged(int state) {
-		if (state == ViewPager.SCROLL_STATE_IDLE) {
-			manager.indicator().setInteractiveAnimation(isInteractionEnabled);
-		}
-	}
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+            manager.indicator().setInteractiveAnimation(isInteractionEnabled);
+        }
+    }
 
     @Override
-    public void onAdapterChanged(@NonNull ViewPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
+    public void onAdapterChanged(@NonNull SliderPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
         updateState();
     }
 
@@ -251,7 +256,6 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
     }
 
 
-
     public void setStrokeWidth(int strokeDp) {
         int strokePx = DensityUtils.dpToPx(strokeDp);
         int radiusPx = manager.indicator().getRadius();
@@ -341,7 +345,7 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
     }
 
 
-    public void setViewPager(@Nullable ViewPager pager) {
+    public void setViewPager(@Nullable SliderPager pager) {
         releaseViewPager();
         if (pager == null) {
             return;
@@ -527,9 +531,16 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
         if (viewPager == null || viewPager.getAdapter() == null) {
             return;
         }
-
-        int count = viewPager.getAdapter().getCount();
-        int selectedPos = isRtl() ? (count - 1) - viewPager.getCurrentItem() : viewPager.getCurrentItem();
+        int count;
+        int selectedPos;
+        if (viewPager.getAdapter() instanceof InfinitePagerAdapter) {
+            InfinitePagerAdapter adapter = (InfinitePagerAdapter) viewPager.getAdapter();
+            count = adapter.getRealCount();
+            selectedPos = isRtl() ? (count - 1) - adapter.getVirtualPosition() : adapter.getVirtualPosition();
+        } else {
+            count = viewPager.getAdapter().getCount();
+            selectedPos = isRtl() ? (count - 1) - viewPager.getCurrentItem() : viewPager.getCurrentItem();
+        }
 
         manager.indicator().setSelectedPosition(selectedPos);
         manager.indicator().setSelectingPosition(selectedPos);
@@ -571,7 +582,7 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
         }
     }
 
-	private void onPageScroll(int position, float positionOffset) {
+    private void onPageScroll(int position, float positionOffset) {
         Indicator indicator = manager.indicator();
         AnimationType animationType = indicator.getAnimationType();
         boolean interactiveAnimation = indicator.isInteractiveAnimation();
@@ -616,7 +627,7 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
         }
 
         int viewPagerId = manager.indicator().getViewPagerId();
-        ViewPager viewPager = findViewPager((ViewGroup) viewParent, viewPagerId);
+        SliderPager viewPager = findViewPager((ViewGroup) viewParent, viewPagerId);
 
         if (viewPager != null) {
             setViewPager(viewPager);
@@ -626,25 +637,25 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
     }
 
     @Nullable
-    private ViewPager findViewPager(@NonNull ViewGroup viewGroup, int id) {
+    private SliderPager findViewPager(@NonNull ViewGroup viewGroup, int id) {
         if (viewGroup.getChildCount() <= 0) {
             return null;
         }
 
         View view = viewGroup.findViewById(id);
-        if (view != null && view instanceof ViewPager) {
-            return (ViewPager) view;
+        if (view != null && view instanceof SliderPager) {
+            return (SliderPager) view;
         } else {
             return null;
         }
     }
 
-    private int adjustPosition(int position){
+    private int adjustPosition(int position) {
         Indicator indicator = manager.indicator();
         int count = indicator.getCount();
         int lastPosition = count - 1;
 
-        if (position < 0) {
+        if (position <= 0) {
             position = 0;
 
         } else if (position > lastPosition) {

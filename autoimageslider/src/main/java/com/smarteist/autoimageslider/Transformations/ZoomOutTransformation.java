@@ -1,9 +1,9 @@
 package com.smarteist.autoimageslider.Transformations;
 
-import androidx.viewpager.widget.ViewPager;
+import com.smarteist.autoimageslider.SliderPager;
 import android.view.View;
 
-public class ZoomOutTransformation implements ViewPager.PageTransformer {
+public class ZoomOutTransformation implements SliderPager.PageTransformer {
 
     private static final float MIN_SCALE = 0.65f;
     private static final float MIN_ALPHA = 0.3f;

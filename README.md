@@ -10,24 +10,34 @@ This is an amazing image slider for the Android .
 You can easily load images with your custom layout, and there are many kinds of amazing animations you can choose.
 
 ```groovy
-     implementation 'com.github.smarteist:autoimageslider:1.3.3'
+     implementation 'com.github.smarteist:autoimageslider:1.3.4'
 ```
-If you are using appcompat libraries
+If you are using appcompat libraries use this one, but please migrate to androidx as soon as you can.
 ```groovy
      implementation 'com.github.smarteist:autoimageslider:1.3.2-appcompat'
 ```
 
-### New Feautures 
-* Bugs fixed.
-* Ability to set an animation interpolator for slider.
+### New Feautures
+* Infinite adapter implemented
+* Auto cycle Bugs fixed.
+* Slider API improvements.
 
-# Demo
+### New Changes
+* Circular handle completely replaced with infinite wrapper adapter.
+because of that the following interface has been replaced with new one.
+```CircularSliderHandle.CurrentPageListener```
+changed to => `SliderView.OnSliderPageListener`.
+* The slider permanently scrolls infinitely, so the following methods have also been deleted.
+`sliderView.setCircularHandlerEnabled(boolean enable)`
+& its attribute in xml side:
+`app:sliderCircularHandlerEnabled="boolean"`
+## Demo
 ![](https://github.com/smarteist/android-image-slider/blob/master/gif/0.gif)
 ![](https://github.com/smarteist/android-image-slider/blob/master/gif/8.gif)
 ![](https://github.com/smarteist/android-image-slider/blob/master/gif/4.gif)
 ![](https://github.com/smarteist/android-image-slider/blob/master/gif/7.gif)
 
-# Integration guide
+## Integration guide
 
 First put the slider view in your layout xml :
 
@@ -39,7 +49,6 @@ First put the slider view in your layout xml :
                     app:sliderAnimationDuration="600"
                     app:sliderAutoCycleDirection="back_and_forth"
                     app:sliderAutoCycleEnabled="true"
-                    app:sliderCircularHandlerEnabled="true"
                     app:sliderIndicatorAnimationDuration="600"
                     app:sliderIndicatorGravity="center_horizontal|bottom"
                     app:sliderIndicatorMargin="15dp"
@@ -51,16 +60,16 @@ First put the slider view in your layout xml :
                     app:sliderScrollTimeInSec="1"
                     app:sliderStartAutoCycle="true" />
 ```
-   
+
 Or you can put it inside the cardView to look more beautiful :
-   
+
 ```xml
        <androidx.cardview.widget.CardView
                app:cardCornerRadius="6dp"
                android:layout_margin="16dp"
                android:layout_width="match_parent"
                android:layout_height="wrap_content">
-       
+
                <com.smarteist.autoimageslider.SliderView
                            android:id="@+id/imageSlider"
                            android:layout_width="match_parent"
@@ -68,7 +77,6 @@ Or you can put it inside the cardView to look more beautiful :
                            app:sliderAnimationDuration="600"
                            app:sliderAutoCycleDirection="back_and_forth"
                            app:sliderAutoCycleEnabled="true"
-                           app:sliderCircularHandlerEnabled="true"
                            app:sliderIndicatorAnimationDuration="600"
                            app:sliderIndicatorGravity="center_horizontal|bottom"
                            app:sliderIndicatorMargin="15dp"
@@ -79,21 +87,38 @@ Or you can put it inside the cardView to look more beautiful :
                            app:sliderIndicatorUnselectedColor="#FFF"
                            app:sliderScrollTimeInSec="1"
                            app:sliderStartAutoCycle="true" />
-       
+
        </androidx.cardview.widget.CardView>
 ```
-     
-# Next step 
+
+## Next step
 
 The new version requires an slider adapter plus your custom layout for slider items, Although its very similar to RecyclerView & RecyclerAdapter, and it's familiar and easy to implement this adapter... here is an example for adapter implementation :
 
-```java	
-public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
+```java
+public class SliderAdapterExample extends
+        SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
 
     private Context context;
+    private List<SliderItem> mSliderItems = new ArrayList<>();
 
     public SliderAdapterExample(Context context) {
         this.context = context;
+    }
+
+    public void renewItems(List<SliderItem> sliderItems) {
+        this.mSliderItems = sliderItems;
+        notifyDataSetChanged();
+    }
+
+    public void deleteItem(int position) {
+        this.mSliderItems.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public void addItem(SliderItem sliderItem) {
+        this.mSliderItems.add(sliderItem);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -103,64 +128,58 @@ public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample
     }
 
     @Override
-    public void onBindViewHolder(SliderAdapterVH viewHolder, int position) {
-        viewHolder.textViewDescription.setText("This is slider item " + position);
+    public void onBindViewHolder(SliderAdapterVH viewHolder, final int position) {
 
-        switch (position) {
-            case 0:
-                Glide.with(viewHolder.itemView)
-                        .load("https://images.pexels.com/photos/218983/pexels-photo-218983.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
-                        .into(viewHolder.imageViewBackground);
-                break;
-            case 1:
-                Glide.with(viewHolder.itemView)
-                        .load("https://images.pexels.com/photos/747964/pexels-photo-747964.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260")
-                        .into(viewHolder.imageViewBackground);
-                break;
-            case 2:
-                Glide.with(viewHolder.itemView)
-                        .load("https://images.pexels.com/photos/929778/pexels-photo-929778.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
-                        .into(viewHolder.imageViewBackground);
-                break;
-            default:
-                Glide.with(viewHolder.itemView)
-                        .load("https://images.pexels.com/photos/218983/pexels-photo-218983.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
-                        .into(viewHolder.imageViewBackground);
-                break;
+        SliderItem sliderItem = mSliderItems.get(position);
 
-        }
+        viewHolder.textViewDescription.setText(sliderItem.getDescription());
+        viewHolder.textViewDescription.setTextSize(16);
+        viewHolder.textViewDescription.setTextColor(Color.WHITE);
+        Glide.with(viewHolder.itemView)
+                .load(sliderItem.getImageUrl())
+                .fitCenter()
+                .into(viewHolder.imageViewBackground);
 
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "This is item in position " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public int getCount() {
         //slider view count could be dynamic size
-        return 4;
+        return mSliderItems.size();
     }
 
     class SliderAdapterVH extends SliderViewAdapter.ViewHolder {
 
         View itemView;
         ImageView imageViewBackground;
+        ImageView imageGifContainer;
         TextView textViewDescription;
 
         public SliderAdapterVH(View itemView) {
             super(itemView);
             imageViewBackground = itemView.findViewById(R.id.iv_auto_image_slider);
+            imageGifContainer = itemView.findViewById(R.id.iv_gif_container);
             textViewDescription = itemView.findViewById(R.id.tv_auto_image_slider);
             this.itemView = itemView;
         }
     }
+
 }
 ```
-# Set the adapter to the Sliderview
+## Set the adapter to the Sliderview
 
-After the instantiating of the sliderView (inside the activity or fragment with findViewById blah blah...), set the adapter to the slider.
+After the instantiating of the sliderView (inside the activity or fragment with findViewById|BindView blah blah...), set the adapter to the slider.
 
 ```java
     sliderView.setSliderAdapter(new SliderAdapterExample(context));
 ```
-		
+
 You can call this method if you want to start flipping automatically and you can also set up the slider animation :
 
 ```java
@@ -169,7 +188,7 @@ You can call this method if you want to start flipping automatically and you can
     sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
 ```
 
-# Elaborate more?
+## Elaborate more?
 
 Here is a more realistic and more complete example :
 
@@ -179,13 +198,13 @@ Here is a more realistic and more complete example :
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
-    
+
             SliderView sliderView = findViewById(R.id.imageSlider);
-    
+
             SliderAdapterExample adapter = new SliderAdapterExample(this);
-    
+
             sliderView.setSliderAdapter(adapter);
-    
+
             sliderView.setIndicatorAnimation(IndicatorAnimations.WORM); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
             sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
             sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
@@ -193,15 +212,16 @@ Here is a more realistic and more complete example :
             sliderView.setIndicatorUnselectedColor(Color.GRAY);
             sliderView.setScrollTimeInSec(4); //set scroll delay in seconds :
             sliderView.startAutoCycle();
-            
+
         }
 ```
 
-# Contribute
+## Contribute
 
 Suggestions and pull requests are always welcome.
+Special Thanks [Roman Danylyk] (https://github.com/romandanylyk) for nice indicator!
 
-# Licence
+## Licence
 
 Copyright [2019] [Ali Hosseini]
 

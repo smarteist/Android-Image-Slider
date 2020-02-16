@@ -1,9 +1,9 @@
 package com.smarteist.autoimageslider.Transformations;
 
-import androidx.viewpager.widget.ViewPager;
+import com.smarteist.autoimageslider.SliderPager;
 import android.view.View;
 
-public class FadeTransformation implements ViewPager.PageTransformer{
+public class FadeTransformation implements SliderPager.PageTransformer{
     @Override
     public void transformPage(View view, float position) {
 
