@@ -24,10 +24,10 @@ If you are using appcompat libraries use this one, but please migrate to android
 
 ### New Changes
 * Circular handle completely replaced with infinite wrapper adapter.
-because of that the following interface has been replaced with this one.
-`CircularSliderHandle.CurrentPageListener` to=> `SliderView.OnSliderPageListener`
-and please change it in `sliderView.setCurrentPageListener(***)` method.
-* The slider behaves infinitely permanently, so the following methods have also been deleted.
+because of that the following interface has been replaced with new one.
+```CircularSliderHandle.CurrentPageListener```
+changed to => `SliderView.OnSliderPageListener`.
+* The slider permanently scrolls infinitely, so the following methods have also been deleted.
 `sliderView.setCircularHandlerEnabled(boolean enable)`
 & its attribute in xml side:
 `app:sliderCircularHandlerEnabled="boolean"`
@@ -37,7 +37,7 @@ and please change it in `sliderView.setCurrentPageListener(***)` method.
 ![](https://github.com/smarteist/android-image-slider/blob/master/gif/4.gif)
 ![](https://github.com/smarteist/android-image-slider/blob/master/gif/7.gif)
 
-# Integration guide
+## Integration guide
 
 First put the slider view in your layout xml :
 
@@ -91,7 +91,7 @@ Or you can put it inside the cardView to look more beautiful :
        </androidx.cardview.widget.CardView>
 ```
 
-# Next step
+## Next step
 
 The new version requires an slider adapter plus your custom layout for slider items, Although its very similar to RecyclerView & RecyclerAdapter, and it's familiar and easy to implement this adapter... here is an example for adapter implementation :
 
@@ -172,7 +172,7 @@ public class SliderAdapterExample extends
 
 }
 ```
-# Set the adapter to the Sliderview
+## Set the adapter to the Sliderview
 
 After the instantiating of the sliderView (inside the activity or fragment with findViewById|BindView blah blah...), set the adapter to the slider.
 
@@ -188,7 +188,7 @@ You can call this method if you want to start flipping automatically and you can
     sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
 ```
 
-# Elaborate more?
+## Elaborate more?
 
 Here is a more realistic and more complete example :
 
@@ -216,12 +216,12 @@ Here is a more realistic and more complete example :
         }
 ```
 
-# Contribute
+## Contribute
 
 Suggestions and pull requests are always welcome.
 Special Thanks [Roman Danylyk] (https://github.com/romandanylyk) for nice indicator!
 
-# Licence
+## Licence
 
 Copyright [2019] [Ali Hosseini]
 
