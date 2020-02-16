@@ -189,7 +189,7 @@ public class SliderView extends FrameLayout
      * @param pagerAdapter Set a SliderAdapter that will supply views
      *                     for this slider as needed.
      */
-    public void setSliderAdapter(final SliderViewAdapter pagerAdapter) {
+    public void setSliderAdapter(@NonNull SliderViewAdapter pagerAdapter) {
         mPagerAdapter = pagerAdapter;
         //set slider adapter
         mInfinitePagerAdapter = new InfinitePagerAdapter(pagerAdapter);
