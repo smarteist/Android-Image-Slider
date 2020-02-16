@@ -236,7 +236,7 @@ public class SliderView extends FrameLayout
      * @return sliding delay in seconds.
      */
     public int getScrollTimeInSec() {
-        return mScrollTimeInMillis * 1000;
+        return mScrollTimeInMillis / 1000;
     }
 
     /**
