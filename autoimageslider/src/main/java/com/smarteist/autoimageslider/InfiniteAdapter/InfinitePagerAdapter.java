@@ -1,5 +1,6 @@
 package com.smarteist.autoimageslider.InfiniteAdapter;
 
+import android.database.DataSetObserver;
 import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,10 @@ import androidx.viewpager.widget.PagerAdapter;
 import com.smarteist.autoimageslider.SliderViewAdapter;
 
 
+/**
+ * Its just a wrapper adapter class for providing infinite behavior
+ * for slider.
+ */
 public class InfinitePagerAdapter extends PagerAdapter {
 
     // Warning: it should be an even number.
@@ -53,8 +58,9 @@ public class InfinitePagerAdapter extends PagerAdapter {
     @NonNull
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+        // prevent division by zer
         if (getRealCount() < 1) {
-            return null;
+            return adapter.instantiateItem(container, 0);
         }
         virtualPosition = position % getRealCount();
 
@@ -67,7 +73,9 @@ public class InfinitePagerAdapter extends PagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+        // prevent division by zero
         if (getRealCount() < 1) {
+            adapter.destroyItem(container, 0, object);
             return;
         }
         int virtualPosition = position % getRealCount();
@@ -76,6 +84,11 @@ public class InfinitePagerAdapter extends PagerAdapter {
 
         // only expose virtual position to the inner adapter
         adapter.destroyItem(container, virtualPosition, object);
+    }
+
+    @Override
+    public void startUpdate(ViewGroup container) {
+        adapter.startUpdate(container);
     }
 
     /*
@@ -102,8 +115,34 @@ public class InfinitePagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public void startUpdate(ViewGroup container) {
-        adapter.startUpdate(container);
+    public CharSequence getPageTitle(int position) {
+        int virtualPosition = position % getRealCount();
+        return adapter.getPageTitle(virtualPosition);
+    }
+
+    @Override
+    public float getPageWidth(int position) {
+        return adapter.getPageWidth(position);
+    }
+
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        adapter.setPrimaryItem(container, position, object);
+    }
+
+    @Override
+    public void unregisterDataSetObserver(DataSetObserver observer) {
+        adapter.unregisterDataSetObserver(observer);
+    }
+
+    @Override
+    public void registerDataSetObserver(DataSetObserver observer) {
+        adapter.registerDataSetObserver(observer);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return adapter.getItemPosition(object);
     }
 
     public int getVirtualPosition() {

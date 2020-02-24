@@ -3,6 +3,7 @@ package com.smarteist.imageslider;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,23 +30,21 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new SliderAdapterExample(this);
         sliderView.setSliderAdapter(adapter);
-        renewItems(null);
 
-        sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+        sliderView.setIndicatorAnimation(IndicatorAnimations.THIN_WORM); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
         sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
-        sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
+        sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_RIGHT);
         sliderView.setIndicatorSelectedColor(Color.WHITE);
         sliderView.setIndicatorUnselectedColor(Color.GRAY);
         sliderView.setScrollTimeInSec(3);
-        sliderView.setAutoCycle(true);
-        sliderView.startAutoCycle();
+        sliderView.setAutoCycle(false);
 
     }
 
     public void renewItems(View view) {
         List<SliderItem> sliderItemList = new ArrayList<>();
         //dummy data
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             SliderItem sliderItem = new SliderItem();
             sliderItem.setDescription("Slider Item " + i);
             if (i % 2 == 0) {
