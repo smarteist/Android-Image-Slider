@@ -19,11 +19,11 @@ If you are using appcompat libraries use this one, but please migrate to android
 
 ### New Feautures
 * Infinite adapter implemented
-* Auto cycle Bugs fixed.
 * Slider API improvements.
-* Sync state bugs fixed.
 
 ### New Changes
+* Auto cycle Bugs fixed.
+* Sync state bugs fixed.
 * Circular handle completely replaced with infinite wrapper adapter.
 because of that the following interface has been replaced with new one.
 ```CircularSliderHandle.CurrentPageListener```

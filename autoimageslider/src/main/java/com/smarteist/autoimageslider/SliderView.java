@@ -371,7 +371,8 @@ public class SliderView extends FrameLayout
     public void setCurrentPagePosition(int position) {
 
         if (getSliderAdapter() != null) {
-            mSliderPager.setCurrentItem(position, true);
+            int midpoint = (getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
+            mSliderPager.setCurrentItem(midpoint + position, true);
         } else {
             throw new NullPointerException("Adapter not set");
         }
@@ -594,7 +595,7 @@ public class SliderView extends FrameLayout
     /**
      * This method handles sliding behaviors
      * which passed into {@link #SliderView#mHandler}
-     *
+     * <p>
      * see {@link #SliderView#startAutoCycle()}
      */
     @Override
