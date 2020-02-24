@@ -29,6 +29,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.EdgeEffect;
 import android.widget.Scroller;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -42,8 +43,6 @@ import androidx.core.view.accessibility.AccessibilityEventCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.customview.view.AbsSavedState;
 import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.PagerTitleStrip;
-import androidx.viewpager.widget.ViewPager;
 import com.smarteist.autoimageslider.InfiniteAdapter.InfinitePagerAdapter;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

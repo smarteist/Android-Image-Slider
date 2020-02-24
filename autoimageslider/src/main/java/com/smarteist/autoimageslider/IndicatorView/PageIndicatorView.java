@@ -532,16 +532,20 @@ public class PageIndicatorView extends View implements SliderPager.OnPageChangeL
             return;
         }
         int count;
-        int selectedPos;
+        int position;
         if (viewPager.getAdapter() instanceof InfinitePagerAdapter) {
-            InfinitePagerAdapter adapter = (InfinitePagerAdapter) viewPager.getAdapter();
-            count = adapter.getRealCount();
-            selectedPos = isRtl() ? (count - 1) - adapter.getVirtualPosition() : adapter.getVirtualPosition();
+            count = ((InfinitePagerAdapter) viewPager.getAdapter()).getRealCount();
+            if (count > 0) {
+                position = viewPager.getCurrentItem() % count;
+            } else {
+                position = 0;
+            }
         } else {
             count = viewPager.getAdapter().getCount();
-            selectedPos = isRtl() ? (count - 1) - viewPager.getCurrentItem() : viewPager.getCurrentItem();
+            position = viewPager.getCurrentItem();
         }
 
+        int selectedPos = isRtl() ? (count - 1) - position : position;
         manager.indicator().setSelectedPosition(selectedPos);
         manager.indicator().setSelectingPosition(selectedPos);
         manager.indicator().setLastSelectedPosition(selectedPos);
