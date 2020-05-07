@@ -38,12 +38,13 @@ public class MainActivity extends AppCompatActivity {
         sliderView.setIndicatorSelectedColor(Color.WHITE);
         sliderView.setIndicatorUnselectedColor(Color.GRAY);
         sliderView.setScrollTimeInSec(3);
-        sliderView.setAutoCycle(false);
+        sliderView.setAutoCycle(true);
+        sliderView.startAutoCycle();
 
         sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
             @Override
             public void onIndicatorClicked(int position) {
-                sliderView.setCurrentPagePosition(position);
+                sliderView.slideToPreviousPosition();
             }
         });
 

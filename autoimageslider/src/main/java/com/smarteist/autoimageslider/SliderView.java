@@ -197,6 +197,7 @@ public class SliderView extends FrameLayout
         //setup with indicator
         mPagerIndicator.setCount(getAdapterItemsCount());
         mPagerIndicator.setDynamicCount(true);
+        setCurrentPagePosition(0);
     }
 
     /**
@@ -207,9 +208,7 @@ public class SliderView extends FrameLayout
         this.mIsInfiniteAdapter = infiniteAdapter;
         if (!infiniteAdapter) {
             this.mPagerAdapter = pagerAdapter;
-            //registerAdapterDataObserver();
             mSliderPager.setAdapter(pagerAdapter);
-            //setup with indicator
             mPagerIndicator.setCount(getAdapterItemsCount());
             mPagerIndicator.setDynamicCount(true);
         } else {

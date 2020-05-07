@@ -101,7 +101,7 @@ public class SliderPager extends ViewGroup {
         }
     };
 
-    private final ArrayList<ItemInfo> mItems = new ArrayList<ItemInfo>();
+    private final ArrayList<ItemInfo> mItems = new ArrayList<>();
     private final ItemInfo mTempItem = new ItemInfo();
 
     private final Rect mTempRect = new Rect();
@@ -351,7 +351,7 @@ public class SliderPager extends ViewGroup {
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
         setFocusable(true);
         final Context context = getContext();
-        mScroller = new Scroller(context, sInterpolator);
+        mScroller = new OwnScroller(context, DEFAULT_SCROLL_DURATION, sInterpolator);
         final ViewConfiguration configuration = ViewConfiguration.get(context);
         final float density = context.getResources().getDisplayMetrics().density;
 
@@ -875,11 +875,9 @@ public class SliderPager extends ViewGroup {
 
     public void setScrollDuration(int millis, Interpolator interpolator) {
         if (interpolator != null) {
-            OwnScroller ownScroller = new OwnScroller(getContext(), millis, interpolator);
-            mScroller = ownScroller;
+            mScroller = new OwnScroller(getContext(), millis, interpolator);
         } else {
-            OwnScroller ownScroller = new OwnScroller(getContext(), millis);
-            mScroller = ownScroller;
+            mScroller = new OwnScroller(getContext(), millis);
         }
     }
 
@@ -1409,7 +1407,7 @@ public class SliderPager extends ViewGroup {
                     + " position=" + position + "}";
         }
 
-        public static final Creator<SavedState> CREATOR = new ClassLoaderCreator<SavedState>() {
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.ClassLoaderCreator<SavedState>() {
             @Override
             public SavedState createFromParcel(Parcel in, ClassLoader loader) {
                 return new SavedState(in, loader);
@@ -3109,7 +3107,7 @@ public class SliderPager extends ViewGroup {
         private int durationScrollMillis;
 
         OwnScroller(Context context, int durationScroll) {
-            super(context, new DecelerateInterpolator());
+            super(context, sInterpolator);
             this.durationScrollMillis = durationScroll;
         }
 
