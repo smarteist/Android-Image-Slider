@@ -1283,7 +1283,7 @@ public class SliderPager extends ViewGroup {
                     int n = position % realCount;
                     eachListener.onPageSelected(n);
                 } else {
-                    eachListener.onPageSelected(mAdapter.getCount());
+                    eachListener.onPageSelected(position);
                 }
 
             }
