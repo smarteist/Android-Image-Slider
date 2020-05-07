@@ -1,19 +1,20 @@
 package com.smarteist.autoimageslider;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.view.PagerAdapter;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
-
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.BaseAnimation;
@@ -22,6 +23,7 @@ import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawControlle
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.RtlMode;
 import com.smarteist.autoimageslider.IndicatorView.utils.DensityUtils;
+import com.smarteist.autoimageslider.InfiniteAdapter.InfinitePagerAdapter;
 import com.smarteist.autoimageslider.Transformations.AntiClockSpinTransformation;
 import com.smarteist.autoimageslider.Transformations.Clock_SpinTransformation;
 import com.smarteist.autoimageslider.Transformations.CubeInDepthTransformation;
@@ -47,24 +49,29 @@ import com.smarteist.autoimageslider.Transformations.ZoomOutTransformation;
 
 import static com.smarteist.autoimageslider.IndicatorView.draw.controller.AttributeController.getRtlMode;
 
-public class SliderView extends FrameLayout {
+public class SliderView extends FrameLayout
+        implements Runnable, View.OnTouchListener,
+        SliderViewAdapter.DataSetListener, SliderPager.OnPageChangeListener {
 
     public static final int AUTO_CYCLE_DIRECTION_RIGHT = 0;
     public static final int AUTO_CYCLE_DIRECTION_LEFT = 1;
     public static final int AUTO_CYCLE_DIRECTION_BACK_AND_FORTH = 2;
+    public static final String TAG = "Slider View : ";
 
     private final Handler mHandler = new Handler();
     private boolean mFlagBackAndForth;
     private boolean mIsAutoCycle;
     private int mAutoCycleDirection;
-    private int mScrollTimeInSec;
-    private CircularSliderHandle mCircularSliderHandle;
+    private int mScrollTimeInMillis;
     private PageIndicatorView mPagerIndicator;
-    private DataSetObserver mDataSetObserver;
-    private PagerAdapter mPagerAdapter;
-    private Runnable mSliderRunnable;
+    private SliderViewAdapter mPagerAdapter;
     private SliderPager mSliderPager;
+    private InfinitePagerAdapter mInfinitePagerAdapter;
+    private boolean mPausedSliding = false;
+    private OnSliderPageListener mPageListener;
+    private boolean mIsInfiniteAdapter = true;
 
+    /*Constructor*/
     public SliderView(Context context) {
         super(context);
         setupSlideView(context);
@@ -81,8 +88,15 @@ public class SliderView extends FrameLayout {
         setupSlideView(context);
         setUpAttributes(context, attrs);
     }
+    /*Constructor*/
 
-    private void setUpAttributes(Context context, AttributeSet attrs) {
+    /**
+     * This class syncs all attributes from xml tag for this slider.
+     *
+     * @param context its android main context which is needed.
+     * @param attrs   attributes from xml slider tags.
+     */
+    private void setUpAttributes(@NonNull Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SliderView, 0, 0);
 
         int indicatorOrientation = typedArray.getInt(R.styleable.SliderView_sliderIndicatorOrientation, Orientation.HORIZONTAL.ordinal());
@@ -95,6 +109,10 @@ public class SliderView extends FrameLayout {
         int indicatorRadius = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorRadius, DensityUtils.dpToPx(2));
         int indicatorPadding = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorPadding, DensityUtils.dpToPx(3));
         int indicatorMargin = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMargin, DensityUtils.dpToPx(12));
+        int indicatorMarginLeft = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginLeft, DensityUtils.dpToPx(12));
+        int indicatorMarginTop = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginTop, DensityUtils.dpToPx(12));
+        int indicatorMarginRight = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginRight, DensityUtils.dpToPx(12));
+        int indicatorMarginBottom = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginBottom, DensityUtils.dpToPx(12));
         int indicatorGravity = typedArray.getInt(R.styleable.SliderView_sliderIndicatorGravity, Gravity.CENTER | Gravity.BOTTOM);
         int indicatorUnselectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorUnselectedColor, Color.parseColor(ColorAnimation.DEFAULT_UNSELECTED_COLOR));
         int indicatorSelectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorSelectedColor, Color.parseColor(ColorAnimation.DEFAULT_SELECTED_COLOR));
@@ -103,7 +121,6 @@ public class SliderView extends FrameLayout {
         RtlMode rtlMode = getRtlMode(indicatorRtlMode);
         int sliderAnimationDuration = typedArray.getInt(R.styleable.SliderView_sliderAnimationDuration, SliderPager.DEFAULT_SCROLL_DURATION);
         int sliderScrollTimeInSec = typedArray.getInt(R.styleable.SliderView_sliderScrollTimeInSec, 2);
-        boolean sliderCircularHandlerEnabled = typedArray.getBoolean(R.styleable.SliderView_sliderCircularHandlerEnabled, true);
         boolean sliderAutoCycleEnabled = typedArray.getBoolean(R.styleable.SliderView_sliderAutoCycleEnabled, true);
         boolean sliderStartAutoCycle = typedArray.getBoolean(R.styleable.SliderView_sliderStartAutoCycle, false);
         int sliderAutoCycleDirection = typedArray.getInt(R.styleable.SliderView_sliderAutoCycleDirection, AUTO_CYCLE_DIRECTION_RIGHT);
@@ -113,22 +130,27 @@ public class SliderView extends FrameLayout {
         setIndicatorPadding(indicatorPadding);
         setIndicatorMargin(indicatorMargin);
         setIndicatorGravity(indicatorGravity);
+        setIndicatorMargins(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
         setIndicatorUnselectedColor(indicatorUnselectedColor);
         setIndicatorSelectedColor(indicatorSelectedColor);
         setIndicatorAnimationDuration(indicatorAnimationDuration);
         setIndicatorRtlMode(rtlMode);
         setSliderAnimationDuration(sliderAnimationDuration);
         setScrollTimeInSec(sliderScrollTimeInSec);
-        setCircularHandlerEnabled(sliderCircularHandlerEnabled);
         setAutoCycle(sliderAutoCycleEnabled);
         setAutoCycleDirection(sliderAutoCycleDirection);
-        if (sliderStartAutoCycle) {
-            startAutoCycle();
-        }
+        setAutoCycle(sliderStartAutoCycle);
 
         typedArray.recycle();
     }
 
+    /**
+     * This method fires initialization jobs for
+     * slider view.
+     *
+     * @param context its android main context which is needed.
+     */
+    @SuppressLint("ClickableViewAccessibility")
     private void setupSlideView(Context context) {
 
         View wrapperView = LayoutInflater
@@ -136,84 +158,121 @@ public class SliderView extends FrameLayout {
                 .inflate(R.layout.slider_view, this, true);
 
         mSliderPager = wrapperView.findViewById(R.id.vp_slider_layout);
-        mCircularSliderHandle = new CircularSliderHandle(mSliderPager);
-        mSliderPager.addOnPageChangeListener(mCircularSliderHandle);
-        mSliderPager.setOffscreenPageLimit(4);
+        mSliderPager.setOnTouchListener(this);
+        mSliderPager.addOnPageChangeListener(this);
 
         mPagerIndicator = wrapperView.findViewById(R.id.pager_indicator);
         mPagerIndicator.setViewPager(mSliderPager);
+
+
     }
 
+    /**
+     * @param listener for indicator dots clicked.
+     */
     public void setOnIndicatorClickListener(DrawController.ClickListener listener) {
         mPagerIndicator.setClickListener(listener);
     }
 
-    public void setCurrentPageListener(CircularSliderHandle.CurrentPageListener listener) {
-        mCircularSliderHandle.setCurrentPageListener(listener);
+    /**
+     * @param listener is a callback of current item in sliderView.
+     */
+    public void setCurrentPageListener(OnSliderPageListener listener) {
+        this.mPageListener = listener;
     }
 
-    public void setSliderAdapter(final PagerAdapter pagerAdapter) {
+    /**
+     * @param pagerAdapter Set a SliderAdapter that will supply views
+     *                     for this slider as needed.
+     */
+    public void setSliderAdapter(@NonNull SliderViewAdapter pagerAdapter) {
         mPagerAdapter = pagerAdapter;
         //set slider adapter
+        mInfinitePagerAdapter = new InfinitePagerAdapter(pagerAdapter);
         //registerAdapterDataObserver();
-        mSliderPager.setAdapter(pagerAdapter);
+        mSliderPager.setAdapter(mInfinitePagerAdapter);
+        mPagerAdapter.dataSetChangedListener(this);
         //setup with indicator
         mPagerIndicator.setCount(getAdapterItemsCount());
         mPagerIndicator.setDynamicCount(true);
+        setCurrentPagePosition(0);
     }
 
+    /**
+     * @param pagerAdapter Set a SliderAdapter that will supply views
+     *                     for this slider as needed.
+     */
+    public void setSliderAdapter(@NonNull SliderViewAdapter pagerAdapter, boolean infiniteAdapter) {
+        this.mIsInfiniteAdapter = infiniteAdapter;
+        if (!infiniteAdapter) {
+            this.mPagerAdapter = pagerAdapter;
+            mSliderPager.setAdapter(pagerAdapter);
+            mPagerIndicator.setCount(getAdapterItemsCount());
+            mPagerIndicator.setDynamicCount(true);
+        } else {
+            setSliderAdapter(pagerAdapter);
+        }
+    }
+
+    /**
+     * @return Sliders Pager
+     */
+    public SliderPager getSliderPager() {
+        return mSliderPager;
+    }
+
+    /**
+     * @return adapter of current slider.
+     */
     public PagerAdapter getSliderAdapter() {
         return mPagerAdapter;
     }
 
-    private void registerAdapterDataObserver() {
-
-        if (mDataSetObserver != null) {
-            mPagerAdapter.unregisterDataSetObserver(mDataSetObserver);
-        }
-
-        mDataSetObserver = new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                mSliderPager.setOffscreenPageLimit(getAdapterItemsCount() - 1);
-            }
-        };
-
-        mPagerAdapter.registerDataSetObserver(mDataSetObserver);
-    }
-
+    /**
+     * @return if is slider auto cycling or not?
+     */
     public boolean isAutoCycle() {
         return mIsAutoCycle;
     }
 
     public void setAutoCycle(boolean autoCycle) {
         this.mIsAutoCycle = autoCycle;
-        if (!mIsAutoCycle && mSliderRunnable != null) {
-            mHandler.removeCallbacks(mSliderRunnable);
-            mSliderRunnable = null;
-        }
     }
 
+    /**
+     * @param limit How many pages will be kept offscreen in an idle state.
+     *              <p>You should keep this limit low, especially if your pages have complex layouts.
+     *              * This setting defaults to 1.</p>
+     */
     public void setOffscreenPageLimit(int limit) {
         mSliderPager.setOffscreenPageLimit(limit);
     }
 
-    public void setCircularHandlerEnabled(boolean enable) {
-        mSliderPager.clearOnPageChangeListeners();
-        if (enable) {
-            mSliderPager.addOnPageChangeListener(mCircularSliderHandle);
-        }
-    }
-
+    /**
+     * @return sliding delay in seconds.
+     */
     public int getScrollTimeInSec() {
-        return mScrollTimeInSec;
+        return mScrollTimeInMillis / 1000;
     }
 
+    /**
+     * @param time of sliding delay in seconds.
+     */
     public void setScrollTimeInSec(int time) {
-        mScrollTimeInSec = time;
+        mScrollTimeInMillis = time * 1000;
     }
 
+    public int getScrollTimeInMillis() {
+        return mScrollTimeInMillis;
+    }
+
+    public void setScrollTimeInMillis(int millis) {
+        this.mScrollTimeInMillis = millis;
+    }
+
+    /**
+     * @param animation changes pre defined animations for slider.
+     */
     public void setSliderTransformAnimation(SliderAnimations animation) {
 
         switch (animation) {
@@ -265,9 +324,6 @@ public class SliderView extends FrameLayout {
             case POPTRANSFORMATION:
                 mSliderPager.setPageTransformer(false, new PopTransformation());
                 break;
-            case SIMPLETRANSFORMATION:
-                mSliderPager.setPageTransformer(false, new SimpleTransformation());
-                break;
             case SPINNERTRANSFORMATION:
                 mSliderPager.setPageTransformer(false, new SpinnerTransformation());
                 break;
@@ -290,50 +346,113 @@ public class SliderView extends FrameLayout {
 
     }
 
-    public void setCustomSliderTransformAnimation(ViewPager.PageTransformer animation) {
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            mPausedSliding = true;
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            mPausedSliding = false;
+        }
+        return false;
+    }
+
+    /**
+     * @param animation set slider animation manually .
+     *                  it accepts {@link ##PageTransformer} animation classes.
+     */
+    public void setCustomSliderTransformAnimation(SliderPager.PageTransformer animation) {
         mSliderPager.setPageTransformer(false, animation);
     }
 
+    /**
+     * @param duration changes slider animation duration.
+     */
     public void setSliderAnimationDuration(int duration) {
         mSliderPager.setScrollDuration(duration);
     }
 
+    /**
+     * @param duration     changes slider animation duration.
+     * @param interpolator its animation duration accelerator
+     *                     An interpolator defines the rate of change of an animation
+     */
+    public void setSliderAnimationDuration(int duration, Interpolator interpolator) {
+        mSliderPager.setScrollDuration(duration, interpolator);
+    }
+
+    /**
+     * @param position changes position of slider
+     *                 items manually.
+     */
     public void setCurrentPagePosition(int position) {
 
         if (getSliderAdapter() != null) {
-            mSliderPager.setCurrentItem(position, true);
+            int midpoint = (getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
+            mSliderPager.setCurrentItem(midpoint + position, true);
         } else {
             throw new NullPointerException("Adapter not set");
         }
     }
 
+    /**
+     * @return Nullable position of current sliding item.
+     */
     public int getCurrentPagePosition() {
 
         if (getSliderAdapter() != null) {
-            return mSliderPager.getCurrentItem();
+            return getSliderPager().getCurrentItem() % mPagerAdapter.getCount();
         } else {
             throw new NullPointerException("Adapter not set");
         }
     }
 
+    /**
+     * @param duration modifies indicator animation duration.
+     */
     public void setIndicatorAnimationDuration(long duration) {
         mPagerIndicator.setAnimationDuration(duration);
     }
 
+    /**
+     * @param gravity {@link #View} integer gravity of indicator dots.
+     */
     public void setIndicatorGravity(int gravity) {
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.gravity = gravity;
         mPagerIndicator.setLayoutParams(layoutParams);
     }
 
+    /**
+     * @param padding changes indicator padding.
+     */
     public void setIndicatorPadding(int padding) {
         mPagerIndicator.setPadding(padding);
     }
 
+    /**
+     * Sets the indicator margins, in pixels.
+     *
+     * @param left   the left margin size
+     * @param top    the top margin size
+     * @param right  the right margin size
+     * @param bottom the bottom margin size
+     */
+    public void setIndicatorMargins(int left, int top, int right, int bottom) {
+        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        layoutParams.setMargins(left, top, right, bottom);
+        mPagerIndicator.setLayoutParams(layoutParams);
+    }
+
+    /**
+     * @param orientation changes orientation of indicator dots.
+     */
     public void setIndicatorOrientation(Orientation orientation) {
         mPagerIndicator.setOrientation(orientation);
     }
 
+    /**
+     * @param animations {@link #SliderView#IndicatorAnimations} of indicator dots
+     */
     public void setIndicatorAnimation(IndicatorAnimations animations) {
 
         switch (animations) {
@@ -370,6 +489,9 @@ public class SliderView extends FrameLayout {
         }
     }
 
+    /**
+     * @param visibility this method changes indicator visibility
+     */
     public void setIndicatorVisibility(boolean visibility) {
         if (visibility) {
             mPagerIndicator.setVisibility(VISIBLE);
@@ -378,103 +500,99 @@ public class SliderView extends FrameLayout {
         }
     }
 
+    /**
+     * @return number of items in {@link #SliderView#SliderViewAdapter)}
+     */
     private int getAdapterItemsCount() {
         try {
             return getSliderAdapter().getCount();
         } catch (NullPointerException e) {
+            Log.e(TAG, "getAdapterItemsCount: Slider Adapter is null so," +
+                    " it can't get count of items");
             return 0;
         }
     }
 
+    /**
+     * This method stars the auto cycling
+     */
     public void startAutoCycle() {
-
-        if (mSliderRunnable != null) {
-            mHandler.removeCallbacks(mSliderRunnable);
-            mSliderRunnable = null;
-        }
-
-        mSliderRunnable = new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    // check is on auto scroll mode
-                    if (!mIsAutoCycle) {
-                        return;
-                    }
-
-                    int currentPosition = mSliderPager.getCurrentItem();
-
-                    if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH) {
-                        if (currentPosition == 0) {
-                            mFlagBackAndForth = true;
-                        }
-                        if (currentPosition == getAdapterItemsCount() - 1) {
-                            mFlagBackAndForth = false;
-                        }
-                        if (mFlagBackAndForth) {
-                            mSliderPager.setCurrentItem(++currentPosition, true);
-                        } else {
-                            mSliderPager.setCurrentItem(--currentPosition, true);
-                        }
-                    } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-                        if (currentPosition == 0) {
-                            mSliderPager.setCurrentItem(getAdapterItemsCount() - 1, true);
-                        } else {
-                            mSliderPager.setCurrentItem(--currentPosition, true);
-                        }
-                    } else {
-                        if (currentPosition == getAdapterItemsCount() - 1) {
-                            // if is last item return to the first position
-                            mSliderPager.setCurrentItem(0, true);
-                        } else {
-                            // continue smooth transition between pager
-                            mSliderPager.setCurrentItem(++currentPosition, true);
-                        }
-                    }
-
-
-                } finally {
-                    mHandler.postDelayed(this, mScrollTimeInSec * 1000);
-                }
-
-            }
-        };
+        //clean previous callbacks
+        mHandler.removeCallbacks(this);
 
         //Run the loop for the first time
-        mHandler.postDelayed(mSliderRunnable, mScrollTimeInSec * 1000);
+        mHandler.postDelayed(this, mScrollTimeInMillis);
     }
 
+    /**
+     * This method cancels the auto cycling
+     */
+    public void stopAutoCycle() {
+        //clean callback
+        mHandler.removeCallbacks(this);
+    }
+
+    /**
+     * This method setting direction of sliders auto cycling
+     * accepts constant values defined in {@link #SliderView} class
+     * {@value AUTO_CYCLE_DIRECTION_LEFT}
+     * {@value AUTO_CYCLE_DIRECTION_RIGHT}
+     * {@value AUTO_CYCLE_DIRECTION_BACK_AND_FORTH}
+     */
     public void setAutoCycleDirection(int direction) {
         mAutoCycleDirection = direction;
     }
 
+    /**
+     * @return direction of auto cycling
+     * {@value AUTO_CYCLE_DIRECTION_LEFT}
+     * {@value AUTO_CYCLE_DIRECTION_RIGHT}
+     * {@value AUTO_CYCLE_DIRECTION_BACK_AND_FORTH}
+     */
     public int getAutoCycleDirection() {
         return mAutoCycleDirection;
     }
 
+    /**
+     * @return size of indicator dot
+     */
     public int getIndicatorRadius() {
         return mPagerIndicator.getRadius();
     }
 
+    /**
+     * @param rtlMode for indicator sliding direction
+     */
     public void setIndicatorRtlMode(RtlMode rtlMode) {
         mPagerIndicator.setRtlMode(rtlMode);
     }
 
+    /**
+     * @param pagerIndicatorRadius modifies size of indicator dots
+     */
     public void setIndicatorRadius(int pagerIndicatorRadius) {
         this.mPagerIndicator.setRadius(pagerIndicatorRadius);
     }
 
+    /**
+     * @param margin modifies indicator margin
+     */
     public void setIndicatorMargin(int margin) {
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(margin, margin, margin, margin);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
 
+    /**
+     * @param color setting color of selected dot
+     */
     public void setIndicatorSelectedColor(int color) {
         this.mPagerIndicator.setSelectedColor(color);
     }
 
+    /**
+     * @return color of selected dot
+     */
     public int getIndicatorSelectedColor() {
         return this.mPagerIndicator.getSelectedColor();
     }
@@ -483,8 +601,112 @@ public class SliderView extends FrameLayout {
         this.mPagerIndicator.setUnselectedColor(color);
     }
 
+    /**
+     * @return color of unselected dots
+     */
     public int getIndicatorUnselectedColor() {
         return this.mPagerIndicator.getUnselectedColor();
     }
 
+    /**
+     * This method handles sliding behaviors
+     * which passed into {@link #SliderView#mHandler}
+     * <p>
+     * see {@link #SliderView#startAutoCycle()}
+     */
+    @Override
+    public void run() {
+        try {
+            if (!mPausedSliding) {
+                // slide to next if not paused
+                slideToNextPosition();
+            }
+        } finally {
+            if (mIsAutoCycle) {
+                // continue the loop
+                mHandler.postDelayed(this, mScrollTimeInMillis);
+            }
+        }
+    }
+
+    public void slideToNextPosition() {
+
+        int currentPosition = mSliderPager.getCurrentItem();
+        int adapterItemsCount = getAdapterItemsCount();
+
+        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 1) {
+            if (currentPosition % (adapterItemsCount - 1) == 0) {
+                mFlagBackAndForth = !mFlagBackAndForth;
+            }
+            if (mFlagBackAndForth) {
+                mSliderPager.setCurrentItem(++currentPosition, true);
+            } else {
+                mSliderPager.setCurrentItem(--currentPosition, true);
+            }
+        } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
+            mSliderPager.setCurrentItem(--currentPosition, true);
+        } else {
+            mSliderPager.setCurrentItem(++currentPosition, true);
+        }
+    }
+
+
+    public void slideToPreviousPosition() {
+
+        int currentPosition = mSliderPager.getCurrentItem();
+        int adapterItemsCount = getAdapterItemsCount();
+
+        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 1) {
+            if (currentPosition % (adapterItemsCount - 1) == 0) {
+                mFlagBackAndForth = !mFlagBackAndForth;
+            }
+            if (mFlagBackAndForth) {
+                mSliderPager.setCurrentItem(--currentPosition, true);
+            } else {
+                mSliderPager.setCurrentItem(++currentPosition, true);
+            }
+        } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
+            mSliderPager.setCurrentItem(++currentPosition, true);
+        } else {
+            mSliderPager.setCurrentItem(--currentPosition, true);
+        }
+    }
+
+    //sync infinite pager adapter with real one
+    @Override
+    public void dataSetChanged() {
+        if (mIsInfiniteAdapter) {
+            mInfinitePagerAdapter.notifyDataSetChanged();
+            mSliderPager.setCurrentItem((getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2), false);
+        }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        // nothing to do
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if (mPageListener != null) {
+            mPageListener.onSliderPageChanged(position);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        // nothing to do
+    }
+
+    public interface OnSliderPageListener {
+
+        /**
+         * This method will be invoked when a new page becomes selected. Animation is not
+         * necessarily complete.
+         *
+         * @param position Position index of the new selected page.
+         */
+        void onSliderPageChanged(int position);
+
+    }
 }

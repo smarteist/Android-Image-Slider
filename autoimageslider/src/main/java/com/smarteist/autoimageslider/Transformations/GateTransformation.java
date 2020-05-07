@@ -1,10 +1,10 @@
 package com.smarteist.autoimageslider.Transformations;
 
-import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 
-public class GateTransformation implements ViewPager.PageTransformer{
+import com.smarteist.autoimageslider.SliderPager;
+
+public class GateTransformation implements SliderPager.PageTransformer{
 
     private String TAG  = "GateAnimationn";
     @Override

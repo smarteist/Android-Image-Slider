@@ -4,16 +4,17 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
 
 public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder> extends PagerAdapter {
 
+    private DataSetListener dataSetListener;
+
     //Default View holder class
     public static abstract class ViewHolder {
-        final View itemView;
+        public final View itemView;
 
         public ViewHolder(View itemView) {
             this.itemView = itemView;
@@ -51,8 +52,22 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
         return ((VH) object).itemView == view;
     }
 
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        if (this.dataSetListener != null) {
+            dataSetListener.dataSetChanged();
+        }
+    }
+
     /**
      * Create a new view holder
+     *
      * @param parent wrapper view
      * @return view holder
      */
@@ -60,10 +75,18 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
 
     /**
      * Bind data at position into viewHolder
+     *
      * @param viewHolder item view holder
-     * @param position item position
+     * @param position   item position
      */
     public abstract void onBindViewHolder(VH viewHolder, int position);
 
+    void dataSetChangedListener(SliderViewAdapter.DataSetListener dataSetListener) {
+        this.dataSetListener = dataSetListener;
+    }
+
+    interface DataSetListener {
+        void dataSetChanged();
+    }
 
 }

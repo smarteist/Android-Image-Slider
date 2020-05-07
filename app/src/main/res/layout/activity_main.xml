@@ -20,7 +20,6 @@
             app:sliderAnimationDuration="600"
             app:sliderAutoCycleDirection="back_and_forth"
             app:sliderAutoCycleEnabled="true"
-            app:sliderCircularHandlerEnabled="true"
             app:sliderIndicatorAnimationDuration="600"
             app:sliderIndicatorGravity="center_horizontal|bottom"
             app:sliderIndicatorMargin="15dp"

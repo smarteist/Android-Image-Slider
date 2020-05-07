@@ -1,10 +1,11 @@
 package com.smarteist.autoimageslider.Transformations;
 
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 
-public class HorizontalFlipTransformation implements ViewPager.PageTransformer {
+import com.smarteist.autoimageslider.SliderPager;
+
+public class HorizontalFlipTransformation implements SliderPager.PageTransformer {
     @Override
     public void transformPage(View page, float position) {
 

@@ -29,12 +29,14 @@ import com.smarteist.autoimageslider.IndicatorView.draw.data.RtlMode;
 import com.smarteist.autoimageslider.IndicatorView.utils.CoordinatesUtils;
 import com.smarteist.autoimageslider.IndicatorView.utils.DensityUtils;
 import com.smarteist.autoimageslider.IndicatorView.utils.IdUtils;
+import com.smarteist.autoimageslider.InfiniteAdapter.InfinitePagerAdapter;
+import com.smarteist.autoimageslider.SliderPager;
 
-public class PageIndicatorView extends View implements ViewPager.OnPageChangeListener, IndicatorManager.Listener, ViewPager.OnAdapterChangeListener {
+public class PageIndicatorView extends View implements SliderPager.OnPageChangeListener, IndicatorManager.Listener, SliderPager.OnAdapterChangeListener {
 
     private IndicatorManager manager;
     private DataSetObserver setObserver;
-    private ViewPager viewPager;
+    private SliderPager viewPager;
     private boolean isInteractionEnabled;
 
     public PageIndicatorView(Context context) {
@@ -131,13 +133,13 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
 
     @Override
     public void onPageScrollStateChanged(int state) {
-		if (state == ViewPager.SCROLL_STATE_IDLE) {
-			manager.indicator().setInteractiveAnimation(isInteractionEnabled);
-		}
-	}
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+            manager.indicator().setInteractiveAnimation(isInteractionEnabled);
+        }
+    }
 
     @Override
-    public void onAdapterChanged(@NonNull ViewPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
+    public void onAdapterChanged(@NonNull SliderPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
         updateState();
     }
 
@@ -251,7 +253,6 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
     }
 
 
-
     public void setStrokeWidth(int strokeDp) {
         int strokePx = DensityUtils.dpToPx(strokeDp);
         int radiusPx = manager.indicator().getRadius();
@@ -341,7 +342,7 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
     }
 
 
-    public void setViewPager(@Nullable ViewPager pager) {
+    public void setViewPager(@Nullable SliderPager pager) {
         releaseViewPager();
         if (pager == null) {
             return;
@@ -527,10 +528,21 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
         if (viewPager == null || viewPager.getAdapter() == null) {
             return;
         }
+        int count;
+        int position;
+        if (viewPager.getAdapter() instanceof InfinitePagerAdapter) {
+            count = ((InfinitePagerAdapter) viewPager.getAdapter()).getRealCount();
+            if (count > 0) {
+                position = viewPager.getCurrentItem() % count;
+            } else {
+                position = 0;
+            }
+        } else {
+            count = viewPager.getAdapter().getCount();
+            position = viewPager.getCurrentItem();
+        }
 
-        int count = viewPager.getAdapter().getCount();
-        int selectedPos = isRtl() ? (count - 1) - viewPager.getCurrentItem() : viewPager.getCurrentItem();
-
+        int selectedPos = isRtl() ? (count - 1) - position : position;
         manager.indicator().setSelectedPosition(selectedPos);
         manager.indicator().setSelectingPosition(selectedPos);
         manager.indicator().setLastSelectedPosition(selectedPos);
@@ -571,7 +583,7 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
         }
     }
 
-	private void onPageScroll(int position, float positionOffset) {
+    private void onPageScroll(int position, float positionOffset) {
         Indicator indicator = manager.indicator();
         AnimationType animationType = indicator.getAnimationType();
         boolean interactiveAnimation = indicator.isInteractiveAnimation();
@@ -616,7 +628,7 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
         }
 
         int viewPagerId = manager.indicator().getViewPagerId();
-        ViewPager viewPager = findViewPager((ViewGroup) viewParent, viewPagerId);
+        SliderPager viewPager = findViewPager((ViewGroup) viewParent, viewPagerId);
 
         if (viewPager != null) {
             setViewPager(viewPager);
@@ -626,25 +638,25 @@ public class PageIndicatorView extends View implements ViewPager.OnPageChangeLis
     }
 
     @Nullable
-    private ViewPager findViewPager(@NonNull ViewGroup viewGroup, int id) {
+    private SliderPager findViewPager(@NonNull ViewGroup viewGroup, int id) {
         if (viewGroup.getChildCount() <= 0) {
             return null;
         }
 
         View view = viewGroup.findViewById(id);
-        if (view != null && view instanceof ViewPager) {
-            return (ViewPager) view;
+        if (view != null && view instanceof SliderPager) {
+            return (SliderPager) view;
         } else {
             return null;
         }
     }
 
-    private int adjustPosition(int position){
+    private int adjustPosition(int position) {
         Indicator indicator = manager.indicator();
         int count = indicator.getCount();
         int lastPosition = count - 1;
 
-        if (position < 0) {
+        if (position <= 0) {
             position = 0;
 
         } else if (position > lastPosition) {

@@ -1,9 +1,10 @@
 package com.smarteist.autoimageslider.Transformations;
 
-import android.support.v4.view.ViewPager;
 import android.view.View;
 
-public class FadeTransformation implements ViewPager.PageTransformer{
+import com.smarteist.autoimageslider.SliderPager;
+
+public class FadeTransformation implements SliderPager.PageTransformer{
     @Override
     public void transformPage(View view, float position) {
 

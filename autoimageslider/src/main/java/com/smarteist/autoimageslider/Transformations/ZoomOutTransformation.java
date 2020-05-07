@@ -1,9 +1,10 @@
 package com.smarteist.autoimageslider.Transformations;
 
-import android.support.v4.view.ViewPager;
 import android.view.View;
 
-public class ZoomOutTransformation implements ViewPager.PageTransformer {
+import com.smarteist.autoimageslider.SliderPager;
+
+public class ZoomOutTransformation implements SliderPager.PageTransformer {
 
     private static final float MIN_SCALE = 0.65f;
     private static final float MIN_ALPHA = 0.3f;
