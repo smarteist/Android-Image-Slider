@@ -390,8 +390,12 @@ public class SliderView extends FrameLayout
     public void setCurrentPagePosition(int position) {
 
         if (getSliderAdapter() != null) {
-            int midpoint = (getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
-            mSliderPager.setCurrentItem(midpoint + position, true);
+            if (mIsInfiniteAdapter) {
+                int midpoint = (getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
+                mSliderPager.setCurrentItem(midpoint + position, true);
+            } else {
+                mSliderPager.setCurrentItem(position, true);
+            }
         } else {
             throw new NullPointerException("Adapter not set");
         }

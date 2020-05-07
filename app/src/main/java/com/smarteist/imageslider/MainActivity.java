@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
             @Override
             public void onIndicatorClicked(int position) {
-                sliderView.slideToPreviousPosition();
+                sliderView.setCurrentPagePosition(position);
             }
         });
 
