@@ -9,6 +9,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.smarteist.autoimageslider.IndicatorAnimations;
+import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 import com.smarteist.imageslider.Model.SliderItem;
@@ -38,6 +39,13 @@ public class MainActivity extends AppCompatActivity {
         sliderView.setIndicatorUnselectedColor(Color.GRAY);
         sliderView.setScrollTimeInSec(3);
         sliderView.setAutoCycle(false);
+
+        sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
+            @Override
+            public void onIndicatorClicked(int position) {
+                sliderView.setCurrentPagePosition(position);
+            }
+        });
 
     }
 

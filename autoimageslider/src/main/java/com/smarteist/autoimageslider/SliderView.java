@@ -71,6 +71,7 @@ public class SliderView extends FrameLayout
     private InfinitePagerAdapter mInfinitePagerAdapter;
     private boolean mPausedSliding = false;
     private OnSliderPageListener mPageListener;
+    private boolean mIsInfiniteAdapter = true;
 
     /*Constructor*/
     public SliderView(Context context) {
@@ -199,6 +200,24 @@ public class SliderView extends FrameLayout
         //setup with indicator
         mPagerIndicator.setCount(getAdapterItemsCount());
         mPagerIndicator.setDynamicCount(true);
+    }
+
+    /**
+     * @param pagerAdapter Set a SliderAdapter that will supply views
+     *                     for this slider as needed.
+     */
+    public void setSliderAdapter(@NonNull SliderViewAdapter pagerAdapter, boolean infiniteAdapter) {
+        this.mIsInfiniteAdapter = infiniteAdapter;
+        if (!infiniteAdapter) {
+            this.mPagerAdapter = pagerAdapter;
+            //registerAdapterDataObserver();
+            mSliderPager.setAdapter(pagerAdapter);
+            //setup with indicator
+            mPagerIndicator.setCount(getAdapterItemsCount());
+            mPagerIndicator.setDynamicCount(true);
+        } else {
+            setSliderAdapter(pagerAdapter);
+        }
     }
 
     /**
@@ -604,7 +623,7 @@ public class SliderView extends FrameLayout
     /**
      * This method handles sliding behaviors
      * which passed into {@link #SliderView#mHandler}
-     *
+     * <p>
      * see {@link #SliderView#startAutoCycle()}
      */
     @Override
@@ -643,11 +662,35 @@ public class SliderView extends FrameLayout
         }
     }
 
+
+    public void slideToPreviousPosition() {
+
+        int currentPosition = mSliderPager.getCurrentItem();
+        int adapterItemsCount = getAdapterItemsCount();
+
+        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 1) {
+            if (currentPosition % (adapterItemsCount - 1) == 0) {
+                mFlagBackAndForth = !mFlagBackAndForth;
+            }
+            if (mFlagBackAndForth) {
+                mSliderPager.setCurrentItem(--currentPosition, true);
+            } else {
+                mSliderPager.setCurrentItem(++currentPosition, true);
+            }
+        } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
+            mSliderPager.setCurrentItem(++currentPosition, true);
+        } else {
+            mSliderPager.setCurrentItem(--currentPosition, true);
+        }
+    }
+
     //sync infinite pager adapter with real one
     @Override
     public void dataSetChanged() {
-        mInfinitePagerAdapter.notifyDataSetChanged();
-        mSliderPager.setCurrentItem((getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2), false);
+        if (mIsInfiniteAdapter) {
+            mInfinitePagerAdapter.notifyDataSetChanged();
+            mSliderPager.setCurrentItem((getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2), false);
+        }
     }
 
     @Override
