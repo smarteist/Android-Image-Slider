@@ -129,6 +129,7 @@ public class SliderView extends FrameLayout
         setIndicatorRadius(indicatorRadius);
         setIndicatorPadding(indicatorPadding);
         setIndicatorMargin(indicatorMargin);
+        setIndicatorMarginCustom(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
         setIndicatorGravity(indicatorGravity);
         setIndicatorMargins(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
         setIndicatorUnselectedColor(indicatorUnselectedColor);
@@ -387,8 +388,12 @@ public class SliderView extends FrameLayout
     public void setCurrentPagePosition(int position) {
 
         if (getSliderAdapter() != null) {
-            int midpoint = (getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
-            mSliderPager.setCurrentItem(midpoint + position, true);
+            if (mIsInfiniteAdapter) {
+                int midpoint = (getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
+                mSliderPager.setCurrentItem(midpoint + position, true);
+            } else {
+                mSliderPager.setCurrentItem(position, true);
+            }
         } else {
             throw new NullPointerException("Adapter not set");
         }
@@ -580,6 +585,12 @@ public class SliderView extends FrameLayout
     public void setIndicatorMargin(int margin) {
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(margin, margin, margin, margin);
+        mPagerIndicator.setLayoutParams(layoutParams);
+    }
+
+    public void setIndicatorMarginCustom(int left, int top, int right, int bottom) {
+        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        layoutParams.setMargins(left, top, right, bottom);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
 
