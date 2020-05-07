@@ -131,9 +131,7 @@ public class SliderView extends FrameLayout
         setIndicatorRadius(indicatorRadius);
         setIndicatorPadding(indicatorPadding);
         setIndicatorMargin(indicatorMargin);
-        if(R.styleable.SliderView_sliderIndicatorMargin == null){
-            setIndicatorMarginCustom(indicatorMarginLeft,indicatorMarginTop,indicatorMarginRight,indicatorMarginBottom);
-        }
+        setIndicatorMarginCustom(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
         setIndicatorGravity(indicatorGravity);
         setIndicatorMargins(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
         setIndicatorUnselectedColor(indicatorUnselectedColor);
@@ -200,6 +198,7 @@ public class SliderView extends FrameLayout
         //setup with indicator
         mPagerIndicator.setCount(getAdapterItemsCount());
         mPagerIndicator.setDynamicCount(true);
+        setCurrentPagePosition(0);
     }
 
     /**
@@ -210,9 +209,7 @@ public class SliderView extends FrameLayout
         this.mIsInfiniteAdapter = infiniteAdapter;
         if (!infiniteAdapter) {
             this.mPagerAdapter = pagerAdapter;
-            //registerAdapterDataObserver();
             mSliderPager.setAdapter(pagerAdapter);
-            //setup with indicator
             mPagerIndicator.setCount(getAdapterItemsCount());
             mPagerIndicator.setDynamicCount(true);
         } else {
@@ -588,8 +585,8 @@ public class SliderView extends FrameLayout
         layoutParams.setMargins(margin, margin, margin, margin);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
-    
-    public void setIndicatorMarginCustom(int left,int top,int right,int bottom) {
+
+    public void setIndicatorMarginCustom(int left, int top, int right, int bottom) {
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(left, top, right, bottom);
         mPagerIndicator.setLayoutParams(layoutParams);
