@@ -131,9 +131,6 @@ public class SliderView extends FrameLayout
         setIndicatorRadius(indicatorRadius);
         setIndicatorPadding(indicatorPadding);
         setIndicatorMargin(indicatorMargin);
-        if(R.styleable.SliderView_sliderIndicatorMargin == null){
-            setIndicatorMarginCustom(indicatorMarginLeft,indicatorMarginTop,indicatorMarginRight,indicatorMarginBottom);
-        }
         setIndicatorGravity(indicatorGravity);
         setIndicatorMargins(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
         setIndicatorUnselectedColor(indicatorUnselectedColor);
@@ -587,7 +584,7 @@ public class SliderView extends FrameLayout
         layoutParams.setMargins(margin, margin, margin, margin);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
-    
+
     public void setIndicatorMarginCustom(int left,int top,int right,int bottom) {
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(left, top, right, bottom);
