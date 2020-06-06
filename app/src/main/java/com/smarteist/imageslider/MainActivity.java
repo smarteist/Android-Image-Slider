@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
+import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 import com.smarteist.imageslider.Model.SliderItem;
@@ -41,12 +42,12 @@ public class MainActivity extends AppCompatActivity {
         sliderView.setAutoCycle(true);
         sliderView.startAutoCycle();
 
-        /*sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
+        sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
             @Override
             public void onIndicatorClicked(int position) {
-                sliderView.setCurrentPagePosition(position);
+                sliderView.setInfiniteAdapterEnabled(position % 2 == 0);
             }
-        });*/
+        });
 
     }
 

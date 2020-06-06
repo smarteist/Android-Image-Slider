@@ -477,7 +477,11 @@ public class SliderPager extends ViewGroup {
                 mObserver = new PagerObserver();
             }
             setAdapterViewPagerObserver(mObserver);
-            mAdapter.registerDataSetObserver(mObserver);
+            try {
+                mAdapter.registerDataSetObserver(mObserver);
+            } catch (Exception ignored) {
+                // maybe there is a registered observer
+            }
             mPopulatePending = false;
             final boolean wasFirstLayout = mFirstLayout;
             mFirstLayout = true;

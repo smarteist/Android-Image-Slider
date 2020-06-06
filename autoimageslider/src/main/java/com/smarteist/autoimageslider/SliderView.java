@@ -13,8 +13,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
+
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
+
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.BaseAnimation;
@@ -214,6 +216,7 @@ public class SliderView extends FrameLayout
         //registerAdapterDataObserver();
         mSliderPager.setAdapter(mInfinitePagerAdapter);
         mPagerAdapter.dataSetChangedListener(this);
+        // set slider on correct position whether its infinite or not.
         setCurrentPagePosition(0);
     }
 
@@ -225,9 +228,16 @@ public class SliderView extends FrameLayout
         this.mIsInfiniteAdapter = infiniteAdapter;
         if (!infiniteAdapter) {
             this.mPagerAdapter = pagerAdapter;
-            mSliderPager.setAdapter(pagerAdapter);
+            this.mSliderPager.setAdapter(pagerAdapter);
         } else {
             setSliderAdapter(pagerAdapter);
+        }
+    }
+
+
+    public void setInfiniteAdapterEnabled(boolean enabled) {
+        if (mPagerAdapter != null) {
+            setSliderAdapter(mPagerAdapter, enabled);
         }
     }
 
@@ -398,6 +408,7 @@ public class SliderView extends FrameLayout
     }
 
     /**
+     * This method handles correct position whether slider is on infinite mode or not
      * @param position changes position of slider
      *                 items manually.
      */
