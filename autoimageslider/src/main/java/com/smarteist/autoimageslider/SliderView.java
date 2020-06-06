@@ -18,9 +18,9 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.BaseAnimation;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.ColorAnimation;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.RtlMode;
@@ -409,21 +409,12 @@ public class SliderView extends FrameLayout
 
     /**
      * This method handles correct position whether slider is on infinite mode or not
+     *
      * @param position changes position of slider
      *                 items manually.
      */
     public void setCurrentPagePosition(int position) {
-
-        if (getSliderAdapter() != null) {
-            if (mIsInfiniteAdapter) {
-                int midpoint = (getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
-                mSliderPager.setCurrentItem(midpoint + position, true);
-            } else {
-                mSliderPager.setCurrentItem(position, true);
-            }
-        } else {
-            throw new NullPointerException("Adapter not set");
-        }
+        mSliderPager.setCurrentItem(position, true);
     }
 
     /**
@@ -659,20 +650,23 @@ public class SliderView extends FrameLayout
 
         int currentPosition = mSliderPager.getCurrentItem();
         int adapterItemsCount = getAdapterItemsCount();
-
-        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 1) {
-            if (currentPosition % (adapterItemsCount - 1) == 0) {
-                mFlagBackAndForth = !mFlagBackAndForth;
+        if (adapterItemsCount > 1) {
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH) {
+                if (currentPosition % (adapterItemsCount - 1) == 0) {
+                    mFlagBackAndForth = !mFlagBackAndForth;
+                }
+                if (mFlagBackAndForth) {
+                    mSliderPager.setCurrentItem(++currentPosition, true);
+                } else {
+                    mSliderPager.setCurrentItem(--currentPosition, true);
+                }
             }
-            if (mFlagBackAndForth) {
-                mSliderPager.setCurrentItem(++currentPosition, true);
-            } else {
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
                 mSliderPager.setCurrentItem(--currentPosition, true);
             }
-        } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-            mSliderPager.setCurrentItem(--currentPosition, true);
-        } else {
-            mSliderPager.setCurrentItem(++currentPosition, true);
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_RIGHT) {
+                mSliderPager.setCurrentItem(++currentPosition, true);
+            }
         }
     }
 
@@ -682,19 +676,23 @@ public class SliderView extends FrameLayout
         int currentPosition = mSliderPager.getCurrentItem();
         int adapterItemsCount = getAdapterItemsCount();
 
-        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 1) {
-            if (currentPosition % (adapterItemsCount - 1) == 0) {
-                mFlagBackAndForth = !mFlagBackAndForth;
+        if (adapterItemsCount > 1) {
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH) {
+                if (currentPosition % (adapterItemsCount - 1) == 0) {
+                    mFlagBackAndForth = !mFlagBackAndForth;
+                }
+                if (mFlagBackAndForth) {
+                    mSliderPager.setCurrentItem(--currentPosition, true);
+                } else {
+                    mSliderPager.setCurrentItem(++currentPosition, true);
+                }
             }
-            if (mFlagBackAndForth) {
-                mSliderPager.setCurrentItem(--currentPosition, true);
-            } else {
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
                 mSliderPager.setCurrentItem(++currentPosition, true);
             }
-        } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-            mSliderPager.setCurrentItem(++currentPosition, true);
-        } else {
-            mSliderPager.setCurrentItem(--currentPosition, true);
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_RIGHT) {
+                mSliderPager.setCurrentItem(--currentPosition, true);
+            }
         }
     }
 
@@ -703,7 +701,7 @@ public class SliderView extends FrameLayout
     public void dataSetChanged() {
         if (mIsInfiniteAdapter) {
             mInfinitePagerAdapter.notifyDataSetChanged();
-            mSliderPager.setCurrentItem((getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2), false);
+            mSliderPager.setCurrentItem(0, false);
         }
     }
 
