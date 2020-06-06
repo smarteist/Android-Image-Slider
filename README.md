@@ -10,28 +10,19 @@ This is an amazing image slider for the Android .
 You can easily load images with your custom layout, and there are many kinds of amazing animations you can choose.
 
 ```groovy
-     implementation 'com.github.smarteist:autoimageslider:1.3.6'
+     implementation 'com.github.smarteist:autoimageslider:1.3.8'
 ```
 If you are using appcompat libraries use this one, but please migrate to androidx as soon as you can.
 ```groovy
-     implementation 'com.github.smarteist:autoimageslider:1.3.2-appcompat'
+     implementation 'com.github.smarteist:autoimageslider:1.3.7-appcompat'
 ```
 
 ### New Feautures
-* Minor sliderView API improvements.
-* Ability to disable infinite mode.
+* Ability to disable default indicator.
 
 ### New Changes
-* Auto cycle Bugs fixed.
-* Sync state bugs fixed.
-* Circular handle completely replaced with infinite wrapper adapter.
-because of that the following interface has been replaced with new one.
-```CircularSliderHandle.CurrentPageListener```
-changed to => `SliderView.OnSliderPageListener`.
-* The slider permanently scrolls infinitely, so the following methods have also been deleted.
-`sliderView.setCircularHandlerEnabled(boolean enable)`
-& its attribute in xml side:
-`app:sliderCircularHandlerEnabled="boolean"`
+
+
 ## Demo
 ![](https://github.com/smarteist/android-image-slider/blob/master/gif/0.gif)
 ![](https://github.com/smarteist/android-image-slider/blob/master/gif/8.gif)

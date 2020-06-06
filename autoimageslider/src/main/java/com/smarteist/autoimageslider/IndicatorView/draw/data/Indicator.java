@@ -2,7 +2,7 @@ package com.smarteist.autoimageslider.IndicatorView.draw.data;
 
 import androidx.annotation.NonNull;
 import android.view.View;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 
 public class Indicator {
 
@@ -43,7 +43,7 @@ public class Indicator {
     private int viewPagerId = View.NO_ID;
 
     private Orientation orientation;
-    private AnimationType animationType;
+    private IndicatorAnimationType animationType;
     private RtlMode rtlMode;
 
     public int getHeight() {
@@ -219,14 +219,14 @@ public class Indicator {
     }
 
     @NonNull
-    public AnimationType getAnimationType() {
+    public IndicatorAnimationType getAnimationType() {
         if (animationType == null) {
-            animationType = AnimationType.NONE;
+            animationType = IndicatorAnimationType.NONE;
         }
         return animationType;
     }
 
-    public void setAnimationType(AnimationType animationType) {
+    public void setAnimationType(IndicatorAnimationType animationType) {
         this.animationType = animationType;
     }
 

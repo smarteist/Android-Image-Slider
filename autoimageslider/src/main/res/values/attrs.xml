@@ -51,6 +51,7 @@
             <enum name="vertical" value="1" />
         </attr>
 
+        <attr name="sliderIndicatorEnabled" format="boolean" />
         <attr name="sliderIndicatorRadius" format="dimension" />
         <attr name="sliderIndicatorPadding" format="dimension" />
         <attr name="sliderIndicatorMargin" format="dimension" />

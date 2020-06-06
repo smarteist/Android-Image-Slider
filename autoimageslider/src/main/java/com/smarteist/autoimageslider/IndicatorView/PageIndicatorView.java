@@ -22,7 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.ScaleAnimation;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
@@ -327,13 +327,13 @@ public class PageIndicatorView extends View implements SliderPager.OnPageChangeL
     }
 
 
-    public void setAnimationType(@Nullable AnimationType type) {
+    public void setAnimationType(@Nullable IndicatorAnimationType type) {
         manager.onValueUpdated(null);
 
         if (type != null) {
             manager.indicator().setAnimationType(type);
         } else {
-            manager.indicator().setAnimationType(AnimationType.NONE);
+            manager.indicator().setAnimationType(IndicatorAnimationType.NONE);
         }
         invalidate();
     }
@@ -420,8 +420,8 @@ public class PageIndicatorView extends View implements SliderPager.OnPageChangeL
 
     public void setSelected(int position) {
         Indicator indicator = manager.indicator();
-        AnimationType animationType = indicator.getAnimationType();
-        indicator.setAnimationType(AnimationType.NONE);
+        IndicatorAnimationType animationType = indicator.getAnimationType();
+        indicator.setAnimationType(IndicatorAnimationType.NONE);
 
         setSelection(position);
         indicator.setAnimationType(animationType);
@@ -588,9 +588,9 @@ public class PageIndicatorView extends View implements SliderPager.OnPageChangeL
 
     private void onPageScroll(int position, float positionOffset) {
         Indicator indicator = manager.indicator();
-        AnimationType animationType = indicator.getAnimationType();
+        IndicatorAnimationType animationType = indicator.getAnimationType();
         boolean interactiveAnimation = indicator.isInteractiveAnimation();
-        boolean canSelectIndicator = isViewMeasured() && interactiveAnimation && animationType != AnimationType.NONE;
+        boolean canSelectIndicator = isViewMeasured() && interactiveAnimation && animationType != IndicatorAnimationType.NONE;
 
         if (!canSelectIndicator) {
             return;
