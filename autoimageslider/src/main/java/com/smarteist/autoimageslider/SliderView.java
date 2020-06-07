@@ -8,13 +8,13 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
@@ -170,11 +170,10 @@ public class SliderView extends FrameLayout
             );
             params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
             params.setMargins(20, 20, 20, 20);
-            mPagerIndicator.setLayoutParams(params);
+            addView(mPagerIndicator, 1, params);
         }
         mPagerIndicator.setViewPager(mSliderPager);
         mPagerIndicator.setDynamicCount(true);
-        addView(mPagerIndicator);
     }
 
     /**
@@ -185,8 +184,14 @@ public class SliderView extends FrameLayout
      */
     @SuppressLint("ClickableViewAccessibility")
     private void setupSlideView(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.slider_view, this, true);
-        mSliderPager = findViewById(R.id.vp_slider_layout);
+        mSliderPager = new SliderPager(context);
+        mSliderPager.setOverScrollMode(OVER_SCROLL_IF_CONTENT_SCROLLS);
+        mSliderPager.setId(ViewCompat.generateViewId());
+        LayoutParams sliderParams = new LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+        );
+        addView(mSliderPager, 0, sliderParams);
         mSliderPager.setOnTouchListener(this);
         mSliderPager.addOnPageChangeListener(this);
     }
@@ -444,7 +449,7 @@ public class SliderView extends FrameLayout
 
     public void setIndicatorEnabled(boolean enabled) {
         this.mIsIndicatorEnabled = enabled;
-        if (mPagerIndicator == null) {
+        if (mPagerIndicator == null && enabled) {
             initIndicator();
         }
     }
@@ -460,7 +465,7 @@ public class SliderView extends FrameLayout
      * @param gravity {@link #View} integer gravity of indicator dots.
      */
     public void setIndicatorGravity(int gravity) {
-        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.gravity = gravity;
         mPagerIndicator.setLayoutParams(layoutParams);
     }
@@ -481,7 +486,7 @@ public class SliderView extends FrameLayout
      * @param bottom the bottom margin size
      */
     public void setIndicatorMargins(int left, int top, int right, int bottom) {
-        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(left, top, right, bottom);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
@@ -589,13 +594,13 @@ public class SliderView extends FrameLayout
      * @param margin modifies indicator margin
      */
     public void setIndicatorMargin(int margin) {
-        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(margin, margin, margin, margin);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
 
     public void setIndicatorMarginCustom(int left, int top, int right, int bottom) {
-        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(left, top, right, bottom);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
