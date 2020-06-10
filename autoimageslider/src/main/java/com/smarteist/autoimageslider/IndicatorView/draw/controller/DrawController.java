@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.MotionEvent;
 import com.smarteist.autoimageslider.IndicatorView.animation.data.Value;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
 import com.smarteist.autoimageslider.IndicatorView.draw.drawer.Drawer;
 import com.smarteist.autoimageslider.IndicatorView.utils.CoordinatesUtils;
@@ -91,7 +91,7 @@ public class DrawController {
     }
 
     private void drawWithAnimation(@NonNull Canvas canvas) {
-        AnimationType animationType = indicator.getAnimationType();
+        IndicatorAnimationType animationType = indicator.getAnimationType();
         switch (animationType) {
             case NONE:
                 drawer.drawBasic(canvas, true);

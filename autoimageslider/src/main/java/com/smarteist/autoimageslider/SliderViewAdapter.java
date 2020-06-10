@@ -29,16 +29,12 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         VH viewHolder = destroyedItems.poll();
-
-        if (viewHolder != null) {
-            // Re-add existing view before rendering so that we can make change inside getView()
-            container.addView(viewHolder.itemView);
-            onBindViewHolder(viewHolder, position);
-        } else {
+        if (viewHolder == null) {
             viewHolder = onCreateViewHolder(container);
-            container.addView(viewHolder.itemView);
-            onBindViewHolder(viewHolder, position);
         }
+        // Re-add existing view before rendering so that we can make change inside getView()
+        container.addView(viewHolder.itemView);
+        onBindViewHolder(viewHolder, position);
 
         return viewHolder;
     }

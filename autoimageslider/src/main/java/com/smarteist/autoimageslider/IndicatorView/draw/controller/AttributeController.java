@@ -6,7 +6,6 @@ import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
 import com.smarteist.autoimageslider.IndicatorView.utils.DensityUtils;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.*;
@@ -75,8 +74,8 @@ public class AttributeController {
             animationDuration = 0;
         }
 
-        int animIndex = typedArray.getInt(R.styleable.PageIndicatorView_piv_animationType, AnimationType.NONE.ordinal());
-        AnimationType animationType = getAnimationType(animIndex);
+        int animIndex = typedArray.getInt(R.styleable.PageIndicatorView_piv_animationType, IndicatorAnimationType.NONE.ordinal());
+        IndicatorAnimationType animationType = getAnimationType(animIndex);
 
         int rtlIndex = typedArray.getInt(R.styleable.PageIndicatorView_piv_rtl_mode, RtlMode.Off.ordinal());
         RtlMode rtlMode = getRtlMode(rtlIndex);
@@ -120,7 +119,7 @@ public class AttributeController {
             stroke = radius;
         }
 
-        if (indicator.getAnimationType() != AnimationType.FILL) {
+        if (indicator.getAnimationType() != IndicatorAnimationType.FILL) {
             stroke = 0;
         }
 
@@ -131,31 +130,31 @@ public class AttributeController {
         indicator.setStroke(stroke);
     }
 
-    private AnimationType getAnimationType(int index) {
+    private IndicatorAnimationType getAnimationType(int index) {
         switch (index) {
             case 0:
-                return AnimationType.NONE;
+                return IndicatorAnimationType.NONE;
             case 1:
-                return AnimationType.COLOR;
+                return IndicatorAnimationType.COLOR;
             case 2:
-                return AnimationType.SCALE;
+                return IndicatorAnimationType.SCALE;
             case 3:
-                return AnimationType.WORM;
+                return IndicatorAnimationType.WORM;
             case 4:
-                return AnimationType.SLIDE;
+                return IndicatorAnimationType.SLIDE;
             case 5:
-                return AnimationType.FILL;
+                return IndicatorAnimationType.FILL;
             case 6:
-                return AnimationType.THIN_WORM;
+                return IndicatorAnimationType.THIN_WORM;
             case 7:
-                return AnimationType.DROP;
+                return IndicatorAnimationType.DROP;
             case 8:
-                return AnimationType.SWAP;
+                return IndicatorAnimationType.SWAP;
             case 9:
-                return AnimationType.SCALE_DOWN;
+                return IndicatorAnimationType.SCALE_DOWN;
         }
 
-        return AnimationType.NONE;
+        return IndicatorAnimationType.NONE;
     }
 
     public static RtlMode getRtlMode(int index) {

@@ -2,7 +2,7 @@ package com.smarteist.autoimageslider.IndicatorView.animation.controller;
 
 import androidx.annotation.NonNull;
 
-import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.BaseAnimation;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
@@ -44,7 +44,7 @@ public class AnimationController {
     }
 
     private void animate() {
-        AnimationType animationType = indicator.getAnimationType();
+        IndicatorAnimationType animationType = indicator.getAnimationType();
         switch (animationType) {
             case NONE:
                 listener.onValueUpdated(null);

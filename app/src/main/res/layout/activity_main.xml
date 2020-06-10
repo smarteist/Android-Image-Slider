@@ -21,6 +21,7 @@
             app:sliderAnimationDuration="600"
             app:sliderAutoCycleDirection="back_and_forth"
             app:sliderIndicatorAnimationDuration="600"
+            app:sliderIndicatorEnabled="true"
             app:sliderIndicatorGravity="center_horizontal|bottom"
             app:sliderIndicatorMargin="15dp"
             app:sliderIndicatorOrientation="horizontal"
@@ -40,21 +41,21 @@
         android:orientation="vertical">
 
         <Button
-            android:onClick="addNewItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="addNewItem"
             android:text="Add An Item" />
 
         <Button
-            android:onClick="removeLastItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="removeLastItem"
             android:text="Rmove Last Item" />
 
         <Button
-            android:onClick="renewItems"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="renewItems"
             android:text="Renew Items" />
 
     </LinearLayout>

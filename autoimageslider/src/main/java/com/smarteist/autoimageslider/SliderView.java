@@ -8,19 +8,19 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.smarteist.autoimageslider.IndicatorView.PageIndicatorView;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.BaseAnimation;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.ColorAnimation;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.RtlMode;
@@ -69,9 +69,10 @@ public class SliderView extends FrameLayout
     private SliderViewAdapter mPagerAdapter;
     private SliderPager mSliderPager;
     private InfinitePagerAdapter mInfinitePagerAdapter;
-    private boolean mPausedSliding = false;
     private OnSliderPageListener mPageListener;
     private boolean mIsInfiniteAdapter = true;
+    private boolean mIsIndicatorEnabled = true;
+    private int mPreviousPosition = -1;
 
     /*Constructor*/
     public SliderView(Context context) {
@@ -101,50 +102,78 @@ public class SliderView extends FrameLayout
     private void setUpAttributes(@NonNull Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SliderView, 0, 0);
 
-        int indicatorOrientation = typedArray.getInt(R.styleable.SliderView_sliderIndicatorOrientation, Orientation.HORIZONTAL.ordinal());
-        Orientation orientation;
-        if (indicatorOrientation == 0) {
-            orientation = Orientation.HORIZONTAL;
-        } else {
-            orientation = Orientation.VERTICAL;
-        }
-        int indicatorRadius = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorRadius, DensityUtils.dpToPx(2));
-        int indicatorPadding = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorPadding, DensityUtils.dpToPx(3));
-        int indicatorMargin = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMargin, DensityUtils.dpToPx(12));
-        int indicatorMarginLeft = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginLeft, DensityUtils.dpToPx(12));
-        int indicatorMarginTop = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginTop, DensityUtils.dpToPx(12));
-        int indicatorMarginRight = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginRight, DensityUtils.dpToPx(12));
-        int indicatorMarginBottom = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginBottom, DensityUtils.dpToPx(12));
-        int indicatorGravity = typedArray.getInt(R.styleable.SliderView_sliderIndicatorGravity, Gravity.CENTER | Gravity.BOTTOM);
-        int indicatorUnselectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorUnselectedColor, Color.parseColor(ColorAnimation.DEFAULT_UNSELECTED_COLOR));
-        int indicatorSelectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorSelectedColor, Color.parseColor(ColorAnimation.DEFAULT_SELECTED_COLOR));
-        int indicatorAnimationDuration = typedArray.getInt(R.styleable.SliderView_sliderIndicatorAnimationDuration, BaseAnimation.DEFAULT_ANIMATION_TIME);
-        int indicatorRtlMode = typedArray.getInt(R.styleable.SliderView_sliderIndicatorRtlMode, RtlMode.Off.ordinal());
-        RtlMode rtlMode = getRtlMode(indicatorRtlMode);
+        boolean indicatorEnabled = typedArray.getBoolean(R.styleable.SliderView_sliderIndicatorEnabled, true);
         int sliderAnimationDuration = typedArray.getInt(R.styleable.SliderView_sliderAnimationDuration, SliderPager.DEFAULT_SCROLL_DURATION);
         int sliderScrollTimeInSec = typedArray.getInt(R.styleable.SliderView_sliderScrollTimeInSec, 2);
         boolean sliderAutoCycleEnabled = typedArray.getBoolean(R.styleable.SliderView_sliderAutoCycleEnabled, true);
         boolean sliderStartAutoCycle = typedArray.getBoolean(R.styleable.SliderView_sliderStartAutoCycle, false);
         int sliderAutoCycleDirection = typedArray.getInt(R.styleable.SliderView_sliderAutoCycleDirection, AUTO_CYCLE_DIRECTION_RIGHT);
 
-        setIndicatorOrientation(orientation);
-        setIndicatorRadius(indicatorRadius);
-        setIndicatorPadding(indicatorPadding);
-        setIndicatorMargin(indicatorMargin);
-        setIndicatorMarginCustom(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
-        setIndicatorGravity(indicatorGravity);
-        setIndicatorMargins(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
-        setIndicatorUnselectedColor(indicatorUnselectedColor);
-        setIndicatorSelectedColor(indicatorSelectedColor);
-        setIndicatorAnimationDuration(indicatorAnimationDuration);
-        setIndicatorRtlMode(rtlMode);
         setSliderAnimationDuration(sliderAnimationDuration);
         setScrollTimeInSec(sliderScrollTimeInSec);
         setAutoCycle(sliderAutoCycleEnabled);
         setAutoCycleDirection(sliderAutoCycleDirection);
         setAutoCycle(sliderStartAutoCycle);
+        setIndicatorEnabled(indicatorEnabled);
+
+        /*start indicator configs*/
+        if (mIsIndicatorEnabled) {
+            initIndicator();
+            int indicatorOrientation = typedArray.getInt(R.styleable.SliderView_sliderIndicatorOrientation, Orientation.HORIZONTAL.ordinal());
+            Orientation orientation;
+            if (indicatorOrientation == 0) {
+                orientation = Orientation.HORIZONTAL;
+            } else {
+                orientation = Orientation.VERTICAL;
+            }
+            int indicatorRadius = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorRadius, DensityUtils.dpToPx(2));
+            int indicatorPadding = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorPadding, DensityUtils.dpToPx(3));
+            int indicatorMargin = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMargin, DensityUtils.dpToPx(12));
+            int indicatorMarginLeft = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginLeft, DensityUtils.dpToPx(12));
+            int indicatorMarginTop = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginTop, DensityUtils.dpToPx(12));
+            int indicatorMarginRight = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginRight, DensityUtils.dpToPx(12));
+            int indicatorMarginBottom = (int) typedArray.getDimension(R.styleable.SliderView_sliderIndicatorMarginBottom, DensityUtils.dpToPx(12));
+            int indicatorGravity = typedArray.getInt(R.styleable.SliderView_sliderIndicatorGravity, Gravity.CENTER | Gravity.BOTTOM);
+            int indicatorUnselectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorUnselectedColor, Color.parseColor(ColorAnimation.DEFAULT_UNSELECTED_COLOR));
+            int indicatorSelectedColor = typedArray.getColor(R.styleable.SliderView_sliderIndicatorSelectedColor, Color.parseColor(ColorAnimation.DEFAULT_SELECTED_COLOR));
+            int indicatorAnimationDuration = typedArray.getInt(R.styleable.SliderView_sliderIndicatorAnimationDuration, BaseAnimation.DEFAULT_ANIMATION_TIME);
+            int indicatorRtlMode = typedArray.getInt(R.styleable.SliderView_sliderIndicatorRtlMode, RtlMode.Off.ordinal());
+            RtlMode rtlMode = getRtlMode(indicatorRtlMode);
+
+            setIndicatorOrientation(orientation);
+            setIndicatorRadius(indicatorRadius);
+            setIndicatorPadding(indicatorPadding);
+            setIndicatorMargin(indicatorMargin);
+            setIndicatorMarginCustom(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
+            setIndicatorGravity(indicatorGravity);
+            setIndicatorMargins(indicatorMarginLeft, indicatorMarginTop, indicatorMarginRight, indicatorMarginBottom);
+            setIndicatorUnselectedColor(indicatorUnselectedColor);
+            setIndicatorSelectedColor(indicatorSelectedColor);
+            setIndicatorAnimationDuration(indicatorAnimationDuration);
+            setIndicatorRtlMode(rtlMode);
+        }
+        /*end indicator configs*/
 
         typedArray.recycle();
+    }
+
+    /**
+     * This method will be called only if {@link #mIsIndicatorEnabled} is true.
+     * so initializes indicator if its active.
+     */
+    private void initIndicator() {
+        if (mPagerIndicator == null) {
+            mPagerIndicator = new PageIndicatorView(getContext());
+            LayoutParams params = new LayoutParams(
+                    LayoutParams.WRAP_CONTENT,
+                    LayoutParams.WRAP_CONTENT
+            );
+            params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+            params.setMargins(20, 20, 20, 20);
+            addView(mPagerIndicator, 1, params);
+        }
+        mPagerIndicator.setViewPager(mSliderPager);
+        mPagerIndicator.setDynamicCount(true);
     }
 
     /**
@@ -155,19 +184,16 @@ public class SliderView extends FrameLayout
      */
     @SuppressLint("ClickableViewAccessibility")
     private void setupSlideView(Context context) {
-
-        View wrapperView = LayoutInflater
-                .from(context)
-                .inflate(R.layout.slider_view, this, true);
-
-        mSliderPager = wrapperView.findViewById(R.id.vp_slider_layout);
+        mSliderPager = new SliderPager(context);
+        mSliderPager.setOverScrollMode(OVER_SCROLL_IF_CONTENT_SCROLLS);
+        mSliderPager.setId(ViewCompat.generateViewId());
+        LayoutParams sliderParams = new LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+        );
+        addView(mSliderPager, 0, sliderParams);
         mSliderPager.setOnTouchListener(this);
         mSliderPager.addOnPageChangeListener(this);
-
-        mPagerIndicator = wrapperView.findViewById(R.id.pager_indicator);
-        mPagerIndicator.setViewPager(mSliderPager);
-
-
     }
 
     /**
@@ -195,9 +221,7 @@ public class SliderView extends FrameLayout
         //registerAdapterDataObserver();
         mSliderPager.setAdapter(mInfinitePagerAdapter);
         mPagerAdapter.dataSetChangedListener(this);
-        //setup with indicator
-        mPagerIndicator.setCount(getAdapterItemsCount());
-        mPagerIndicator.setDynamicCount(true);
+        // set slider on correct position whether its infinite or not.
         setCurrentPagePosition(0);
     }
 
@@ -209,11 +233,16 @@ public class SliderView extends FrameLayout
         this.mIsInfiniteAdapter = infiniteAdapter;
         if (!infiniteAdapter) {
             this.mPagerAdapter = pagerAdapter;
-            mSliderPager.setAdapter(pagerAdapter);
-            mPagerIndicator.setCount(getAdapterItemsCount());
-            mPagerIndicator.setDynamicCount(true);
+            this.mSliderPager.setAdapter(pagerAdapter);
         } else {
             setSliderAdapter(pagerAdapter);
+        }
+    }
+
+
+    public void setInfiniteAdapterEnabled(boolean enabled) {
+        if (mPagerAdapter != null) {
+            setSliderAdapter(mPagerAdapter, enabled);
         }
     }
 
@@ -351,10 +380,18 @@ public class SliderView extends FrameLayout
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            mPausedSliding = true;
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            mPausedSliding = false;
+        if (isAutoCycle()) {
+            if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                stopAutoCycle();
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                // resume after ~2 seconds debounce.
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAutoCycle();
+                    }
+                }, 2000);
+            }
         }
         return false;
     }
@@ -384,21 +421,13 @@ public class SliderView extends FrameLayout
     }
 
     /**
+     * This method handles correct position whether slider is on infinite mode or not
+     *
      * @param position changes position of slider
      *                 items manually.
      */
     public void setCurrentPagePosition(int position) {
-
-        if (getSliderAdapter() != null) {
-            if (mIsInfiniteAdapter) {
-                int midpoint = (getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
-                mSliderPager.setCurrentItem(midpoint + position, true);
-            } else {
-                mSliderPager.setCurrentItem(position, true);
-            }
-        } else {
-            throw new NullPointerException("Adapter not set");
-        }
+        mSliderPager.setCurrentItem(position, true);
     }
 
     /**
@@ -417,6 +446,22 @@ public class SliderView extends FrameLayout
         }
     }
 
+    public PageIndicatorView getPagerIndicator() {
+        return this.mPagerIndicator;
+    }
+
+    public void setPageIndicatorView(PageIndicatorView indicatorView) {
+        this.mPagerIndicator = indicatorView;
+        initIndicator();
+    }
+
+    public void setIndicatorEnabled(boolean enabled) {
+        this.mIsIndicatorEnabled = enabled;
+        if (mPagerIndicator == null && enabled) {
+            initIndicator();
+        }
+    }
+
     /**
      * @param duration modifies indicator animation duration.
      */
@@ -428,7 +473,7 @@ public class SliderView extends FrameLayout
      * @param gravity {@link #View} integer gravity of indicator dots.
      */
     public void setIndicatorGravity(int gravity) {
-        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.gravity = gravity;
         mPagerIndicator.setLayoutParams(layoutParams);
     }
@@ -449,7 +494,7 @@ public class SliderView extends FrameLayout
      * @param bottom the bottom margin size
      */
     public void setIndicatorMargins(int left, int top, int right, int bottom) {
-        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(left, top, right, bottom);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
@@ -462,42 +507,10 @@ public class SliderView extends FrameLayout
     }
 
     /**
-     * @param animations {@link #SliderView#IndicatorAnimations} of indicator dots
+     * @param animation {@link #SliderView#IndicatorAnimationType} of indicator dots
      */
-    public void setIndicatorAnimation(IndicatorAnimations animations) {
-
-        switch (animations) {
-            case DROP:
-                mPagerIndicator.setAnimationType(AnimationType.DROP);
-                break;
-            case FILL:
-                mPagerIndicator.setAnimationType(AnimationType.FILL);
-                break;
-            case NONE:
-                mPagerIndicator.setAnimationType(AnimationType.NONE);
-                break;
-            case SWAP:
-                mPagerIndicator.setAnimationType(AnimationType.SWAP);
-                break;
-            case WORM:
-                mPagerIndicator.setAnimationType(AnimationType.WORM);
-                break;
-            case COLOR:
-                mPagerIndicator.setAnimationType(AnimationType.COLOR);
-                break;
-            case SCALE:
-                mPagerIndicator.setAnimationType(AnimationType.SCALE);
-                break;
-            case SLIDE:
-                mPagerIndicator.setAnimationType(AnimationType.SLIDE);
-                break;
-            case SCALE_DOWN:
-                mPagerIndicator.setAnimationType(AnimationType.SCALE_DOWN);
-                break;
-            case THIN_WORM:
-                mPagerIndicator.setAnimationType(AnimationType.THIN_WORM);
-                break;
-        }
+    public void setIndicatorAnimation(IndicatorAnimationType animation) {
+        mPagerIndicator.setAnimationType(animation);
     }
 
     /**
@@ -589,13 +602,13 @@ public class SliderView extends FrameLayout
      * @param margin modifies indicator margin
      */
     public void setIndicatorMargin(int margin) {
-        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(margin, margin, margin, margin);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
 
     public void setIndicatorMarginCustom(int left, int top, int right, int bottom) {
-        FrameLayout.LayoutParams layoutParams = (LayoutParams) mPagerIndicator.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mPagerIndicator.getLayoutParams();
         layoutParams.setMargins(left, top, right, bottom);
         mPagerIndicator.setLayoutParams(layoutParams);
     }
@@ -634,10 +647,7 @@ public class SliderView extends FrameLayout
     @Override
     public void run() {
         try {
-            if (!mPausedSliding) {
-                // slide to next if not paused
-                slideToNextPosition();
-            }
+            slideToNextPosition();
         } finally {
             if (mIsAutoCycle) {
                 // continue the loop
@@ -650,21 +660,25 @@ public class SliderView extends FrameLayout
 
         int currentPosition = mSliderPager.getCurrentItem();
         int adapterItemsCount = getAdapterItemsCount();
-
-        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 1) {
-            if (currentPosition % (adapterItemsCount - 1) == 0) {
-                mFlagBackAndForth = !mFlagBackAndForth;
+        if (adapterItemsCount > 1) {
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH) {
+                if (currentPosition % (adapterItemsCount - 1) == 0 && mPreviousPosition != getAdapterItemsCount() - 1 && mPreviousPosition != 0) {
+                    mFlagBackAndForth = !mFlagBackAndForth;
+                }
+                if (mFlagBackAndForth) {
+                    mSliderPager.setCurrentItem(currentPosition + 1, true);
+                } else {
+                    mSliderPager.setCurrentItem(currentPosition - 1, true);
+                }
             }
-            if (mFlagBackAndForth) {
-                mSliderPager.setCurrentItem(++currentPosition, true);
-            } else {
-                mSliderPager.setCurrentItem(--currentPosition, true);
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
+                mSliderPager.setCurrentItem(currentPosition - 1, true);
             }
-        } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-            mSliderPager.setCurrentItem(--currentPosition, true);
-        } else {
-            mSliderPager.setCurrentItem(++currentPosition, true);
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_RIGHT) {
+                mSliderPager.setCurrentItem(currentPosition + 1, true);
+            }
         }
+        mPreviousPosition = currentPosition;
     }
 
 
@@ -673,20 +687,25 @@ public class SliderView extends FrameLayout
         int currentPosition = mSliderPager.getCurrentItem();
         int adapterItemsCount = getAdapterItemsCount();
 
-        if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH && adapterItemsCount > 1) {
-            if (currentPosition % (adapterItemsCount - 1) == 0) {
-                mFlagBackAndForth = !mFlagBackAndForth;
+        if (adapterItemsCount > 1) {
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH) {
+                if (currentPosition % (adapterItemsCount - 1) == 0 && mPreviousPosition != getAdapterItemsCount() - 1 && mPreviousPosition != 0) {
+                    mFlagBackAndForth = !mFlagBackAndForth;
+                }
+                if (mFlagBackAndForth && currentPosition < mPreviousPosition) {
+                    mSliderPager.setCurrentItem(currentPosition - 1, true);
+                } else {
+                    mSliderPager.setCurrentItem(currentPosition + 1, true);
+                }
             }
-            if (mFlagBackAndForth) {
-                mSliderPager.setCurrentItem(--currentPosition, true);
-            } else {
-                mSliderPager.setCurrentItem(++currentPosition, true);
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
+                mSliderPager.setCurrentItem(currentPosition + 1, true);
             }
-        } else if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-            mSliderPager.setCurrentItem(++currentPosition, true);
-        } else {
-            mSliderPager.setCurrentItem(--currentPosition, true);
+            if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_RIGHT) {
+                mSliderPager.setCurrentItem(currentPosition - 1, true);
+            }
         }
+        mPreviousPosition = currentPosition;
     }
 
     //sync infinite pager adapter with real one
@@ -694,7 +713,7 @@ public class SliderView extends FrameLayout
     public void dataSetChanged() {
         if (mIsInfiniteAdapter) {
             mInfinitePagerAdapter.notifyDataSetChanged();
-            mSliderPager.setCurrentItem((getAdapterItemsCount() - 1) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2), false);
+            mSliderPager.setCurrentItem(0, false);
         }
     }
 
