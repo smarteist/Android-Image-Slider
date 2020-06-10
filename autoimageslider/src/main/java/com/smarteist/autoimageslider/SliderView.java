@@ -380,10 +380,18 @@ public class SliderView extends FrameLayout
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            mPausedSliding = true;
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            mPausedSliding = false;
+        if (isAutoCycle()) {
+            if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                mPausedSliding = true;
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                // resume after ~2 seconds debounce.
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPausedSliding = false;
+                    }
+                }, 2000);
+            }
         }
         return false;
     }
