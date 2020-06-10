@@ -14,13 +14,15 @@ You can easily load images with your custom layout, and there are many kinds of 
 ```
 If you are using appcompat libraries use this one, but please migrate to androidx as soon as you can.
 ```groovy
-     implementation 'com.github.smarteist:autoimageslider:1.3.7-appcompat'
+     implementation 'com.github.smarteist:autoimageslider:1.3.8-appcompat'
 ```
 
 ### New Feautures
 * Ability to disable default indicator.
 
 ### New Changes
+* Auto cycle bugs fixed.
+* Swiping debounce implemented.
 
 
 ## Demo
