@@ -3,7 +3,7 @@ package com.smarteist.autoimageslider.IndicatorView.draw.drawer.type;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
 
 public class BasicDrawer extends BaseDrawer {
@@ -33,12 +33,12 @@ public class BasicDrawer extends BaseDrawer {
         int selectedColor = indicator.getSelectedColor();
         int unselectedColor = indicator.getUnselectedColor();
         int selectedPosition = indicator.getSelectedPosition();
-        AnimationType animationType = indicator.getAnimationType();
+        IndicatorAnimationType animationType = indicator.getAnimationType();
 
-		if (animationType == AnimationType.SCALE && !isSelectedItem) {
+		if (animationType == IndicatorAnimationType.SCALE && !isSelectedItem) {
 			radius *= scaleFactor;
 
-		} else if (animationType == AnimationType.SCALE_DOWN && isSelectedItem) {
+		} else if (animationType == IndicatorAnimationType.SCALE_DOWN && isSelectedItem) {
 			radius *= scaleFactor;
 		}
 
@@ -48,7 +48,7 @@ public class BasicDrawer extends BaseDrawer {
         }
 
         Paint paint;
-        if (animationType == AnimationType.FILL && position != selectedPosition) {
+        if (animationType == IndicatorAnimationType.FILL && position != selectedPosition) {
             paint = strokePaint;
             paint.setStrokeWidth(strokePx);
         } else {

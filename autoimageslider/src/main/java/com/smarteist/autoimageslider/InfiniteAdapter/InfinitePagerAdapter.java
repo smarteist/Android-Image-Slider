@@ -18,9 +18,7 @@ public class InfinitePagerAdapter extends PagerAdapter {
     // Warning: it should be an even number.
     public static final int INFINITE_SCROLL_LIMIT = 32400;
     private static final String TAG = "InfinitePagerAdapter";
-
     private SliderViewAdapter adapter;
-    private int virtualPosition;
 
     public InfinitePagerAdapter(SliderViewAdapter adapter) {
         this.adapter = adapter;
@@ -44,44 +42,51 @@ public class InfinitePagerAdapter extends PagerAdapter {
      * @return the {@link #getCount()} result of the wrapped adapter
      */
     public int getRealCount() {
-        int count;
         try {
-            count = getRealAdapter().getCount();
+            return getRealAdapter().getCount();
         } catch (Exception e) {
-            count = 0;
+            return 0;
         }
-        return count;
+    }
+
+
+    /**
+     * @param item real position of item
+     * @return virtual mid point
+     */
+    public int getMiddlePosition(int item) {
+        int adapterCount = getRealCount() - 1;
+        adapterCount = adapterCount == 0 ? 1 : adapterCount;
+        int midpoint = adapterCount * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
+        return item + midpoint;
     }
 
     @NonNull
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(ViewGroup container, int virtualPosition) {
         // prevent division by zer
         if (getRealCount() < 1) {
             return adapter.instantiateItem(container, 0);
         }
-        virtualPosition = position % getRealCount();
+        //Log.i(TAG, "instantiateItem: real virtualPosition: " + virtualPosition);
+        //Log.i(TAG, "instantiateItem: virtual virtualPosition: " + virtualPosition);
 
-        //Log.i(TAG, "instantiateItem: real position: " + position);
-        //Log.i(TAG, "instantiateItem: virtual position: " + virtualPosition);
-
-        // only expose virtual position to the inner adapter
-        return adapter.instantiateItem(container, virtualPosition);
+        // only expose virtual virtualPosition to the inner adapter
+        return adapter.instantiateItem(container, getRealPosition(virtualPosition));
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    public void destroyItem(ViewGroup container, int virtualPosition, Object object) {
         // prevent division by zero
         if (getRealCount() < 1) {
             adapter.destroyItem(container, 0, object);
             return;
         }
-        int virtualPosition = position % getRealCount();
         //Log.i(TAG, "destroyItem: real position: " + position);
         //Log.i(TAG, "destroyItem: virtual position: " + virtualPosition);
 
         // only expose virtual position to the inner adapter
-        adapter.destroyItem(container, virtualPosition, object);
+        adapter.destroyItem(container, getRealPosition(virtualPosition), object);
     }
 
     @Override
@@ -113,9 +118,8 @@ public class InfinitePagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(int position) {
-        int virtualPosition = position % getRealCount();
-        return adapter.getPageTitle(virtualPosition);
+    public CharSequence getPageTitle(int virtualPosition) {
+        return adapter.getPageTitle(getRealPosition(virtualPosition));
     }
 
     @Override
@@ -143,8 +147,10 @@ public class InfinitePagerAdapter extends PagerAdapter {
         return adapter.getItemPosition(object);
     }
 
-    public int getVirtualPosition() {
-        return virtualPosition;
+    public int getRealPosition(int virtualPosition) {
+        if (getRealCount() > 0) {
+            return virtualPosition % getRealCount();
+        }
+        return 0;
     }
-
 }

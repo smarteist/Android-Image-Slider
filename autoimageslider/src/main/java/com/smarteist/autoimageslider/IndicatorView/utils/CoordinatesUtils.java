@@ -3,7 +3,7 @@ package com.smarteist.autoimageslider.IndicatorView.utils;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Pair;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
 
@@ -119,7 +119,7 @@ public class CoordinatesUtils {
 			coordinate += radius + padding + (stroke / 2);
 		}
 
-		if (indicator.getAnimationType() == AnimationType.DROP) {
+		if (indicator.getAnimationType() == IndicatorAnimationType.DROP) {
 			coordinate += radius * 2;
 		}
 
@@ -130,7 +130,7 @@ public class CoordinatesUtils {
 		int radius = indicator.getRadius();
 		int coordinate;
 
-		if (indicator.getAnimationType() == AnimationType.DROP) {
+		if (indicator.getAnimationType() == IndicatorAnimationType.DROP) {
 			coordinate = radius * 3;
 		} else {
 			coordinate = radius;

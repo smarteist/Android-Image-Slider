@@ -475,7 +475,11 @@ public class SliderPager extends ViewGroup {
                 mObserver = new PagerObserver();
             }
             setAdapterViewPagerObserver(mObserver);
-            mAdapter.registerDataSetObserver(mObserver);
+            try {
+                mAdapter.registerDataSetObserver(mObserver);
+            } catch (Exception ignored) {
+                // maybe there is a registered observer
+            }
             mPopulatePending = false;
             final boolean wasFirstLayout = mFirstLayout;
             mFirstLayout = true;
@@ -575,7 +579,7 @@ public class SliderPager extends ViewGroup {
      */
     public void setCurrentItem(int item) {
         mPopulatePending = false;
-        setCurrentItemInternal(item, !mFirstLayout, false);
+        setCurrentItem(item, !mFirstLayout);
     }
 
     /**
@@ -585,11 +589,17 @@ public class SliderPager extends ViewGroup {
      * @param smoothScroll True to smoothly scroll to the new item, false to transition immediately
      */
     public void setCurrentItem(int item, boolean smoothScroll) {
+        if (mAdapter instanceof InfinitePagerAdapter) {
+            item = ((InfinitePagerAdapter) mAdapter).getMiddlePosition(item);
+        }
         mPopulatePending = false;
         setCurrentItemInternal(item, smoothScroll, false);
     }
 
     public int getCurrentItem() {
+        if (mAdapter instanceof InfinitePagerAdapter && ((InfinitePagerAdapter) mAdapter).getRealCount() > 0) {
+            return ((InfinitePagerAdapter) mAdapter).getRealPosition(mCurItem);
+        }
         return mCurItem;
     }
 
@@ -763,9 +773,11 @@ public class SliderPager extends ViewGroup {
     @Override
     protected int getChildDrawingOrder(int childCount, int i) {
         final int index = mDrawingOrder == DRAW_ORDER_REVERSE ? childCount - 1 - i : i;
-        final int result =
-                ((LayoutParams) mDrawingOrderedChildren.get(index).getLayoutParams()).childIndex;
-        return result;
+
+        if (mDrawingOrderedChildren == null || mDrawingOrderedChildren.size() != getChildCount()) {
+            sortChildDrawingOrder();
+        }
+        return ((LayoutParams) mDrawingOrderedChildren.get(index).getLayoutParams()).childIndex;
     }
 
     /**
@@ -1273,12 +1285,7 @@ public class SliderPager extends ViewGroup {
         for (OnPageChangeListener eachListener : mOnPageChangeListeners) {
             if (eachListener != null) {
                 if (mAdapter instanceof InfinitePagerAdapter) {
-                    InfinitePagerAdapter infiniteAdapter = (InfinitePagerAdapter) mAdapter;
-                    int realCount = infiniteAdapter.getRealCount();
-                    if (realCount < 1) {
-                        return;
-                    }
-                    int n = position % realCount;
+                    int n = ((InfinitePagerAdapter) mAdapter).getRealPosition(position);
                     eachListener.onPageSelected(n);
                 } else {
                     eachListener.onPageSelected(position);

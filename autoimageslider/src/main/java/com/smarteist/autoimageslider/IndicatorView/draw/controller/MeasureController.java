@@ -3,7 +3,7 @@ package com.smarteist.autoimageslider.IndicatorView.draw.controller;
 import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.AnimationType;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
 import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
 
@@ -52,7 +52,7 @@ public class MeasureController {
             }
         }
 
-        if (indicator.getAnimationType() == AnimationType.DROP) {
+        if (indicator.getAnimationType() == IndicatorAnimationType.DROP) {
             if (orientation == Orientation.HORIZONTAL) {
                 desiredHeight *= 2;
             } else {
