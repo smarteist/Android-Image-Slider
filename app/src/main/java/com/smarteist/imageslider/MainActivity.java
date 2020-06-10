@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         adapter = new SliderAdapterExample(this);
-        //sliderView.setIndicatorEnabled(true);
         sliderView.setSliderAdapter(adapter);
         sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
         sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);

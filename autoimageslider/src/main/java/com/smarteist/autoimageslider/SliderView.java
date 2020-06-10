@@ -69,10 +69,10 @@ public class SliderView extends FrameLayout
     private SliderViewAdapter mPagerAdapter;
     private SliderPager mSliderPager;
     private InfinitePagerAdapter mInfinitePagerAdapter;
-    private boolean mPausedSliding = false;
     private OnSliderPageListener mPageListener;
     private boolean mIsInfiniteAdapter = true;
     private boolean mIsIndicatorEnabled = true;
+    private int mPreviousPosition = -1;
 
     /*Constructor*/
     public SliderView(Context context) {
@@ -382,13 +382,13 @@ public class SliderView extends FrameLayout
     public boolean onTouch(View v, MotionEvent event) {
         if (isAutoCycle()) {
             if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                mPausedSliding = true;
+                stopAutoCycle();
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 // resume after ~2 seconds debounce.
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mPausedSliding = false;
+                        startAutoCycle();
                     }
                 }, 2000);
             }
@@ -647,10 +647,7 @@ public class SliderView extends FrameLayout
     @Override
     public void run() {
         try {
-            if (!mPausedSliding) {
-                // slide to next if not paused
-                slideToNextPosition();
-            }
+            slideToNextPosition();
         } finally {
             if (mIsAutoCycle) {
                 // continue the loop
@@ -665,22 +662,23 @@ public class SliderView extends FrameLayout
         int adapterItemsCount = getAdapterItemsCount();
         if (adapterItemsCount > 1) {
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH) {
-                if (currentPosition % (adapterItemsCount - 1) == 0) {
+                if (currentPosition % (adapterItemsCount - 1) == 0 && mPreviousPosition != getAdapterItemsCount() - 1 && mPreviousPosition != 0) {
                     mFlagBackAndForth = !mFlagBackAndForth;
                 }
                 if (mFlagBackAndForth) {
-                    mSliderPager.setCurrentItem(++currentPosition, true);
+                    mSliderPager.setCurrentItem(currentPosition + 1, true);
                 } else {
-                    mSliderPager.setCurrentItem(--currentPosition, true);
+                    mSliderPager.setCurrentItem(currentPosition - 1, true);
                 }
             }
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-                mSliderPager.setCurrentItem(--currentPosition, true);
+                mSliderPager.setCurrentItem(currentPosition - 1, true);
             }
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_RIGHT) {
-                mSliderPager.setCurrentItem(++currentPosition, true);
+                mSliderPager.setCurrentItem(currentPosition + 1, true);
             }
         }
+        mPreviousPosition = currentPosition;
     }
 
 
@@ -691,22 +689,23 @@ public class SliderView extends FrameLayout
 
         if (adapterItemsCount > 1) {
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_BACK_AND_FORTH) {
-                if (currentPosition % (adapterItemsCount - 1) == 0) {
+                if (currentPosition % (adapterItemsCount - 1) == 0 && mPreviousPosition != getAdapterItemsCount() - 1 && mPreviousPosition != 0) {
                     mFlagBackAndForth = !mFlagBackAndForth;
                 }
-                if (mFlagBackAndForth) {
-                    mSliderPager.setCurrentItem(--currentPosition, true);
+                if (mFlagBackAndForth && currentPosition < mPreviousPosition) {
+                    mSliderPager.setCurrentItem(currentPosition - 1, true);
                 } else {
-                    mSliderPager.setCurrentItem(++currentPosition, true);
+                    mSliderPager.setCurrentItem(currentPosition + 1, true);
                 }
             }
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-                mSliderPager.setCurrentItem(++currentPosition, true);
+                mSliderPager.setCurrentItem(currentPosition + 1, true);
             }
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_RIGHT) {
-                mSliderPager.setCurrentItem(--currentPosition, true);
+                mSliderPager.setCurrentItem(currentPosition - 1, true);
             }
         }
+        mPreviousPosition = currentPosition;
     }
 
     //sync infinite pager adapter with real one
