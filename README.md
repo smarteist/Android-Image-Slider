@@ -10,11 +10,11 @@ This is an amazing image slider for the Android .
 You can easily load images with your custom layout, and there are many kinds of amazing animations you can choose.
 
 ```groovy
-     implementation 'com.github.smarteist:autoimageslider:1.3.8'
+     implementation 'com.github.smarteist:autoimageslider:1.4.0'
 ```
 If you are using appcompat libraries use this one, but please migrate to androidx as soon as you can.
 ```groovy
-     implementation 'com.github.smarteist:autoimageslider:1.3.8-appcompat'
+     implementation 'com.github.smarteist:autoimageslider:1.3.9-appcompat'
 ```
 
 ### New Feautures
@@ -166,20 +166,73 @@ public class SliderAdapterExample extends
 
 }
 ```
+
+## Custom Slider Image Layout
+
+you can make your own layout for slider view
+
+here is an example for adapter implementation :
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/iv_auto_image_slider"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY" />
+
+
+    <ImageView
+        android:id="@+id/iv_gif_container"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="50dp" />
+
+
+    <FrameLayout
+        android:id="@+id/fl_shadow_container"
+        android:background="@drawable/bg_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <TextView
+            android:id="@+id/tv_auto_image_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="25dp"
+            android:padding="6dp"
+            android:textColor="#FFF"
+            android:textSize="18sp" />
+
+    </FrameLayout>
+
+</FrameLayout>
+```
+
 ## Set the adapter to the Sliderview
 
-After the instantiating of the sliderView (inside the activity or fragment with findViewById|BindView blah blah...), set the adapter to the slider.
+After the instantiating of the sliderView (inside the activity or fragment with findViewById|BindView...), set the adapter to the slider.
 
 ```java
+    SliderView sliderView = findViewById(R.id.imageSlider);
     sliderView.setSliderAdapter(new SliderAdapterExample(context));
 ```
 
 You can call this method if you want to start flipping automatically and you can also set up the slider animation :
 
 ```java
-    sliderView.startAutoCycle();
-    sliderView.setIndicatorAnimation(IndicatorAnimations.WORM);
+    sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM);
     sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
+    sliderView.startAutoCycle();
 ```
 
 ## Elaborate more?
@@ -199,7 +252,7 @@ Here is a more realistic and more complete example :
 
             sliderView.setSliderAdapter(adapter);
 
-            sliderView.setIndicatorAnimation(IndicatorAnimations.WORM); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+            sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM); //set indicator animation by using IndicatorAnimationType. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
             sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
             sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
             sliderView.setIndicatorSelectedColor(Color.WHITE);
