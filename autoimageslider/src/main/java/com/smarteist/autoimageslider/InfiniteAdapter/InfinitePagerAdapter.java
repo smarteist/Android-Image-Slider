@@ -2,6 +2,7 @@ package com.smarteist.autoimageslider.InfiniteAdapter;
 
 import android.database.DataSetObserver;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -57,15 +58,8 @@ public class InfinitePagerAdapter extends PagerAdapter {
      * @return virtual mid point
      */
     public int getMiddlePosition(int item) {
-        int realCount = getRealCount();
-        int adapterCount = realCount - 1 == 0 ? 1 : realCount - 1;
-        int midpoint = adapterCount * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
-
-        if (realCount != 0 && midpoint % realCount != 0) {
-            return midpoint + (realCount - midpoint % realCount) + item;
-        } else {
-            return midpoint + item;
-        }
+       int midpoint = Math.max(0, getRealCount()) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
+        return item + midpoint;
     }
 
     @NonNull

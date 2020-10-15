@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/smarteist'
     gitUrl = 'https://github.com/smarteist/android-image-slider.git'
 
-    libraryVersion = '1.3.9'
+    libraryVersion = '1.4.0'
     organization = 'smarteistbintray' // if you push to organization's repository.
     developerId = 'smarteist'
     developerName = 'Ali Hosseini'
