@@ -58,7 +58,7 @@ public class InfinitePagerAdapter extends PagerAdapter {
      * @return virtual mid point
      */
     public int getMiddlePosition(int item) {
-        int midpoint = Math.max(0, getRealCount()) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
+       int midpoint = Math.max(0, getRealCount()) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
         return item + midpoint;
     }
 
