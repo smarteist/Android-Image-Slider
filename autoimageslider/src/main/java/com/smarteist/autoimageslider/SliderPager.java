@@ -80,7 +80,7 @@ public class SliderPager extends ViewGroup {
     private int mExpectedAdapterCount;
 
     static class ItemInfo {
-        Object object;
+        Object objectHere;
         int position;
         boolean scrolling;
         float widthFactor;
@@ -458,7 +458,7 @@ public class SliderPager extends ViewGroup {
             mAdapter.startUpdate(this);
             for (int i = 0; i < mItems.size(); i++) {
                 final ItemInfo ii = mItems.get(i);
-                mAdapter.destroyItem(this, ii.position, ii.object);
+                mAdapter.destroyItem(this, ii.position, ii.objectHere);
             }
             mAdapter.finishUpdate(this);
             mItems.clear();
@@ -995,7 +995,7 @@ public class SliderPager extends ViewGroup {
     ItemInfo addNewItem(int position, int index) {
         ItemInfo ii = new ItemInfo();
         ii.position = position;
-        ii.object = mAdapter.instantiateItem(this, position);
+        ii.objectHere = mAdapter.instantiateItem(this, position);
         ii.widthFactor = mAdapter.getPageWidth(position);
         if (index < 0 || index >= mItems.size()) {
             mItems.add(ii);
@@ -1017,7 +1017,7 @@ public class SliderPager extends ViewGroup {
         boolean isUpdating = false;
         for (int i = 0; i < mItems.size(); i++) {
             final ItemInfo ii = mItems.get(i);
-            final int newPos = mAdapter.getItemPosition(ii.object);
+            final int newPos = mAdapter.getItemPosition(ii.objectHere);
 
             if (newPos == PagerAdapter.POSITION_UNCHANGED) {
                 continue;
@@ -1032,7 +1032,7 @@ public class SliderPager extends ViewGroup {
                     isUpdating = true;
                 }
 
-                mAdapter.destroyItem(this, ii.position, ii.object);
+                mAdapter.destroyItem(this, ii.position, ii.objectHere);
                 needPopulate = true;
 
                 if (mCurItem == ii.position) {
@@ -1163,10 +1163,10 @@ public class SliderPager extends ViewGroup {
                     }
                     if (pos == ii.position && !ii.scrolling) {
                         mItems.remove(itemIndex);
-                        mAdapter.destroyItem(this, pos, ii.object);
+                        mAdapter.destroyItem(this, pos, ii.objectHere);
                         if (DEBUG) {
                             Log.i(TAG, "populate() - destroyItem() with pos: " + pos
-                                    + " view: " + ((View) ii.object));
+                                    + " view: " + ((View) ii.objectHere));
                         }
                         itemIndex--;
                         curIndex--;
@@ -1197,10 +1197,10 @@ public class SliderPager extends ViewGroup {
                         }
                         if (pos == ii.position && !ii.scrolling) {
                             mItems.remove(itemIndex);
-                            mAdapter.destroyItem(this, pos, ii.object);
+                            mAdapter.destroyItem(this, pos, ii.objectHere);
                             if (DEBUG) {
                                 Log.i(TAG, "populate() - destroyItem() with pos: " + pos
-                                        + " view: " + ((View) ii.object));
+                                        + " view: " + ((View) ii.objectHere));
                             }
                             ii = itemIndex < mItems.size() ? mItems.get(itemIndex) : null;
                         }
@@ -1219,7 +1219,7 @@ public class SliderPager extends ViewGroup {
 
             calculatePageOffsets(curItem, curIndex, oldCurInfo);
 
-            mAdapter.setPrimaryItem(this, mCurItem, curItem.object);
+            mAdapter.setPrimaryItem(this, mCurItem, curItem.objectHere);
         }
 
         if (DEBUG) {
@@ -1518,7 +1518,7 @@ public class SliderPager extends ViewGroup {
     ItemInfo infoForChild(View child) {
         for (int i = 0; i < mItems.size(); i++) {
             ItemInfo ii = mItems.get(i);
-            if (mAdapter.isViewFromObject(child, ii.object)) {
+            if (mAdapter.isViewFromObject(child, ii.objectHere)) {
                 return ii;
             }
         }
@@ -1775,7 +1775,7 @@ public class SliderPager extends ViewGroup {
                         child.measure(widthSpec, heightSpec);
                     }
                     if (DEBUG) {
-                        Log.v(TAG, "Positioning #" + i + " " + child + " f=" + ii.object
+                        Log.v(TAG, "Positioning #" + i + " " + child + " f=" + ii.objectHere
                                 + ":" + childLeft + "," + childTop + " " + child.getMeasuredWidth()
                                 + "x" + child.getMeasuredHeight());
                     }

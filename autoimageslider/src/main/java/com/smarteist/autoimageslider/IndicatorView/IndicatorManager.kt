@@ -1,45 +1,37 @@
-package com.smarteist.autoimageslider.IndicatorView;
+package com.smarteist.autoimageslider.IndicatorView
 
-import androidx.annotation.Nullable;
-import com.smarteist.autoimageslider.IndicatorView.animation.AnimationManager;
-import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.Value;
-import com.smarteist.autoimageslider.IndicatorView.draw.DrawManager;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
+import com.smarteist.autoimageslider.IndicatorView.animation.AnimationManager
+import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController.UpdateListener
+import com.smarteist.autoimageslider.IndicatorView.animation.data.Value
+import com.smarteist.autoimageslider.IndicatorView.draw.DrawManager
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator
 
-public class IndicatorManager implements ValueController.UpdateListener {
+class IndicatorManager internal constructor(private val listener: Listener?) : UpdateListener {
+    private val drawManager: DrawManager = DrawManager()
+    private val animationManager: AnimationManager
 
-    private DrawManager drawManager;
-    private AnimationManager animationManager;
-    private Listener listener;
-
-    interface Listener {
-        void onIndicatorUpdated();
+    internal interface Listener {
+        fun onIndicatorUpdated()
     }
 
-    IndicatorManager(@Nullable Listener listener) {
-        this.listener = listener;
-        this.drawManager = new DrawManager();
-        this.animationManager = new AnimationManager(drawManager.indicator(), this);
+    fun animate(): AnimationManager {
+        return animationManager
     }
 
-    public AnimationManager animate() {
-        return animationManager;
+    fun indicator(): Indicator {
+        return drawManager.indicator()
     }
 
-    public Indicator indicator() {
-        return drawManager.indicator();
+    fun drawer(): DrawManager {
+        return drawManager
     }
 
-    public DrawManager drawer() {
-        return drawManager;
+    override fun onValueUpdated(value: Value?) {
+        drawManager.updateValue(value)
+        listener?.onIndicatorUpdated()
     }
 
-    @Override
-    public void onValueUpdated(@Nullable Value value) {
-        drawManager.updateValue(value);
-        if (listener != null) {
-            listener.onIndicatorUpdated();
-        }
+    init {
+        animationManager = AnimationManager(drawManager.indicator(), this)
     }
 }

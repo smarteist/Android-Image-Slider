@@ -1,32 +1,22 @@
-package com.smarteist.autoimageslider.Transformations;
+package com.smarteist.autoimageslider.Transformations
 
-import com.smarteist.autoimageslider.SliderPager;
-import android.view.View;
+import android.view.View
+import com.smarteist.autoimageslider.SliderPager
 
-public class FadeTransformation implements SliderPager.PageTransformer{
-    @Override
-    public void transformPage(View view, float position) {
-
-        view.setTranslationX(-position*view.getWidth());
+class FadeTransformation : SliderPager.PageTransformer {
+    override fun transformPage(view: View, position: Float) {
+        view.translationX = -position * view.width
 
         // Page is not an immediate sibling, just make transparent
-        if(position < -1 || position > 1) {
-            view.setAlpha(0);
-        }
-        // Page is sibling to left or right
-        else if (position <= 0 || position <= 1) {
+        if (position < -1 || position > 1) {
+            view.alpha = 0f
+        } else if (position <= 0 || position <= 1) {
 
             // Calculate alpha.  Position is decimal in [-1,0] or [0,1]
-            float alpha = (position <= 0) ? position + 1 : 1 - position;
-            view.setAlpha(alpha);
-
+            val alpha = if (position <= 0) position + 1 else 1 - position
+            view.alpha = alpha
+        } else if (position == 0f) {
+            view.alpha = 1f
         }
-        // Page is active, make fully visible
-        else if (position == 0) {
-            view.setAlpha(1);
-        }
-
-
-
     }
 }

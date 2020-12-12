@@ -1,129 +1,95 @@
-package com.smarteist.autoimageslider.IndicatorView.animation.type;
+package com.smarteist.autoimageslider.IndicatorView.animation.type
 
-import android.animation.IntEvaluator;
-import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
-import androidx.annotation.NonNull;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.type.ScaleAnimationValue;
+import android.animation.IntEvaluator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
+import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController.UpdateListener
+import com.smarteist.autoimageslider.IndicatorView.animation.data.type.ScaleAnimationValue
 
-public class ScaleAnimation extends ColorAnimation {
-
-    public static final float DEFAULT_SCALE_FACTOR = 0.7f;
-    public static final float MIN_SCALE_FACTOR = 0.3f;
-    public static final float MAX_SCALE_FACTOR = 1;
-
-    static final String ANIMATION_SCALE_REVERSE = "ANIMATION_SCALE_REVERSE";
-    static final String ANIMATION_SCALE = "ANIMATION_SCALE";
-
-    int radius;
-    float scaleFactor;
-
-    private ScaleAnimationValue value;
-
-    public ScaleAnimation(@NonNull ValueController.UpdateListener listener) {
-        super(listener);
-        value = new ScaleAnimationValue();
+open class ScaleAnimation(listener: UpdateListener) : ColorAnimation(listener) {
+    var radius = 0
+    var scaleFactor = 0f
+    private val value: ScaleAnimationValue
+    override fun createAnimator(): ValueAnimator {
+        val animator = ValueAnimator()
+        animator.duration = BaseAnimation.Companion.DEFAULT_ANIMATION_TIME.toLong()
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.addUpdateListener { animation -> onAnimateUpdated(animation) }
+        return animator
     }
 
-    @NonNull
-    @Override
-    public ValueAnimator createAnimator() {
-        ValueAnimator animator = new ValueAnimator();
-        animator.setDuration(BaseAnimation.DEFAULT_ANIMATION_TIME);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                onAnimateUpdated(animation);
-            }
-        });
-
-        return animator;
-    }
-
-    @NonNull
-    public ScaleAnimation with(int colorStart, int colorEnd, int radius, float scaleFactor) {
+    fun with(colorStart: Int, colorEnd: Int, radius: Int, scaleFactor: Float): ScaleAnimation {
         if (animator != null && hasChanges(colorStart, colorEnd, radius, scaleFactor)) {
-
-            this.colorStart = colorStart;
-            this.colorEnd = colorEnd;
-
-            this.radius = radius;
-            this.scaleFactor = scaleFactor;
-
-            PropertyValuesHolder colorHolder = createColorPropertyHolder(false);
-            PropertyValuesHolder reverseColorHolder = createColorPropertyHolder(true);
-
-            PropertyValuesHolder scaleHolder = createScalePropertyHolder(false);
-            PropertyValuesHolder scaleReverseHolder = createScalePropertyHolder(true);
-
-            animator.setValues(colorHolder, reverseColorHolder, scaleHolder, scaleReverseHolder);
+            this.colorStart = colorStart
+            this.colorEnd = colorEnd
+            this.radius = radius
+            this.scaleFactor = scaleFactor
+            val colorHolder = createColorPropertyHolder(false)
+            val reverseColorHolder = createColorPropertyHolder(true)
+            val scaleHolder = createScalePropertyHolder(false)
+            val scaleReverseHolder = createScalePropertyHolder(true)
+            animator!!.setValues(colorHolder, reverseColorHolder, scaleHolder, scaleReverseHolder)
         }
-
-        return this;
+        return this
     }
 
-    private void onAnimateUpdated(@NonNull ValueAnimator animation) {
-        int color = (int) animation.getAnimatedValue(ANIMATION_COLOR);
-        int colorReverse = (int) animation.getAnimatedValue(ANIMATION_COLOR_REVERSE);
-
-        int radius = (int) animation.getAnimatedValue(ANIMATION_SCALE);
-        int radiusReverse = (int) animation.getAnimatedValue(ANIMATION_SCALE_REVERSE);
-
-        value.setColor(color);
-        value.setColorReverse(colorReverse);
-
-        value.setRadius(radius);
-        value.setRadiusReverse(radiusReverse);
-
+    private fun onAnimateUpdated(animation: ValueAnimator) {
+        val color = animation.getAnimatedValue(ColorAnimation.Companion.ANIMATION_COLOR) as Int
+        val colorReverse = animation.getAnimatedValue(ColorAnimation.Companion.ANIMATION_COLOR_REVERSE) as Int
+        val radius = animation.getAnimatedValue(ANIMATION_SCALE) as Int
+        val radiusReverse = animation.getAnimatedValue(ANIMATION_SCALE_REVERSE) as Int
+        value.color = color
+        value.colorReverse = colorReverse
+        value.radius = radius
+        value.radiusReverse = radiusReverse
         if (listener != null) {
-            listener.onValueUpdated(value);
+            listener!!.onValueUpdated(value)
         }
     }
 
-    @NonNull
-    protected PropertyValuesHolder createScalePropertyHolder(boolean isReverse) {
-        String propertyName;
-        int startRadiusValue;
-        int endRadiusValue;
-
+    protected open fun createScalePropertyHolder(isReverse: Boolean): PropertyValuesHolder {
+        val propertyName: String
+        val startRadiusValue: Int
+        val endRadiusValue: Int
         if (isReverse) {
-            propertyName = ANIMATION_SCALE_REVERSE;
-            startRadiusValue = radius;
-            endRadiusValue = (int) (radius * scaleFactor);
+            propertyName = ANIMATION_SCALE_REVERSE
+            startRadiusValue = radius
+            endRadiusValue = (radius * scaleFactor).toInt()
         } else {
-            propertyName = ANIMATION_SCALE;
-            startRadiusValue = (int) (radius * scaleFactor);
-            endRadiusValue = radius;
+            propertyName = ANIMATION_SCALE
+            startRadiusValue = (radius * scaleFactor).toInt()
+            endRadiusValue = radius
         }
-
-        PropertyValuesHolder holder = PropertyValuesHolder.ofInt(propertyName, startRadiusValue, endRadiusValue);
-        holder.setEvaluator(new IntEvaluator());
-
-        return holder;
+        val holder = PropertyValuesHolder.ofInt(propertyName, startRadiusValue, endRadiusValue)
+        holder.setEvaluator(IntEvaluator())
+        return holder
     }
 
-    @SuppressWarnings("RedundantIfStatement")
-    private boolean hasChanges(int colorStart, int colorEnd, int radiusValue, float scaleFactorValue) {
+    private fun hasChanges(colorStart: Int, colorEnd: Int, radiusValue: Int, scaleFactorValue: Float): Boolean {
         if (this.colorStart != colorStart) {
-            return true;
+            return true
         }
-
         if (this.colorEnd != colorEnd) {
-            return true;
+            return true
         }
-
         if (radius != radiusValue) {
-            return true;
+            return true
         }
+        return if (scaleFactor != scaleFactorValue) {
+            true
+        } else false
+    }
 
-        if (scaleFactor != scaleFactorValue) {
-            return true;
-        }
+    companion object {
+        const val DEFAULT_SCALE_FACTOR = 0.7f
+        const val MIN_SCALE_FACTOR = 0.3f
+        const val MAX_SCALE_FACTOR = 1f
+        const val ANIMATION_SCALE_REVERSE = "ANIMATION_SCALE_REVERSE"
+        const val ANIMATION_SCALE = "ANIMATION_SCALE"
+    }
 
-        return false;
+    init {
+        value = ScaleAnimationValue()
     }
 }
-

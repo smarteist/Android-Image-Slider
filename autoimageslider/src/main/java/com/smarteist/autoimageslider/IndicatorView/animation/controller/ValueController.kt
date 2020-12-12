@@ -1,111 +1,83 @@
-package com.smarteist.autoimageslider.IndicatorView.animation.controller;
+package com.smarteist.autoimageslider.IndicatorView.animation.controller
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import com.smarteist.autoimageslider.IndicatorView.animation.data.Value
+import com.smarteist.autoimageslider.IndicatorView.animation.type.*
 
-import com.smarteist.autoimageslider.IndicatorView.animation.data.Value;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.*;
+class ValueController(private val updateListener: UpdateListener?) {
+    private var colorAnimation: ColorAnimation? = null
+    private var scaleAnimation: ScaleAnimation? = null
+    private var wormAnimation: WormAnimation? = null
+    private var slideAnimation: SlideAnimation? = null
+    private var fillAnimation: FillAnimation? = null
+    private var thinWormAnimation: ThinWormAnimation? = null
+    private var dropAnimation: DropAnimation? = null
+    private var swapAnimation: SwapAnimation? = null
+    private var scaleDownAnimation: ScaleDownAnimation? = null
 
-public class ValueController {
-
-    private ColorAnimation colorAnimation;
-    private ScaleAnimation scaleAnimation;
-    private WormAnimation wormAnimation;
-    private SlideAnimation slideAnimation;
-    private FillAnimation fillAnimation;
-    private ThinWormAnimation thinWormAnimation;
-    private DropAnimation dropAnimation;
-    private SwapAnimation swapAnimation;
-    private ScaleDownAnimation scaleDownAnimation;
-
-    private UpdateListener updateListener;
-
-    public interface UpdateListener {
-        void onValueUpdated(@Nullable Value value);
+    interface UpdateListener {
+        fun onValueUpdated(value: Value?)
     }
 
-    public ValueController(@Nullable UpdateListener listener) {
-        updateListener = listener;
-    }
-
-    @NonNull
-    public ColorAnimation color() {
+    fun color(): ColorAnimation {
         if (colorAnimation == null) {
-            colorAnimation = new ColorAnimation(updateListener);
+            colorAnimation = ColorAnimation(updateListener)
         }
-
-        return colorAnimation;
+        return colorAnimation!!
     }
 
-    @NonNull
-    public ScaleAnimation scale() {
+    fun scale(): ScaleAnimation {
         if (scaleAnimation == null) {
-            scaleAnimation = new ScaleAnimation(updateListener);
+            scaleAnimation = ScaleAnimation(updateListener!!)
         }
-
-        return scaleAnimation;
+        return scaleAnimation!!
     }
 
-    @NonNull
-    public WormAnimation worm() {
+    fun worm(): WormAnimation {
         if (wormAnimation == null) {
-            wormAnimation = new WormAnimation(updateListener);
+            wormAnimation = WormAnimation(updateListener!!)
         }
-
-        return wormAnimation;
+        return wormAnimation!!
     }
 
-    @NonNull
-    public SlideAnimation slide() {
+    fun slide(): SlideAnimation {
         if (slideAnimation == null) {
-            slideAnimation = new SlideAnimation(updateListener);
+            slideAnimation = SlideAnimation(updateListener!!)
         }
-
-        return slideAnimation;
+        return slideAnimation!!
     }
 
-    @NonNull
-    public FillAnimation fill() {
+    fun fill(): FillAnimation {
         if (fillAnimation == null) {
-            fillAnimation = new FillAnimation(updateListener);
+            fillAnimation = FillAnimation(updateListener!!)
         }
-
-        return fillAnimation;
+        return fillAnimation!!
     }
 
-    @NonNull
-    public ThinWormAnimation thinWorm() {
+    fun thinWorm(): ThinWormAnimation {
         if (thinWormAnimation == null) {
-            thinWormAnimation = new ThinWormAnimation(updateListener);
+            thinWormAnimation = ThinWormAnimation(updateListener!!)
         }
-
-        return thinWormAnimation;
+        return thinWormAnimation!!
     }
 
-    @NonNull
-    public DropAnimation drop() {
+    fun drop(): DropAnimation {
         if (dropAnimation == null) {
-            dropAnimation = new DropAnimation(updateListener);
+            dropAnimation = DropAnimation(updateListener!!)
         }
-
-        return dropAnimation;
+        return dropAnimation!!
     }
 
-    @NonNull
-    public SwapAnimation swap() {
+    fun swap(): SwapAnimation {
         if (swapAnimation == null) {
-            swapAnimation = new SwapAnimation(updateListener);
+            swapAnimation = SwapAnimation(updateListener!!)
         }
-
-        return swapAnimation;
+        return swapAnimation!!
     }
 
-    @NonNull
-    public ScaleDownAnimation scaleDown() {
+    fun scaleDown(): ScaleDownAnimation {
         if (scaleDownAnimation == null) {
-            scaleDownAnimation = new ScaleDownAnimation(updateListener);
+            scaleDownAnimation = ScaleDownAnimation(updateListener!!)
         }
-
-        return scaleDownAnimation;
+        return scaleDownAnimation!!
     }
 }

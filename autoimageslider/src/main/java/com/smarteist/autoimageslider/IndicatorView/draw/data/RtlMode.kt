@@ -1,3 +1,5 @@
-package com.smarteist.autoimageslider.IndicatorView.draw.data;
+package com.smarteist.autoimageslider.IndicatorView.draw.data
 
-public enum RtlMode {On, Off, Auto}
+enum class RtlMode {
+    On, Off, Auto
+}

@@ -1,116 +1,86 @@
-package com.smarteist.autoimageslider.IndicatorView.animation.type;
+package com.smarteist.autoimageslider.IndicatorView.animation.type
 
-import android.animation.ValueAnimator;
-import androidx.annotation.NonNull;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.type.ThinWormAnimationValue;
+import android.animation.ValueAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
+import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController.UpdateListener
+import com.smarteist.autoimageslider.IndicatorView.animation.data.type.ThinWormAnimationValue
 
-public class ThinWormAnimation extends WormAnimation {
-
-    private ThinWormAnimationValue value;
-
-    public ThinWormAnimation(@NonNull ValueController.UpdateListener listener) {
-        super(listener);
-        value = new ThinWormAnimationValue();
+class ThinWormAnimation(listener: UpdateListener) : WormAnimation(listener) {
+    private val value: ThinWormAnimationValue
+    override fun duration(duration: Long): ThinWormAnimation {
+        super.duration(duration)
+        return this
     }
 
-    @Override
-    public ThinWormAnimation duration(long duration) {
-        super.duration(duration);
-        return this;
-    }
-
-    @Override
-    public WormAnimation with(int coordinateStart, int coordinateEnd, int radius, boolean isRightSide) {
+    override fun with(coordinateStart: Int, coordinateEnd: Int, radius: Int, isRightSide: Boolean): WormAnimation {
         if (hasChanges(coordinateStart, coordinateEnd, radius, isRightSide)) {
-            animator = createAnimator();
-
-            this.coordinateStart = coordinateStart;
-            this.coordinateEnd = coordinateEnd;
-
-            this.radius = radius;
-            this.isRightSide = isRightSide;
-
-            int height = radius * 2;
-            rectLeftEdge = coordinateStart - radius;
-            rectRightEdge = coordinateStart + radius;
-
-            value.setRectStart(rectLeftEdge);
-            value.setRectEnd(rectRightEdge);
-            value.setHeight(height);
-
-            RectValues rec = createRectValues(isRightSide);
-            long sizeDuration = (long) (animationDuration * 0.8);
-            long reverseDelay = (long) (animationDuration * 0.2);
-
-            long heightDuration = (long) (animationDuration * 0.5);
-            long reverseHeightDelay = (long) (animationDuration * 0.5);
-
-            ValueAnimator straightAnimator = createWormAnimator(rec.fromX, rec.toX, sizeDuration, false, value);
-            ValueAnimator reverseAnimator = createWormAnimator(rec.reverseFromX, rec.reverseToX, sizeDuration, true, value);
-            reverseAnimator.setStartDelay(reverseDelay);
-
-            ValueAnimator straightHeightAnimator = createHeightAnimator(height, radius, heightDuration);
-            ValueAnimator reverseHeightAnimator = createHeightAnimator(radius, height, heightDuration);
-            reverseHeightAnimator.setStartDelay(reverseHeightDelay);
-
-            animator.playTogether(straightAnimator, reverseAnimator, straightHeightAnimator, reverseHeightAnimator);
+            animator = createAnimator()
+            this.coordinateStart = coordinateStart
+            this.coordinateEnd = coordinateEnd
+            this.radius = radius
+            this.isRightSide = isRightSide
+            val height = radius * 2
+            rectLeftEdge = coordinateStart - radius
+            rectRightEdge = coordinateStart + radius
+            value.rectStart = rectLeftEdge
+            value.rectEnd = rectRightEdge
+            value.height = height
+            val rec = createRectValues(isRightSide)
+            val sizeDuration = (animationDuration * 0.8).toLong()
+            val reverseDelay = (animationDuration * 0.2).toLong()
+            val heightDuration = (animationDuration * 0.5).toLong()
+            val reverseHeightDelay = (animationDuration * 0.5).toLong()
+            val straightAnimator = createWormAnimator(rec.fromX, rec.toX, sizeDuration, false, value)
+            val reverseAnimator = createWormAnimator(rec.reverseFromX, rec.reverseToX, sizeDuration, true, value)
+            reverseAnimator!!.startDelay = reverseDelay
+            val straightHeightAnimator = createHeightAnimator(height, radius, heightDuration)
+            val reverseHeightAnimator = createHeightAnimator(radius, height, heightDuration)
+            reverseHeightAnimator.startDelay = reverseHeightDelay
+            animator!!.playTogether(straightAnimator, reverseAnimator, straightHeightAnimator, reverseHeightAnimator)
         }
-        return this;
+        return this
     }
 
-    private ValueAnimator createHeightAnimator(int fromHeight, int toHeight, long duration) {
-        ValueAnimator anim = ValueAnimator.ofInt(fromHeight, toHeight);
-        anim.setInterpolator(new AccelerateDecelerateInterpolator());
-        anim.setDuration(duration);
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                onAnimateUpdated(animation);
-            }
-        });
-
-        return anim;
+    private fun createHeightAnimator(fromHeight: Int, toHeight: Int, duration: Long): ValueAnimator {
+        val anim = ValueAnimator.ofInt(fromHeight, toHeight)
+        anim.interpolator = AccelerateDecelerateInterpolator()
+        anim.duration = duration
+        anim.addUpdateListener { animation -> onAnimateUpdated(animation) }
+        return anim
     }
 
-    private void onAnimateUpdated(@NonNull ValueAnimator animation) {
-        value.setHeight((int) animation.getAnimatedValue());
-
+    private fun onAnimateUpdated(animation: ValueAnimator) {
+        value.height = animation.animatedValue as Int
         if (listener != null) {
-            listener.onValueUpdated(value);
+            listener!!.onValueUpdated(value)
         }
     }
 
-    @Override
-    public ThinWormAnimation progress(float progress) {
+    override fun progress(progress: Float): ThinWormAnimation {
         if (animator != null) {
-            long progressDuration = (long) (progress * animationDuration);
-            int size = animator.getChildAnimations().size();
-
-            for (int i = 0; i < size; i++) {
-                ValueAnimator anim = (ValueAnimator) animator.getChildAnimations().get(i);
-
-                long setDuration = progressDuration - anim.getStartDelay();
-                long duration = anim.getDuration();
-
+            val progressDuration = (progress * animationDuration).toLong()
+            val size = animator!!.childAnimations.size
+            for (i in 0 until size) {
+                val anim = animator!!.childAnimations[i] as ValueAnimator
+                var setDuration = progressDuration - anim.startDelay
+                val duration = anim.duration
                 if (setDuration > duration) {
-                    setDuration = duration;
-
+                    setDuration = duration
                 } else if (setDuration < 0) {
-                    setDuration = 0;
+                    setDuration = 0
                 }
-
                 if (i == size - 1 && setDuration <= 0) {
-                    continue;
+                    continue
                 }
-
-                if (anim.getValues() != null && anim.getValues().length > 0) {
-                    anim.setCurrentPlayTime(setDuration);
+                if (anim.values != null && anim.values.size > 0) {
+                    anim.currentPlayTime = setDuration
                 }
             }
         }
+        return this
+    }
 
-        return this;
+    init {
+        value = ThinWormAnimationValue()
     }
 }

@@ -1,71 +1,62 @@
-package com.smarteist.autoimageslider.IndicatorView.animation.data;
+package com.smarteist.autoimageslider.IndicatorView.animation.data
 
-import androidx.annotation.NonNull;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.type.*;
+import com.smarteist.autoimageslider.IndicatorView.animation.data.type.*
 
-public class AnimationValue {
-
-    private ColorAnimationValue colorAnimationValue;
-    private ScaleAnimationValue scaleAnimationValue;
-    private WormAnimationValue wormAnimationValue;
-    private FillAnimationValue fillAnimationValue;
-    private ThinWormAnimationValue thinWormAnimationValue;
-    private DropAnimationValue dropAnimationValue;
-    private SwapAnimationValue swapAnimationValue;
-
-    @NonNull
-    public ColorAnimationValue getColorAnimationValue() {
-        if (colorAnimationValue == null) {
-            colorAnimationValue = new ColorAnimationValue();
+class AnimationValue {
+    var colorAnimationValue: ColorAnimationValue? = null
+        get() {
+            if (field == null) {
+                field = ColorAnimationValue()
+            }
+            return field
         }
-        return colorAnimationValue;
-    }
-
-    @NonNull
-    public ScaleAnimationValue getScaleAnimationValue() {
-        if (scaleAnimationValue == null) {
-            scaleAnimationValue = new ScaleAnimationValue();
+        private set
+    var scaleAnimationValue: ScaleAnimationValue? = null
+        get() {
+            if (field == null) {
+                field = ScaleAnimationValue()
+            }
+            return field
         }
-        return scaleAnimationValue;
-    }
-
-    @NonNull
-    public WormAnimationValue getWormAnimationValue() {
-        if (wormAnimationValue == null) {
-            wormAnimationValue = new WormAnimationValue();
+        private set
+    var wormAnimationValue: WormAnimationValue? = null
+        get() {
+            if (field == null) {
+                field = WormAnimationValue()
+            }
+            return field
         }
-        return wormAnimationValue;
-    }
-
-    @NonNull
-    public FillAnimationValue getFillAnimationValue() {
-        if (fillAnimationValue == null) {
-            fillAnimationValue = new FillAnimationValue();
+        private set
+    var fillAnimationValue: FillAnimationValue? = null
+        get() {
+            if (field == null) {
+                field = FillAnimationValue()
+            }
+            return field
         }
-        return fillAnimationValue;
-    }
-
-    @NonNull
-    public ThinWormAnimationValue getThinWormAnimationValue() {
-        if (thinWormAnimationValue == null) {
-            thinWormAnimationValue = new ThinWormAnimationValue();
+        private set
+    var thinWormAnimationValue: ThinWormAnimationValue? = null
+        get() {
+            if (field == null) {
+                field = ThinWormAnimationValue()
+            }
+            return field
         }
-        return thinWormAnimationValue;
-    }
-
-    @NonNull
-    public DropAnimationValue getDropAnimationValue() {
-        if (dropAnimationValue == null) {
-            dropAnimationValue = new DropAnimationValue();
+        private set
+    var dropAnimationValue: DropAnimationValue? = null
+        get() {
+            if (field == null) {
+                field = DropAnimationValue()
+            }
+            return field
         }
-        return dropAnimationValue;
-    }
-
-    @NonNull
-    public SwapAnimationValue getSwapAnimationValue() {
-        if (swapAnimationValue == null) {
-            swapAnimationValue = new SwapAnimationValue();
+        private set
+    var swapAnimationValue: SwapAnimationValue? = null
+        get() {
+            if (field == null) {
+                field = SwapAnimationValue()
+            }
+            return field
         }
-        return swapAnimationValue;
-    }
+        private set
 }

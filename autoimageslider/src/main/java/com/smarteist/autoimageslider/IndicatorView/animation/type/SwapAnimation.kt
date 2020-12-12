@@ -1,101 +1,77 @@
-package com.smarteist.autoimageslider.IndicatorView.animation.type;
+package com.smarteist.autoimageslider.IndicatorView.animation.type
 
-import android.animation.IntEvaluator;
-import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
-import androidx.annotation.NonNull;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.type.SwapAnimationValue;
+import android.animation.IntEvaluator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
+import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController.UpdateListener
+import com.smarteist.autoimageslider.IndicatorView.animation.data.type.SwapAnimationValue
 
-public class SwapAnimation extends BaseAnimation<ValueAnimator> {
-
-    private static final String ANIMATION_COORDINATE = "ANIMATION_COORDINATE";
-    private static final String ANIMATION_COORDINATE_REVERSE = "ANIMATION_COORDINATE_REVERSE";
-    private static final int COORDINATE_NONE = -1;
-
-    private int coordinateStart = COORDINATE_NONE;
-    private int coordinateEnd = COORDINATE_NONE;
-
-    private SwapAnimationValue value;
-
-    public SwapAnimation(@NonNull ValueController.UpdateListener listener) {
-        super(listener);
-        value = new SwapAnimationValue();
+class SwapAnimation(listener: UpdateListener) : BaseAnimation<ValueAnimator>(listener) {
+    private var coordinateStart = COORDINATE_NONE
+    private var coordinateEnd = COORDINATE_NONE
+    private val value: SwapAnimationValue
+    override fun createAnimator(): ValueAnimator {
+        val animator = ValueAnimator()
+        animator.duration = BaseAnimation.Companion.DEFAULT_ANIMATION_TIME.toLong()
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.addUpdateListener { animation -> onAnimateUpdated(animation) }
+        return animator
     }
 
-    @NonNull
-    @Override
-    public ValueAnimator createAnimator() {
-        ValueAnimator animator = new ValueAnimator();
-        animator.setDuration(BaseAnimation.DEFAULT_ANIMATION_TIME);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                onAnimateUpdated(animation);
-            }
-        });
-
-        return animator;
-    }
-
-    @Override
-    public SwapAnimation progress(float progress) {
+    override fun progress(progress: Float): SwapAnimation {
         if (animator != null) {
-            long playTime = (long) (progress * animationDuration);
-
-            if (animator.getValues() != null && animator.getValues().length > 0) {
-                animator.setCurrentPlayTime(playTime);
+            val playTime = (progress * animationDuration).toLong()
+            if (animator!!.values != null && animator!!.values.size > 0) {
+                animator!!.currentPlayTime = playTime
             }
         }
-
-        return this;
+        return this
     }
 
-    @NonNull
-    public SwapAnimation with(int coordinateStart, int coordinateEnd) {
+    fun with(coordinateStart: Int, coordinateEnd: Int): SwapAnimation {
         if (animator != null && hasChanges(coordinateStart, coordinateEnd)) {
-            this.coordinateStart = coordinateStart;
-            this.coordinateEnd = coordinateEnd;
-
-            PropertyValuesHolder holder = createColorPropertyHolder(ANIMATION_COORDINATE, coordinateStart, coordinateEnd);
-            PropertyValuesHolder holderReverse = createColorPropertyHolder(ANIMATION_COORDINATE_REVERSE, coordinateEnd, coordinateStart);
-            animator.setValues(holder, holderReverse);
+            this.coordinateStart = coordinateStart
+            this.coordinateEnd = coordinateEnd
+            val holder = createColorPropertyHolder(ANIMATION_COORDINATE, coordinateStart, coordinateEnd)
+            val holderReverse = createColorPropertyHolder(ANIMATION_COORDINATE_REVERSE, coordinateEnd, coordinateStart)
+            animator!!.setValues(holder, holderReverse)
         }
-
-        return this;
+        return this
     }
 
-    private PropertyValuesHolder createColorPropertyHolder(String propertyName, int startValue, int endValue) {
-        PropertyValuesHolder holder = PropertyValuesHolder.ofInt(propertyName, startValue, endValue);
-        holder.setEvaluator(new IntEvaluator());
-
-        return holder;
+    private fun createColorPropertyHolder(propertyName: String, startValue: Int, endValue: Int): PropertyValuesHolder {
+        val holder = PropertyValuesHolder.ofInt(propertyName, startValue, endValue)
+        holder.setEvaluator(IntEvaluator())
+        return holder
     }
 
-    private void onAnimateUpdated(@NonNull ValueAnimator animation) {
-        int coordinate = (int) animation.getAnimatedValue(ANIMATION_COORDINATE);
-        int coordinateReverse = (int) animation.getAnimatedValue(ANIMATION_COORDINATE_REVERSE);
-
-        value.setCoordinate(coordinate);
-        value.setCoordinateReverse(coordinateReverse);
-
+    private fun onAnimateUpdated(animation: ValueAnimator) {
+        val coordinate = animation.getAnimatedValue(ANIMATION_COORDINATE) as Int
+        val coordinateReverse = animation.getAnimatedValue(ANIMATION_COORDINATE_REVERSE) as Int
+        value.coordinate = coordinate
+        value.coordinateReverse = coordinateReverse
         if (listener != null) {
-            listener.onValueUpdated(value);
+            listener!!.onValueUpdated(value)
         }
     }
 
-    @SuppressWarnings("RedundantIfStatement")
-    private boolean hasChanges(int coordinateStart, int coordinateEnd) {
+    private fun hasChanges(coordinateStart: Int, coordinateEnd: Int): Boolean {
         if (this.coordinateStart != coordinateStart) {
-            return true;
+            return true
         }
+        return if (this.coordinateEnd != coordinateEnd) {
+            true
+        } else false
+    }
 
-        if (this.coordinateEnd != coordinateEnd) {
-            return true;
-        }
+    companion object {
+        private const val ANIMATION_COORDINATE = "ANIMATION_COORDINATE"
+        private const val ANIMATION_COORDINATE_REVERSE = "ANIMATION_COORDINATE_REVERSE"
+        private const val COORDINATE_NONE = -1
+    }
 
-        return false;
+    init {
+        value = SwapAnimationValue()
     }
 }

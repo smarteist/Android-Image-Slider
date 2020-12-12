@@ -1,11 +1,8 @@
-package com.smarteist.autoimageslider.Transformations;
+package com.smarteist.autoimageslider.Transformations
 
-import com.smarteist.autoimageslider.SliderPager;
-import android.view.View;
+import android.view.View
+import com.smarteist.autoimageslider.SliderPager
 
-public class SimpleTransformation implements SliderPager.PageTransformer {
-    @Override
-    public void transformPage(View page, float position) {
-
-    }
+class SimpleTransformation : SliderPager.PageTransformer {
+    override fun transformPage(page: View, position: Float) {}
 }

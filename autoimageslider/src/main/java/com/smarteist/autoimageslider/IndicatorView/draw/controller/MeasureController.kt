@@ -1,104 +1,83 @@
-package com.smarteist.autoimageslider.IndicatorView.draw.controller;
+package com.smarteist.autoimageslider.IndicatorView.draw.controller
 
-import androidx.annotation.NonNull;
-import android.util.Pair;
-import android.view.View;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
+import android.util.Pair
+import android.view.View
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation
 
-public class MeasureController {
-
-    public Pair<Integer, Integer> measureViewSize(@NonNull Indicator indicator, int widthMeasureSpec, int heightMeasureSpec) {
-        int widthMode = View.MeasureSpec.getMode(widthMeasureSpec);
-        int widthSize = View.MeasureSpec.getSize(widthMeasureSpec);
-
-        int heightMode = View.MeasureSpec.getMode(heightMeasureSpec);
-        int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
-
-        int count = indicator.getCount();
-        int radius = indicator.getRadius();
-        int stroke = indicator.getStroke();
-
-        int padding = indicator.getPadding();
-        int paddingLeft = indicator.getPaddingLeft();
-        int paddingTop = indicator.getPaddingTop();
-        int paddingRight = indicator.getPaddingRight();
-        int paddingBottom = indicator.getPaddingBottom();
-
-        int circleDiameterPx = radius * 2;
-        int desiredWidth = 0;
-        int desiredHeight = 0;
-
-        int width;
-        int height;
-
-        Orientation orientation = indicator.getOrientation();
+class MeasureController {
+    fun measureViewSize(indicator: Indicator, widthMeasureSpec: Int, heightMeasureSpec: Int): Pair<Int, Int> {
+        val widthMode = View.MeasureSpec.getMode(widthMeasureSpec)
+        val widthSize = View.MeasureSpec.getSize(widthMeasureSpec)
+        val heightMode = View.MeasureSpec.getMode(heightMeasureSpec)
+        val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
+        val count = indicator.count
+        val radius = indicator.radius
+        val stroke = indicator.strokeHere
+        val padding = indicator.padding
+        val paddingLeft = indicator.paddingLeft
+        val paddingTop = indicator.paddingTop
+        val paddingRight = indicator.paddingRight
+        val paddingBottom = indicator.paddingBottom
+        val circleDiameterPx = radius * 2
+        var desiredWidth = 0
+        var desiredHeight = 0
+        var width: Int
+        var height: Int
+        val orientation = indicator.orientation
         if (count != 0) {
-            int diameterSum = circleDiameterPx * count;
-            int strokeSum = (stroke * 2) * count;
-
-            int paddingSum = padding * (count - 1);
-            int w = diameterSum + strokeSum + paddingSum;
-            int h = circleDiameterPx + stroke;
-
+            val diameterSum = circleDiameterPx * count
+            val strokeSum = stroke * 2 * count
+            val paddingSum = padding * (count - 1)
+            val w = diameterSum + strokeSum + paddingSum
+            val h = circleDiameterPx + stroke
             if (orientation == Orientation.HORIZONTAL) {
-                desiredWidth = w;
-                desiredHeight = h;
-
+                desiredWidth = w
+                desiredHeight = h
             } else {
-                desiredWidth = h;
-                desiredHeight = w;
+                desiredWidth = h
+                desiredHeight = w
             }
         }
-
-        if (indicator.getAnimationType() == IndicatorAnimationType.DROP) {
+        if (indicator.animationType === IndicatorAnimationType.DROP) {
             if (orientation == Orientation.HORIZONTAL) {
-                desiredHeight *= 2;
+                desiredHeight *= 2
             } else {
-                desiredWidth *= 2;
+                desiredWidth *= 2
             }
         }
-
-        int horizontalPadding = paddingLeft + paddingRight;
-        int verticalPadding = paddingTop + paddingBottom;
-
+        val horizontalPadding = paddingLeft + paddingRight
+        val verticalPadding = paddingTop + paddingBottom
         if (orientation == Orientation.HORIZONTAL) {
-            desiredWidth += horizontalPadding;
-            desiredHeight += verticalPadding;
-
+            desiredWidth += horizontalPadding
+            desiredHeight += verticalPadding
         } else {
-            desiredWidth += horizontalPadding;
-            desiredHeight += verticalPadding;
+            desiredWidth += horizontalPadding
+            desiredHeight += verticalPadding
         }
-
-        if (widthMode == View.MeasureSpec.EXACTLY) {
-            width = widthSize;
+        width = if (widthMode == View.MeasureSpec.EXACTLY) {
+            widthSize
         } else if (widthMode == View.MeasureSpec.AT_MOST) {
-            width = Math.min(desiredWidth, widthSize);
+            Math.min(desiredWidth, widthSize)
         } else {
-            width = desiredWidth;
+            desiredWidth
         }
-
-        if (heightMode == View.MeasureSpec.EXACTLY) {
-            height = heightSize;
+        height = if (heightMode == View.MeasureSpec.EXACTLY) {
+            heightSize
         } else if (heightMode == View.MeasureSpec.AT_MOST) {
-            height = Math.min(desiredHeight, heightSize);
+            Math.min(desiredHeight, heightSize)
         } else {
-            height = desiredHeight;
+            desiredHeight
         }
-
         if (width < 0) {
-            width = 0;
+            width = 0
         }
-
         if (height < 0) {
-            height = 0;
+            height = 0
         }
-
-        indicator.setWidth(width);
-        indicator.setHeight(height);
-
-        return new Pair<>(width, height);
+        indicator.width = width
+        indicator.height = height
+        return Pair(width, height)
     }
 }

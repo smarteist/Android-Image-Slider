@@ -1,22 +1,17 @@
-package com.smarteist.autoimageslider.Transformations;
+package com.smarteist.autoimageslider.Transformations
 
-import com.smarteist.autoimageslider.SliderPager;
-import android.view.View;
+import android.view.View
+import com.smarteist.autoimageslider.SliderPager
 
-public class PopTransformation implements SliderPager.PageTransformer {
-    @Override
-    public void transformPage(View page, float position) {
-
-        page.setTranslationX(-position * page.getWidth());
-
+class PopTransformation : SliderPager.PageTransformer {
+    override fun transformPage(page: View, position: Float) {
+        page.translationX = -position * page.width
         if (Math.abs(position) < 0.5) {
-            page.setVisibility(View.VISIBLE);
-            page.setScaleX(1 - Math.abs(position));
-            page.setScaleY(1 - Math.abs(position));
+            page.visibility = View.VISIBLE
+            page.scaleX = 1 - Math.abs(position)
+            page.scaleY = 1 - Math.abs(position)
         } else if (Math.abs(position) > 0.5) {
-            page.setVisibility(View.GONE);
+            page.visibility = View.GONE
         }
-
-
     }
 }

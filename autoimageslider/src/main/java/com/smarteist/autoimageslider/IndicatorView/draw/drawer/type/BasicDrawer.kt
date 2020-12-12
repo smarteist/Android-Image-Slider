@@ -1,61 +1,49 @@
-package com.smarteist.autoimageslider.IndicatorView.draw.drawer.type;
+package com.smarteist.autoimageslider.IndicatorView.draw.drawer.type
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import androidx.annotation.NonNull;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
+import android.graphics.Canvas
+import android.graphics.Paint
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator
 
-public class BasicDrawer extends BaseDrawer {
-
-    private Paint strokePaint;
-
-    public BasicDrawer(@NonNull Paint paint, @NonNull Indicator indicator) {
-        super(paint, indicator);
-
-        strokePaint = new Paint();
-        strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setAntiAlias(true);
-        strokePaint.setStrokeWidth(indicator.getStroke());
+class BasicDrawer(paint: Paint, indicator: Indicator) : BaseDrawer(paint, indicator) {
+    private val strokePaint: Paint
+    fun draw(
+            canvas: Canvas,
+            position: Int,
+            isSelectedItem: Boolean,
+            coordinateX: Int,
+            coordinateY: Int) {
+        var radius = indicator.radius.toFloat()
+        val strokePx = indicator.strokeHere
+        val scaleFactor = indicator.scaleFactor
+        val selectedColor = indicator.selectedColor
+        val unselectedColor = indicator.unselectedColor
+        val selectedPosition = indicator.selectedPosition
+        val animationType = indicator.animationType
+        if (animationType === IndicatorAnimationType.SCALE && !isSelectedItem) {
+            radius *= scaleFactor
+        } else if (animationType === IndicatorAnimationType.SCALE_DOWN && isSelectedItem) {
+            radius *= scaleFactor
+        }
+        var color = unselectedColor
+        if (position == selectedPosition) {
+            color = selectedColor
+        }
+        val paint: Paint?
+        if (animationType === IndicatorAnimationType.FILL && position != selectedPosition) {
+            paint = strokePaint
+            paint.strokeWidth = strokePx.toFloat()
+        } else {
+            paint = this.paint
+        }
+        paint.setColor(color)
+        canvas.drawCircle(coordinateX.toFloat(), coordinateY.toFloat(), radius, paint)
     }
 
-    public void draw(
-            @NonNull Canvas canvas,
-            int position,
-            boolean isSelectedItem,
-            int coordinateX,
-            int coordinateY) {
-
-        float radius = indicator.getRadius();
-        int strokePx = indicator.getStroke();
-        float scaleFactor = indicator.getScaleFactor();
-
-        int selectedColor = indicator.getSelectedColor();
-        int unselectedColor = indicator.getUnselectedColor();
-        int selectedPosition = indicator.getSelectedPosition();
-        IndicatorAnimationType animationType = indicator.getAnimationType();
-
-		if (animationType == IndicatorAnimationType.SCALE && !isSelectedItem) {
-			radius *= scaleFactor;
-
-		} else if (animationType == IndicatorAnimationType.SCALE_DOWN && isSelectedItem) {
-			radius *= scaleFactor;
-		}
-
-        int color = unselectedColor;
-        if (position == selectedPosition) {
-            color = selectedColor;
-        }
-
-        Paint paint;
-        if (animationType == IndicatorAnimationType.FILL && position != selectedPosition) {
-            paint = strokePaint;
-            paint.setStrokeWidth(strokePx);
-        } else {
-            paint = this.paint;
-        }
-
-        paint.setColor(color);
-        canvas.drawCircle(coordinateX, coordinateY, radius, paint);
+    init {
+        strokePaint = Paint()
+        strokePaint.style = Paint.Style.STROKE
+        strokePaint.isAntiAlias = true
+        strokePaint.strokeWidth = indicator.strokeHere.toFloat()
     }
 }

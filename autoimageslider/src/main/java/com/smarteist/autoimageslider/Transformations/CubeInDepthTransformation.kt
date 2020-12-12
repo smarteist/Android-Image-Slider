@@ -1,41 +1,33 @@
-package com.smarteist.autoimageslider.Transformations;
+package com.smarteist.autoimageslider.Transformations
 
-import com.smarteist.autoimageslider.SliderPager;
-import android.view.View;
+import android.view.View
+import com.smarteist.autoimageslider.SliderPager
 
-public class CubeInDepthTransformation implements SliderPager.PageTransformer {
-    @Override
-    public void transformPage(View page, float position) {
-        page.setCameraDistance(20000);
-
-
-        if (position < -1){
-            page.setAlpha(0);
+class CubeInDepthTransformation : SliderPager.PageTransformer {
+    override fun transformPage(page: View, position: Float) {
+        page.cameraDistance = 20000f
+        when {
+            position < -1 -> {
+                page.alpha = 0f
+            }
+            position <= 0 -> {
+                page.alpha = 1f
+                page.pivotX = page.width.toFloat()
+                page.rotationY = 90 * Math.abs(position)
+            }
+            position <= 1 -> {
+                page.alpha = 1f
+                page.pivotX = 0f
+                page.rotationY = -90 * Math.abs(position)
+            }
+            else -> {
+                page.alpha = 0f
+            }
         }
-        else if (position <= 0){
-            page.setAlpha(1);
-            page.setPivotX(page.getWidth());
-            page.setRotationY(90*Math.abs(position));
+        if (Math.abs(position) <= 0.5) {
+            page.scaleY = Math.max(.4f, 1 - Math.abs(position))
+        } else if (Math.abs(position) <= 1) {
+            page.scaleY = Math.max(.4f, 1 - Math.abs(position))
         }
-        else if (position <= 1){
-            page.setAlpha(1);
-            page.setPivotX(0);
-            page.setRotationY(-90*Math.abs(position));
-        }
-        else{
-            page.setAlpha(0);
-        }
-
-
-
-        if (Math.abs(position) <= 0.5){
-            page.setScaleY(Math.max(.4f,1-Math.abs(position)));
-        }
-        else if (Math.abs(position) <= 1){
-            page.setScaleY(Math.max(.4f,1-Math.abs(position)));
-
-        }
-
-
     }
 }

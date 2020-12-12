@@ -1,48 +1,39 @@
-package com.smarteist.autoimageslider.IndicatorView.animation.type;
+package com.smarteist.autoimageslider.IndicatorView.animation.type
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
+import android.animation.Animator
+import android.animation.ValueAnimator
+import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController.UpdateListener
 
-public abstract class BaseAnimation<T extends Animator> {
-
-    public static final int DEFAULT_ANIMATION_TIME = 350;
-    protected long animationDuration = DEFAULT_ANIMATION_TIME;
-
-    protected ValueController.UpdateListener listener;
-    protected T animator;
-
-    public BaseAnimation(@Nullable ValueController.UpdateListener listener) {
-        this.listener = listener;
-        animator = createAnimator();
-    }
-
-    @NonNull
-    public abstract T createAnimator();
-
-    public abstract BaseAnimation progress(float progress);
-
-    public BaseAnimation duration(long duration) {
-        animationDuration = duration;
-
-        if (animator instanceof ValueAnimator) {
-            animator.setDuration(animationDuration);
+abstract class BaseAnimation<T : Animator?>(protected var listener: UpdateListener?) {
+    protected var animationDuration = DEFAULT_ANIMATION_TIME.toLong()
+    protected var animator: T?
+    abstract fun createAnimator(): T
+    abstract fun progress(progress: Float): BaseAnimation<*>
+    open fun duration(duration: Long): BaseAnimation<*> {
+        animationDuration = duration
+        if (animator is ValueAnimator) {
+            animator!!.duration = animationDuration
         }
-
-        return this;
+        return this
     }
 
-    public void start() {
-        if (animator != null && !animator.isRunning()) {
-            animator.start();
+    fun start() {
+        if (animator != null && !animator!!.isRunning) {
+            animator!!.start()
         }
     }
 
-    public void end() {
-        if (animator != null && animator.isStarted()) {
-            animator.end();
+    fun end() {
+        if (animator != null && animator!!.isStarted) {
+            animator!!.end()
         }
+    }
+
+    companion object {
+        const val DEFAULT_ANIMATION_TIME = 350
+    }
+
+    init {
+        animator = createAnimator()
     }
 }

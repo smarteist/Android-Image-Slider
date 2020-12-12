@@ -1,37 +1,31 @@
-package com.smarteist.autoimageslider.Transformations;
+package com.smarteist.autoimageslider.Transformations
 
-import com.smarteist.autoimageslider.SliderPager;
-import android.view.View;
+import android.view.View
+import com.smarteist.autoimageslider.SliderPager
 
-public class FanTransformation implements SliderPager.PageTransformer{
-    @Override
-    public void transformPage(View page, float position) {
-
-        page.setTranslationX(-position*page.getWidth());
-        page.setPivotX(0);
-        page.setPivotY(page.getHeight()/2);
-        page.setCameraDistance(20000);
-
-        if (position < -1){     // [-Infinity,-1)
-            // This page is way off-screen to the left.
-            page.setAlpha(0);
-
+class FanTransformation : SliderPager.PageTransformer {
+    override fun transformPage(page: View, position: Float) {
+        page.translationX = -position * page.width
+        page.pivotX = 0f
+        page.pivotY = (page.height / 2).toFloat()
+        page.cameraDistance = 20000f
+        when {
+            position < -1 -> {     // [-Infinity,-1)
+                // This page is way off-screen to the left.
+                page.alpha = 0f
+            }
+            position <= 0 -> {    // [-1,0]
+                page.alpha = 1f
+                page.rotationY = -120 * Math.abs(position)
+            }
+            position <= 1 -> {    // (0,1]
+                page.alpha = 1f
+                page.rotationY = 120 * Math.abs(position)
+            }
+            else -> {    // (1,+Infinity]
+                // This page is way off-screen to the right.
+                page.alpha = 0f
+            }
         }
-        else if (position <= 0){    // [-1,0]
-            page.setAlpha(1);
-            page.setRotationY(-120*Math.abs(position));
-        }
-        else if (position <= 1){    // (0,1]
-            page.setAlpha(1);
-            page.setRotationY(120*Math.abs(position));
-
-        }
-        else {    // (1,+Infinity]
-            // This page is way off-screen to the right.
-            page.setAlpha(0);
-
-        }
-
-
     }
 }

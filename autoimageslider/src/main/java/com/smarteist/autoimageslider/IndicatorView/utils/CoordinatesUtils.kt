@@ -1,193 +1,153 @@
-package com.smarteist.autoimageslider.IndicatorView.utils;
+package com.smarteist.autoimageslider.IndicatorView.utils
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.util.Pair;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
+import android.util.Pair
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation
 
-public class CoordinatesUtils {
+object CoordinatesUtils {
+    fun getCoordinate(indicator: Indicator?, position: Int): Int {
+        if (indicator == null) {
+            return 0
+        }
+        return if (indicator.orientation == Orientation.HORIZONTAL) {
+            getXCoordinate(indicator, position)
+        } else {
+            getYCoordinate(indicator, position)
+        }
+    }
 
-	@SuppressWarnings("UnnecessaryLocalVariable")
-	public static int getCoordinate(@Nullable Indicator indicator, int position) {
-		if (indicator == null) {
-			return 0;
-		}
+    fun getXCoordinate(indicator: Indicator?, position: Int): Int {
+        if (indicator == null) {
+            return 0
+        }
+        var coordinate: Int = if (indicator.orientation == Orientation.HORIZONTAL) {
+            getHorizontalCoordinate(indicator, position)
+        } else {
+            getVerticalCoordinate(indicator)
+        }
+        coordinate += indicator.paddingLeft
+        return coordinate
+    }
 
-		if (indicator.getOrientation() == Orientation.HORIZONTAL) {
-			return getXCoordinate(indicator, position);
-		} else {
-			return getYCoordinate(indicator, position);
-		}
-	}
+    fun getYCoordinate(indicator: Indicator?, position: Int): Int {
+        if (indicator == null) {
+            return 0
+        }
+        var coordinate: Int = if (indicator.orientation == Orientation.HORIZONTAL) {
+            getVerticalCoordinate(indicator)
+        } else {
+            getHorizontalCoordinate(indicator, position)
+        }
+        coordinate += indicator.paddingTop
+        return coordinate
+    }
 
-	@SuppressWarnings("UnnecessaryLocalVariable")
-	public static int getXCoordinate(@Nullable Indicator indicator, int position) {
-		if (indicator == null) {
-			return 0;
-		}
+    fun getPosition(indicator: Indicator?, x: Float, y: Float): Int {
+        if (indicator == null) {
+            return -1
+        }
+        val lengthCoordinate: Float
+        val heightCoordinate: Float
+        if (indicator.orientation == Orientation.HORIZONTAL) {
+            lengthCoordinate = x
+            heightCoordinate = y
+        } else {
+            lengthCoordinate = y
+            heightCoordinate = x
+        }
+        return getFitPosition(indicator, lengthCoordinate, heightCoordinate)
+    }
 
-		int coordinate;
-		if (indicator.getOrientation() == Orientation.HORIZONTAL) {
-			coordinate = getHorizontalCoordinate(indicator, position);
-		} else {
-			coordinate = getVerticalCoordinate(indicator);
-		}
+    private fun getFitPosition(indicator: Indicator, lengthCoordinate: Float, heightCoordinate: Float): Int {
+        val count = indicator.count
+        val radius = indicator.radius
+        val stroke = indicator.strokeHere
+        val padding = indicator.padding
+        val height = if (indicator.orientation == Orientation.HORIZONTAL) indicator.height else indicator.width
+        var length = 0
+        for (i in 0 until count) {
+            val indicatorPadding = if (i > 0) padding else padding / 2
+            val startValue = length
+            length += radius * 2 + stroke / 2 + indicatorPadding
+            val endValue = length
+            val fitLength = lengthCoordinate >= startValue && lengthCoordinate <= endValue
+            val fitHeight = heightCoordinate >= 0 && heightCoordinate <= height
+            if (fitLength && fitHeight) {
+                return i
+            }
+        }
+        return -1
+    }
 
-		coordinate += indicator.getPaddingLeft();
-		return coordinate;
-	}
+    private fun getHorizontalCoordinate(indicator: Indicator, position: Int): Int {
+        val count = indicator.count
+        val radius = indicator.radius
+        val stroke = indicator.strokeHere
+        val padding = indicator.padding
+        var coordinate = 0
+        for (i in 0 until count) {
+            coordinate += radius + stroke / 2
+            if (position == i) {
+                return coordinate
+            }
+            coordinate += radius + padding + stroke / 2
+        }
+        if (indicator.animationType === IndicatorAnimationType.DROP) {
+            coordinate += radius * 2
+        }
+        return coordinate
+    }
 
-	public static int getYCoordinate(@Nullable Indicator indicator, int position) {
-		if (indicator == null) {
-			return 0;
-		}
+    private fun getVerticalCoordinate(indicator: Indicator): Int {
+        val radius = indicator.radius
+        val coordinate: Int
+        coordinate = if (indicator.animationType === IndicatorAnimationType.DROP) {
+            radius * 3
+        } else {
+            radius
+        }
+        return coordinate
+    }
 
-		int coordinate;
-		if (indicator.getOrientation() == Orientation.HORIZONTAL) {
-			coordinate = getVerticalCoordinate(indicator);
-		} else {
-			coordinate = getHorizontalCoordinate(indicator, position);
-		}
-
-		coordinate += indicator.getPaddingTop();
-		return coordinate;
-	}
-
-	@SuppressWarnings("SuspiciousNameCombination")
-	public static int getPosition(@Nullable Indicator indicator, float x, float y) {
-		if (indicator == null) {
-			return -1;
-		}
-
-		float lengthCoordinate;
-		float heightCoordinate;
-
-		if (indicator.getOrientation() == Orientation.HORIZONTAL) {
-			lengthCoordinate = x;
-			heightCoordinate = y;
-		} else {
-			lengthCoordinate = y;
-			heightCoordinate = x;
-		}
-
-		return getFitPosition(indicator, lengthCoordinate, heightCoordinate);
-	}
-
-	private static int getFitPosition(@NonNull Indicator indicator, float lengthCoordinate, float heightCoordinate) {
-		int count = indicator.getCount();
-		int radius = indicator.getRadius();
-		int stroke = indicator.getStroke();
-		int padding = indicator.getPadding();
-
-		int height = indicator.getOrientation() == Orientation.HORIZONTAL ? indicator.getHeight() : indicator.getWidth();
-		int length = 0;
-
-		for (int i = 0; i < count; i++) {
-			int indicatorPadding = i > 0 ? padding : padding / 2;
-			int startValue = length;
-
-			length += radius * 2 + (stroke / 2) + indicatorPadding;
-			int endValue = length;
-
-			boolean fitLength = lengthCoordinate >= startValue && lengthCoordinate <= endValue;
-			boolean fitHeight = heightCoordinate >= 0 && heightCoordinate <= height;
-
-			if (fitLength && fitHeight) {
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	private static int getHorizontalCoordinate(@NonNull Indicator indicator, int position) {
-		int count = indicator.getCount();
-		int radius = indicator.getRadius();
-		int stroke = indicator.getStroke();
-		int padding = indicator.getPadding();
-
-		int coordinate = 0;
-		for (int i = 0; i < count; i++) {
-			coordinate += radius + (stroke / 2);
-
-			if (position == i) {
-				return coordinate;
-			}
-
-			coordinate += radius + padding + (stroke / 2);
-		}
-
-		if (indicator.getAnimationType() == IndicatorAnimationType.DROP) {
-			coordinate += radius * 2;
-		}
-
-		return coordinate;
-	}
-
-	private static int getVerticalCoordinate(@NonNull Indicator indicator) {
-		int radius = indicator.getRadius();
-		int coordinate;
-
-		if (indicator.getAnimationType() == IndicatorAnimationType.DROP) {
-			coordinate = radius * 3;
-		} else {
-			coordinate = radius;
-		}
-
-		return coordinate;
-	}
-
-	public static Pair<Integer, Float> getProgress(@NonNull Indicator indicator, int position, float positionOffset, boolean isRtl) {
-		int count = indicator.getCount();
-		int selectedPosition = indicator.getSelectedPosition();
-
-		if (isRtl) {
-			position = (count - 1) - position;
-		}
-
-		if (position < 0) {
-			position = 0;
-
-		} else if (position > count - 1) {
-			position = count - 1;
-		}
-
-		boolean isRightOverScrolled = position > selectedPosition;
-		boolean isLeftOverScrolled;
-
-		if (isRtl) {
-			isLeftOverScrolled = position - 1 < selectedPosition;
-		} else {
-			isLeftOverScrolled = position + 1 < selectedPosition;
-		}
-
-		if (isRightOverScrolled || isLeftOverScrolled) {
-			selectedPosition = position;
-			indicator.setSelectedPosition(selectedPosition);
-		}
-
-		boolean slideToRightSide = selectedPosition == position && positionOffset != 0;
-		int selectingPosition;
-		float selectingProgress;
-
-		if (slideToRightSide) {
-			selectingPosition = isRtl ? position - 1 : position + 1;
-			selectingProgress = positionOffset;
-
-		} else {
-			selectingPosition = position;
-			selectingProgress = 1 - positionOffset;
-		}
-
-		if (selectingProgress > 1) {
-			selectingProgress = 1;
-
-		} else if (selectingProgress < 0) {
-			selectingProgress = 0;
-		}
-
-		return new Pair<>(selectingPosition, selectingProgress);
-	}
+    fun getProgress(indicator: Indicator, position: Int, positionOffset: Float, isRtl: Boolean): Pair<Int, Float> {
+        var position = position
+        val count = indicator.count
+        var selectedPosition = indicator.selectedPosition
+        if (isRtl) {
+            position = count - 1 - position
+        }
+        if (position < 0) {
+            position = 0
+        } else if (position > count - 1) {
+            position = count - 1
+        }
+        val isRightOverScrolled = position > selectedPosition
+        val isLeftOverScrolled: Boolean
+        isLeftOverScrolled = if (isRtl) {
+            position - 1 < selectedPosition
+        } else {
+            position + 1 < selectedPosition
+        }
+        if (isRightOverScrolled || isLeftOverScrolled) {
+            selectedPosition = position
+            indicator.selectedPosition = selectedPosition
+        }
+        val slideToRightSide = selectedPosition == position && positionOffset != 0f
+        val selectingPosition: Int
+        var selectingProgress: Float
+        if (slideToRightSide) {
+            selectingPosition = if (isRtl) position - 1 else position + 1
+            selectingProgress = positionOffset
+        } else {
+            selectingPosition = position
+            selectingProgress = 1 - positionOffset
+        }
+        if (selectingProgress > 1) {
+            selectingProgress = 1f
+        } else if (selectingProgress < 0) {
+            selectingProgress = 0f
+        }
+        return Pair(selectingPosition, selectingProgress)
+    }
 }

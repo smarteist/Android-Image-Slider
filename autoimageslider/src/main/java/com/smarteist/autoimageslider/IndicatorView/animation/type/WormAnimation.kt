@@ -1,199 +1,138 @@
-package com.smarteist.autoimageslider.IndicatorView.animation.type;
+package com.smarteist.autoimageslider.IndicatorView.animation.type
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ValueAnimator;
-import androidx.annotation.NonNull;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.type.WormAnimationValue;
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
+import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController.UpdateListener
+import com.smarteist.autoimageslider.IndicatorView.animation.data.type.WormAnimationValue
 
-public class WormAnimation extends BaseAnimation<AnimatorSet> {
-
-    int coordinateStart;
-    int coordinateEnd;
-
-    int radius;
-    boolean isRightSide;
-
-    int rectLeftEdge;
-    int rectRightEdge;
-
-    private WormAnimationValue value;
-
-    public WormAnimation(@NonNull ValueController.UpdateListener listener) {
-        super(listener);
-        value = new WormAnimationValue();
+open class WormAnimation(listener: UpdateListener) : BaseAnimation<AnimatorSet>(listener) {
+    var coordinateStart = 0
+    var coordinateEnd = 0
+    var radius = 0
+    var isRightSide = false
+    var rectLeftEdge = 0
+    var rectRightEdge = 0
+    private val value: WormAnimationValue
+    override fun createAnimator(): AnimatorSet {
+        val animator = AnimatorSet()
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        return animator
     }
 
-    @NonNull
-    @Override
-    public AnimatorSet createAnimator() {
-        AnimatorSet animator = new AnimatorSet();
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-
-        return animator;
+    override fun duration(duration: Long): WormAnimation {
+        super.duration(duration)
+        return this
     }
 
-    @Override
-    public WormAnimation duration(long duration) {
-        super.duration(duration);
-        return this;
-    }
-
-    public WormAnimation with(int coordinateStart, int coordinateEnd, int radius, boolean isRightSide) {
+    open fun with(coordinateStart: Int, coordinateEnd: Int, radius: Int, isRightSide: Boolean): WormAnimation {
         if (hasChanges(coordinateStart, coordinateEnd, radius, isRightSide)) {
-            animator = createAnimator();
-
-            this.coordinateStart = coordinateStart;
-            this.coordinateEnd = coordinateEnd;
-
-            this.radius = radius;
-            this.isRightSide = isRightSide;
-
-            rectLeftEdge = coordinateStart - radius;
-            rectRightEdge = coordinateStart + radius;
-
-            value.setRectStart(rectLeftEdge);
-            value.setRectEnd(rectRightEdge);
-
-            RectValues rect = createRectValues(isRightSide);
-            long duration = animationDuration / 2;
-
-            ValueAnimator straightAnimator = createWormAnimator(rect.fromX, rect.toX, duration, false, value);
-            ValueAnimator reverseAnimator = createWormAnimator(rect.reverseFromX, rect.reverseToX, duration, true, value);
-            animator.playSequentially(straightAnimator, reverseAnimator);
+            animator = createAnimator()
+            this.coordinateStart = coordinateStart
+            this.coordinateEnd = coordinateEnd
+            this.radius = radius
+            this.isRightSide = isRightSide
+            rectLeftEdge = coordinateStart - radius
+            rectRightEdge = coordinateStart + radius
+            value.rectStart = rectLeftEdge
+            value.rectEnd = rectRightEdge
+            val rect = createRectValues(isRightSide)
+            val duration = animationDuration / 2
+            val straightAnimator = createWormAnimator(rect.fromX, rect.toX, duration, false, value)
+            val reverseAnimator = createWormAnimator(rect.reverseFromX, rect.reverseToX, duration, true, value)
+            animator!!.playSequentially(straightAnimator, reverseAnimator)
         }
-        return this;
+        return this
     }
 
-    @Override
-    public WormAnimation progress(float progress) {
+    override fun progress(progress: Float): WormAnimation {
         if (animator == null) {
-            return this;
+            return this
         }
-
-        long progressDuration = (long) (progress * animationDuration);
-        for (Animator anim : animator.getChildAnimations()) {
-            ValueAnimator animator = (ValueAnimator) anim;
-            long duration = animator.getDuration();
-            long setDuration = progressDuration;
-
+        var progressDuration = (progress * animationDuration).toLong()
+        for (anim in animator!!.childAnimations) {
+            val animator = anim as ValueAnimator
+            val duration = animator.duration
+            var setDuration = progressDuration
             if (setDuration > duration) {
-                setDuration = duration;
+                setDuration = duration
             }
-
-            animator.setCurrentPlayTime(setDuration);
-            progressDuration -= setDuration;
+            animator.currentPlayTime = setDuration
+            progressDuration -= setDuration
         }
-
-        return this;
+        return this
     }
 
-    ValueAnimator createWormAnimator(
-            int fromValue,
-            int toValue,
-            long duration,
-            final boolean isReverse,
-            final WormAnimationValue value) {
-
-        ValueAnimator anim = ValueAnimator.ofInt(fromValue, toValue);
-        anim.setInterpolator(new AccelerateDecelerateInterpolator());
-        anim.setDuration(duration);
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                onAnimateUpdated(value, animation, isReverse);
-            }
-        });
-
-        return anim;
+    fun createWormAnimator(
+            fromValue: Int,
+            toValue: Int,
+            duration: Long,
+            isReverse: Boolean,
+            value: WormAnimationValue): ValueAnimator {
+        val anim = ValueAnimator.ofInt(fromValue, toValue)
+        anim.interpolator = AccelerateDecelerateInterpolator()
+        anim.duration = duration
+        anim.addUpdateListener { animation -> onAnimateUpdated(value, animation, isReverse) }
+        return anim
     }
 
-    private void onAnimateUpdated(@NonNull WormAnimationValue value, @NonNull ValueAnimator animation, final boolean isReverse) {
-        int rectEdge = (int) animation.getAnimatedValue();
-
+    private fun onAnimateUpdated(value: WormAnimationValue, animation: ValueAnimator, isReverse: Boolean) {
+        val rectEdge = animation.animatedValue as Int
         if (isRightSide) {
             if (!isReverse) {
-                value.setRectEnd(rectEdge);
+                value.rectEnd = rectEdge
             } else {
-                value.setRectStart(rectEdge);
+                value.rectStart = rectEdge
             }
-
         } else {
             if (!isReverse) {
-                value.setRectStart(rectEdge);
+                value.rectStart = rectEdge
             } else {
-                value.setRectEnd(rectEdge);
+                value.rectEnd = rectEdge
             }
         }
-
         if (listener != null) {
-            listener.onValueUpdated(value);
+            listener!!.onValueUpdated(value)
         }
     }
 
-    @SuppressWarnings("RedundantIfStatement")
-    boolean hasChanges(int coordinateStart, int coordinateEnd, int radius, boolean isRightSide) {
+    fun hasChanges(coordinateStart: Int, coordinateEnd: Int, radius: Int, isRightSide: Boolean): Boolean {
         if (this.coordinateStart != coordinateStart) {
-            return true;
+            return true
         }
-
         if (this.coordinateEnd != coordinateEnd) {
-            return true;
+            return true
         }
-
         if (this.radius != radius) {
-            return true;
+            return true
         }
-
-        if (this.isRightSide != isRightSide) {
-            return true;
-        }
-
-        return false;
+        return if (this.isRightSide != isRightSide) {
+            true
+        } else false
     }
 
-    @NonNull
-    RectValues createRectValues(boolean isRightSide) {
-        int fromX;
-        int toX;
-
-        int reverseFromX;
-        int reverseToX;
-
+    fun createRectValues(isRightSide: Boolean): RectValues {
+        val fromX: Int
+        val toX: Int
+        val reverseFromX: Int
+        val reverseToX: Int
         if (isRightSide) {
-            fromX = coordinateStart + radius;
-            toX = coordinateEnd + radius;
-
-            reverseFromX = coordinateStart - radius;
-            reverseToX = coordinateEnd - radius;
-
+            fromX = coordinateStart + radius
+            toX = coordinateEnd + radius
+            reverseFromX = coordinateStart - radius
+            reverseToX = coordinateEnd - radius
         } else {
-            fromX = coordinateStart - radius;
-            toX = coordinateEnd - radius;
-
-            reverseFromX = coordinateStart + radius;
-            reverseToX = coordinateEnd + radius;
+            fromX = coordinateStart - radius
+            toX = coordinateEnd - radius
+            reverseFromX = coordinateStart + radius
+            reverseToX = coordinateEnd + radius
         }
-
-        return new RectValues(fromX, toX, reverseFromX, reverseToX);
+        return RectValues(fromX, toX, reverseFromX, reverseToX)
     }
 
-    class RectValues {
+    inner class RectValues(val fromX: Int, val toX: Int, val reverseFromX: Int, val reverseToX: Int)
 
-        final int fromX;
-        final int toX;
-
-        final int reverseFromX;
-        final int reverseToX;
-
-        RectValues(int fromX, int toX, int reverseFromX, int reverseToX) {
-            this.fromX = fromX;
-            this.toX = toX;
-
-            this.reverseFromX = reverseFromX;
-            this.reverseToX = reverseToX;
-        }
+    init {
+        value = WormAnimationValue()
     }
 }

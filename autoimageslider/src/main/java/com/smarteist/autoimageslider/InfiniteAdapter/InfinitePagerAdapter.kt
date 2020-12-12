@@ -1,157 +1,126 @@
-package com.smarteist.autoimageslider.InfiniteAdapter;
+package com.smarteist.autoimageslider.InfiniteAdapter
 
-import android.database.DataSetObserver;
-import android.os.Parcelable;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.viewpager.widget.PagerAdapter;
-
-import com.smarteist.autoimageslider.SliderViewAdapter;
-
+import android.database.DataSetObserver
+import android.os.Parcelable
+import android.view.View
+import android.view.ViewGroup
+import androidx.viewpager.widget.PagerAdapter
+import com.smarteist.autoimageslider.SliderViewAdapter
 
 /**
  * Its just a wrapper adapter class for providing infinite behavior
  * for slider.
  */
-public class InfinitePagerAdapter extends PagerAdapter {
+class InfinitePagerAdapter(private val adapter: SliderViewAdapter<*>) : PagerAdapter() {
+    val realAdapter: PagerAdapter get() = adapter
 
-    // Warning: it should be an even number.
-    public static final int INFINITE_SCROLL_LIMIT = 32400;
-    private static final String TAG = "InfinitePagerAdapter";
-    private SliderViewAdapter adapter;
-
-    public InfinitePagerAdapter(SliderViewAdapter adapter) {
-        this.adapter = adapter;
-    }
-
-    public PagerAdapter getRealAdapter() {
-        return this.adapter;
-    }
-
-    @Override
-    public int getCount() {
-        if (getRealCount() < 1) {
-            return 0;
-        }
+    override fun getCount(): Int {
+        return if (realCount < 1) {
+            0
+        } else realCount * INFINITE_SCROLL_LIMIT
         // warning: infinite scroller actually is not infinite!
         // very big number will be cause memory problems.
-        return getRealCount() * INFINITE_SCROLL_LIMIT;
     }
 
     /**
-     * @return the {@link #getCount()} result of the wrapped adapter
+     * @return the [.getCount] result of the wrapped adapter
      */
-    public int getRealCount() {
-        try {
-            return getRealAdapter().getCount();
-        } catch (Exception e) {
-            return 0;
+    val realCount: Int
+        get() = try {
+            realAdapter.count
+        } catch (e: Exception) {
+            0
         }
-    }
-
 
     /**
      * @param item real position of item
      * @return virtual mid point
      */
-    public int getMiddlePosition(int item) {
-       int midpoint = Math.max(0, getRealCount()) * (InfinitePagerAdapter.INFINITE_SCROLL_LIMIT / 2);
-        return item + midpoint;
+    fun getMiddlePosition(item: Int): Int {
+        val midpoint = Math.max(0, realCount) * (INFINITE_SCROLL_LIMIT / 2)
+        return item + midpoint
     }
 
-    @NonNull
-    @Override
-    public Object instantiateItem(ViewGroup container, int virtualPosition) {
+    override fun instantiateItem(container: ViewGroup, virtualPosition: Int): Any {
         // prevent division by zer
-        if (getRealCount() < 1) {
-            return adapter.instantiateItem(container, 0);
-        }
+        return if (realCount < 1) {
+            adapter.instantiateItem(container, 0)
+        } else adapter.instantiateItem(container, getRealPosition(virtualPosition))
         //Log.i(TAG, "instantiateItem: real virtualPosition: " + virtualPosition);
         //Log.i(TAG, "instantiateItem: virtual virtualPosition: " + virtualPosition);
 
         // only expose virtual virtualPosition to the inner adapter
-        return adapter.instantiateItem(container, getRealPosition(virtualPosition));
     }
 
-    @Override
-    public void destroyItem(ViewGroup container, int virtualPosition, Object object) {
+    override fun destroyItem(container: ViewGroup, virtualPosition: Int, `object`: Any) {
         // prevent division by zero
-        if (getRealCount() < 1) {
-            adapter.destroyItem(container, 0, object);
-            return;
+        if (realCount < 1) {
+            adapter.destroyItem(container, 0, `object`)
+            return
         }
         //Log.i(TAG, "destroyItem: real position: " + position);
         //Log.i(TAG, "destroyItem: virtual position: " + virtualPosition);
 
         // only expose virtual position to the inner adapter
-        adapter.destroyItem(container, getRealPosition(virtualPosition), object);
+        adapter.destroyItem(container, getRealPosition(virtualPosition), `object`)
     }
 
-    @Override
-    public void startUpdate(ViewGroup container) {
-        adapter.startUpdate(container);
+    override fun startUpdate(container: ViewGroup) {
+        adapter.startUpdate(container)
     }
 
     /*
      * Delegate rest of methods directly to the inner adapter.
      */
-    @Override
-    public void finishUpdate(ViewGroup container) {
-        adapter.finishUpdate(container);
+    override fun finishUpdate(container: ViewGroup) {
+        adapter.finishUpdate(container)
     }
 
-    @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return adapter.isViewFromObject(view, object);
+    override fun isViewFromObject(view: View, `object`: Any): Boolean {
+        return adapter.isViewFromObject(view, `object`)
     }
 
-    @Override
-    public void restoreState(Parcelable bundle, ClassLoader classLoader) {
-        adapter.restoreState(bundle, classLoader);
+    override fun restoreState(bundle: Parcelable?, classLoader: ClassLoader?) {
+        adapter.restoreState(bundle, classLoader)
     }
 
-    @Override
-    public Parcelable saveState() {
-        return adapter.saveState();
+    override fun saveState(): Parcelable? {
+        return adapter.saveState()
     }
 
-    @Override
-    public CharSequence getPageTitle(int virtualPosition) {
-        return adapter.getPageTitle(getRealPosition(virtualPosition));
+    override fun getPageTitle(virtualPosition: Int): CharSequence? {
+        return adapter.getPageTitle(getRealPosition(virtualPosition))
     }
 
-    @Override
-    public float getPageWidth(int position) {
-        return adapter.getPageWidth(position);
+    override fun getPageWidth(position: Int): Float {
+        return adapter.getPageWidth(position)
     }
 
-    @Override
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        adapter.setPrimaryItem(container, position, object);
+    override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
+        adapter.setPrimaryItem(container, position, `object`)
     }
 
-    @Override
-    public void unregisterDataSetObserver(DataSetObserver observer) {
-        adapter.unregisterDataSetObserver(observer);
+    override fun unregisterDataSetObserver(observer: DataSetObserver) {
+        adapter.unregisterDataSetObserver(observer)
     }
 
-    @Override
-    public void registerDataSetObserver(DataSetObserver observer) {
-        adapter.registerDataSetObserver(observer);
+    override fun registerDataSetObserver(observer: DataSetObserver) {
+        adapter.registerDataSetObserver(observer)
     }
 
-    @Override
-    public int getItemPosition(Object object) {
-        return adapter.getItemPosition(object);
+    override fun getItemPosition(`object`: Any): Int {
+        return adapter.getItemPosition(`object`)
     }
 
-    public int getRealPosition(int virtualPosition) {
-        if (getRealCount() > 0) {
-            return virtualPosition % getRealCount();
-        }
-        return 0;
+    fun getRealPosition(virtualPosition: Int): Int {
+        return if (realCount > 0) {
+            virtualPosition % realCount
+        } else 0
+    }
+
+    companion object {
+        // Warning: it should be an even number.
+        const val INFINITE_SCROLL_LIMIT = 32400
+        private const val TAG = "InfinitePagerAdapter"
     }
 }

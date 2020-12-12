@@ -1,36 +1,27 @@
-package com.smarteist.autoimageslider.IndicatorView.animation;
+package com.smarteist.autoimageslider.IndicatorView.animation
 
-import androidx.annotation.NonNull;
+import com.smarteist.autoimageslider.IndicatorView.animation.controller.AnimationController
+import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController.UpdateListener
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator
 
-import com.smarteist.autoimageslider.IndicatorView.animation.controller.AnimationController;
-import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
-
-
-public class AnimationManager {
-
-    private AnimationController animationController;
-
-    public AnimationManager(@NonNull Indicator indicator, @NonNull ValueController.UpdateListener listener) {
-        this.animationController = new AnimationController(indicator, listener);
-    }
-
-    public void basic() {
+class AnimationManager(indicator: Indicator, listener: UpdateListener) {
+    private val animationController: AnimationController?
+    fun basic() {
         if (animationController != null) {
-            animationController.end();
-            animationController.basic();
+            animationController.end()
+            animationController.basic()
         }
     }
 
-    public void interactive(float progress) {
-        if (animationController != null) {
-            animationController.interactive(progress);
-        }
+    fun interactive(progress: Float) {
+        animationController?.interactive(progress)
     }
 
-    public void end() {
-        if (animationController != null) {
-            animationController.end();
-        }
+    fun end() {
+        animationController?.end()
+    }
+
+    init {
+        animationController = AnimationController(indicator, listener)
     }
 }

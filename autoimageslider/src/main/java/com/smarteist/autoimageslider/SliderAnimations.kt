@@ -1,6 +1,6 @@
-package com.smarteist.autoimageslider;
+package com.smarteist.autoimageslider
 
-public enum SliderAnimations {
+enum class SliderAnimations {
     ANTICLOCKSPINTRANSFORMATION,
     CLOCK_SPINTRANSFORMATION,
     CUBEINDEPTHTRANSFORMATION,

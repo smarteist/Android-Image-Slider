@@ -1,74 +1,60 @@
-package com.smarteist.autoimageslider.IndicatorView.draw.drawer.type;
+package com.smarteist.autoimageslider.IndicatorView.draw.drawer.type
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import androidx.annotation.NonNull;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.Value;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.type.FillAnimationValue;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
+import android.graphics.Canvas
+import android.graphics.Paint
+import com.smarteist.autoimageslider.IndicatorView.animation.data.Value
+import com.smarteist.autoimageslider.IndicatorView.animation.data.type.FillAnimationValue
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator
 
-public class FillDrawer extends BaseDrawer {
-
-    private Paint strokePaint;
-
-    public FillDrawer(@NonNull Paint paint, @NonNull Indicator indicator) {
-        super(paint, indicator);
-
-        strokePaint = new Paint();
-        strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setAntiAlias(true);
-    }
-
-    public void draw(
-            @NonNull Canvas canvas,
-            @NonNull Value value,
-            int position,
-            int coordinateX,
-            int coordinateY) {
-
-        if (!(value instanceof FillAnimationValue)) {
-            return;
+class FillDrawer(paint: Paint, indicator: Indicator) : BaseDrawer(paint, indicator) {
+    private val strokePaint: Paint
+    fun draw(
+            canvas: Canvas,
+            value: Value,
+            position: Int,
+            coordinateX: Int,
+            coordinateY: Int) {
+        if (value !is FillAnimationValue) {
+            return
         }
-
-        FillAnimationValue v = (FillAnimationValue) value;
-        int color = indicator.getUnselectedColor();
-        float radius = indicator.getRadius();
-        int stroke = indicator.getStroke();
-
-        int selectedPosition = indicator.getSelectedPosition();
-        int selectingPosition = indicator.getSelectingPosition();
-        int lastSelectedPosition = indicator.getLastSelectedPosition();
-
-        if (indicator.isInteractiveAnimation()) {
+        val v = value
+        var color = indicator.unselectedColor
+        var radius = indicator.radius.toFloat()
+        var stroke = indicator.strokeHere
+        val selectedPosition = indicator.selectedPosition
+        val selectingPosition = indicator.selectingPosition
+        val lastSelectedPosition = indicator.lastSelectedPosition
+        if (indicator.isInteractiveAnimation) {
             if (position == selectingPosition) {
-                color = v.getColor();
-                radius = v.getRadius();
-                stroke = v.getStroke();
-
+                color = v.color
+                radius = v.radius.toFloat()
+                stroke = v.stroke
             } else if (position == selectedPosition) {
-                color = v.getColorReverse();
-                radius = v.getRadiusReverse();
-                stroke = v.getStrokeReverse();
+                color = v.colorReverse
+                radius = v.radiusReverse.toFloat()
+                stroke = v.strokeReverse
             }
-
         } else {
             if (position == selectedPosition) {
-                color = v.getColor();
-                radius = v.getRadius();
-                stroke = v.getStroke();
-
+                color = v.color
+                radius = v.radius.toFloat()
+                stroke = v.stroke
             } else if (position == lastSelectedPosition) {
-                color = v.getColorReverse();
-                radius = v.getRadiusReverse();
-                stroke = v.getStrokeReverse();
+                color = v.colorReverse
+                radius = v.radiusReverse.toFloat()
+                stroke = v.strokeReverse
             }
         }
+        strokePaint.color = color
+        strokePaint.strokeWidth = indicator.strokeHere.toFloat()
+        canvas.drawCircle(coordinateX.toFloat(), coordinateY.toFloat(), indicator.radius.toFloat(), strokePaint)
+        strokePaint.strokeWidth = stroke.toFloat()
+        canvas.drawCircle(coordinateX.toFloat(), coordinateY.toFloat(), radius, strokePaint)
+    }
 
-        strokePaint.setColor(color);
-        strokePaint.setStrokeWidth(indicator.getStroke());
-        canvas.drawCircle(coordinateX, coordinateY, indicator.getRadius(), strokePaint);
-
-        strokePaint.setStrokeWidth(stroke);
-        canvas.drawCircle(coordinateX, coordinateY, radius, strokePaint);
+    init {
+        strokePaint = Paint()
+        strokePaint.style = Paint.Style.STROKE
+        strokePaint.isAntiAlias = true
     }
 }

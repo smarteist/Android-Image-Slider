@@ -1,55 +1,42 @@
-package com.smarteist.autoimageslider.IndicatorView.draw.drawer.type;
+package com.smarteist.autoimageslider.IndicatorView.draw.drawer.type
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import androidx.annotation.NonNull;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.Value;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.type.ThinWormAnimationValue;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
+import android.graphics.Canvas
+import android.graphics.Paint
+import com.smarteist.autoimageslider.IndicatorView.animation.data.Value
+import com.smarteist.autoimageslider.IndicatorView.animation.data.type.ThinWormAnimationValue
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation
 
-public class ThinWormDrawer extends WormDrawer {
-
-    public ThinWormDrawer(@NonNull Paint paint, @NonNull Indicator indicator) {
-        super(paint, indicator);
-    }
-
-    public void draw(
-            @NonNull Canvas canvas,
-            @NonNull Value value,
-            int coordinateX,
-            int coordinateY) {
-
-        if (!(value instanceof ThinWormAnimationValue)) {
-            return;
+class ThinWormDrawer(paint: Paint, indicator: Indicator) : WormDrawer(paint, indicator) {
+    override fun draw(
+            canvas: Canvas,
+            value: Value,
+            coordinateX: Int,
+            coordinateY: Int) {
+        if (value !is ThinWormAnimationValue) {
+            return
         }
-
-        ThinWormAnimationValue v = (ThinWormAnimationValue) value;
-        int rectStart = v.getRectStart();
-        int rectEnd = v.getRectEnd();
-        int height = v.getHeight() / 2;
-
-        int radius = indicator.getRadius();
-        int unselectedColor = indicator.getUnselectedColor();
-        int selectedColor = indicator.getSelectedColor();
-
-        if (indicator.getOrientation() == Orientation.HORIZONTAL) {
-            rect.left = rectStart;
-            rect.right = rectEnd;
-            rect.top = coordinateY - height;
-            rect.bottom = coordinateY + height;
-
+        val v = value
+        val rectStart = v.rectStart
+        val rectEnd = v.rectEnd
+        val height = v.height / 2
+        val radius = indicator.radius
+        val unselectedColor = indicator.unselectedColor
+        val selectedColor = indicator.selectedColor
+        if (indicator.orientation == Orientation.HORIZONTAL) {
+            rect.left = rectStart.toFloat()
+            rect.right = rectEnd.toFloat()
+            rect.top = (coordinateY - height).toFloat()
+            rect.bottom = (coordinateY + height).toFloat()
         } else {
-            rect.left = coordinateX - height;
-            rect.right = coordinateX + height;
-            rect.top = rectStart;
-            rect.bottom = rectEnd;
+            rect.left = (coordinateX - height).toFloat()
+            rect.right = (coordinateX + height).toFloat()
+            rect.top = rectStart.toFloat()
+            rect.bottom = rectEnd.toFloat()
         }
-
-        paint.setColor(unselectedColor);
-        canvas.drawCircle(coordinateX, coordinateY, radius, paint);
-
-        paint.setColor(selectedColor);
-        canvas.drawRoundRect(rect, radius, radius, paint);
+        paint.color = unselectedColor
+        canvas.drawCircle(coordinateX.toFloat(), coordinateY.toFloat(), radius.toFloat(), paint)
+        paint.color = selectedColor
+        canvas.drawRoundRect(rect, radius.toFloat(), radius.toFloat(), paint)
     }
 }

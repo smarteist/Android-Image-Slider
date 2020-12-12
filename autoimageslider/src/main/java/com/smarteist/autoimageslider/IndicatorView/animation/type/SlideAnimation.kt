@@ -1,96 +1,73 @@
-package com.smarteist.autoimageslider.IndicatorView.animation.type;
+package com.smarteist.autoimageslider.IndicatorView.animation.type
 
-import android.animation.IntEvaluator;
-import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
-import androidx.annotation.NonNull;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController;
-import com.smarteist.autoimageslider.IndicatorView.animation.data.type.SlideAnimationValue;
+import android.animation.IntEvaluator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
+import com.smarteist.autoimageslider.IndicatorView.animation.controller.ValueController.UpdateListener
+import com.smarteist.autoimageslider.IndicatorView.animation.data.type.SlideAnimationValue
 
-public class SlideAnimation extends BaseAnimation<ValueAnimator> {
-
-    private static final String ANIMATION_COORDINATE = "ANIMATION_COORDINATE";
-    private static final int COORDINATE_NONE = -1;
-
-    private SlideAnimationValue value;
-    private int coordinateStart = COORDINATE_NONE;
-    private int coordinateEnd = COORDINATE_NONE;
-
-    public SlideAnimation(@NonNull ValueController.UpdateListener listener) {
-        super(listener);
-        value = new SlideAnimationValue();
+class SlideAnimation(listener: UpdateListener) : BaseAnimation<ValueAnimator>(listener) {
+    private val value: SlideAnimationValue
+    private var coordinateStart = COORDINATE_NONE
+    private var coordinateEnd = COORDINATE_NONE
+    override fun createAnimator(): ValueAnimator {
+        val animator = ValueAnimator()
+        animator.duration = BaseAnimation.Companion.DEFAULT_ANIMATION_TIME.toLong()
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.addUpdateListener { animation -> onAnimateUpdated(animation) }
+        return animator
     }
 
-    @NonNull
-    @Override
-    public ValueAnimator createAnimator() {
-        ValueAnimator animator = new ValueAnimator();
-        animator.setDuration(BaseAnimation.DEFAULT_ANIMATION_TIME);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                onAnimateUpdated(animation);
-            }
-        });
-
-        return animator;
-    }
-
-    @Override
-    public SlideAnimation progress(float progress) {
+    override fun progress(progress: Float): SlideAnimation {
         if (animator != null) {
-            long playTime = (long) (progress * animationDuration);
-
-            if (animator.getValues() != null && animator.getValues().length > 0) {
-                animator.setCurrentPlayTime(playTime);
+            val playTime = (progress * animationDuration).toLong()
+            if (animator!!.values != null && animator!!.values.size > 0) {
+                animator!!.currentPlayTime = playTime
             }
         }
-
-        return this;
+        return this
     }
 
-    @NonNull
-    public SlideAnimation with(int coordinateStart, int coordinateEnd) {
+    fun with(coordinateStart: Int, coordinateEnd: Int): SlideAnimation {
         if (animator != null && hasChanges(coordinateStart, coordinateEnd)) {
-
-            this.coordinateStart = coordinateStart;
-            this.coordinateEnd = coordinateEnd;
-
-            PropertyValuesHolder holder = createSlidePropertyHolder();
-            animator.setValues(holder);
+            this.coordinateStart = coordinateStart
+            this.coordinateEnd = coordinateEnd
+            val holder = createSlidePropertyHolder()
+            animator!!.setValues(holder)
         }
-
-        return this;
+        return this
     }
 
-    private PropertyValuesHolder createSlidePropertyHolder() {
-        PropertyValuesHolder holder = PropertyValuesHolder.ofInt(ANIMATION_COORDINATE, coordinateStart, coordinateEnd);
-        holder.setEvaluator(new IntEvaluator());
-
-        return holder;
+    private fun createSlidePropertyHolder(): PropertyValuesHolder {
+        val holder = PropertyValuesHolder.ofInt(ANIMATION_COORDINATE, coordinateStart, coordinateEnd)
+        holder.setEvaluator(IntEvaluator())
+        return holder
     }
 
-    private void onAnimateUpdated(@NonNull ValueAnimator animation) {
-        int coordinate = (int) animation.getAnimatedValue(ANIMATION_COORDINATE);
-        value.setCoordinate(coordinate);
-
+    private fun onAnimateUpdated(animation: ValueAnimator) {
+        val coordinate = animation.getAnimatedValue(ANIMATION_COORDINATE) as Int
+        value.coordinate = coordinate
         if (listener != null) {
-            listener.onValueUpdated(value);
+            listener!!.onValueUpdated(value)
         }
     }
 
-    @SuppressWarnings("RedundantIfStatement")
-    private boolean hasChanges(int coordinateStart, int coordinateEnd) {
+    private fun hasChanges(coordinateStart: Int, coordinateEnd: Int): Boolean {
         if (this.coordinateStart != coordinateStart) {
-            return true;
+            return true
         }
+        return if (this.coordinateEnd != coordinateEnd) {
+            true
+        } else false
+    }
 
-        if (this.coordinateEnd != coordinateEnd) {
-            return true;
-        }
+    companion object {
+        private const val ANIMATION_COORDINATE = "ANIMATION_COORDINATE"
+        private const val COORDINATE_NONE = -1
+    }
 
-        return false;
+    init {
+        value = SlideAnimationValue()
     }
 }

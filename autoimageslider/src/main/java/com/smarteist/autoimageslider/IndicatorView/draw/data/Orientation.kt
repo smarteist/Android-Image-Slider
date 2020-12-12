@@ -1,3 +1,5 @@
-package com.smarteist.autoimageslider.IndicatorView.draw.data;
+package com.smarteist.autoimageslider.IndicatorView.draw.data
 
-public enum Orientation {HORIZONTAL, VERTICAL}
+enum class Orientation {
+    HORIZONTAL, VERTICAL
+}

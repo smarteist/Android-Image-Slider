@@ -1,65 +1,46 @@
-package com.smarteist.autoimageslider;
+package com.smarteist.autoimageslider
 
-import androidx.annotation.NonNull;
-import androidx.viewpager.widget.PagerAdapter;
+import android.view.View
+import android.view.ViewGroup
+import androidx.viewpager.widget.PagerAdapter
+import com.smarteist.autoimageslider.SliderViewAdapter.ViewHolder
+import java.util.*
 
-import android.view.View;
-import android.view.ViewGroup;
-
-import java.util.LinkedList;
-import java.util.Queue;
-
-
-public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder> extends PagerAdapter {
-
-    private DataSetListener dataSetListener;
+abstract class SliderViewAdapter<VH : ViewHolder?> : PagerAdapter() {
+    private var dataSetListener: DataSetListener? = null
 
     //Default View holder class
-    public static abstract class ViewHolder {
-        public final View itemView;
+    abstract class ViewHolder(val itemView: View)
 
-        public ViewHolder(View itemView) {
-            this.itemView = itemView;
-        }
-    }
-
-    private Queue<VH> destroyedItems = new LinkedList<>();
-
-    @NonNull
-    @Override
-    public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        VH viewHolder = destroyedItems.poll();
+    private val destroyedItems: Queue<VH> = LinkedList()
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        var viewHolder = destroyedItems.poll()
         if (viewHolder == null) {
-            viewHolder = onCreateViewHolder(container);
+            viewHolder = onCreateViewHolder(container)
         }
         // Re-add existing view before rendering so that we can make change inside getView()
-        container.addView(viewHolder.itemView);
-        onBindViewHolder(viewHolder, position);
-
-        return viewHolder;
+        container.addView(viewHolder!!.itemView)
+        onBindViewHolder(viewHolder, position)
+        return viewHolder
     }
 
-    @Override
-    public final void destroyItem(ViewGroup container, int position, @NonNull Object object) {
-        container.removeView(((VH) object).itemView);
-        destroyedItems.add((VH) object);
+    override fun destroyItem(container: ViewGroup, position: Int, objectHere: Any) {
+        container.removeView((objectHere as VH)!!.itemView)
+        destroyedItems.add(objectHere as VH)
     }
 
-    @Override
-    public final boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return ((VH) object).itemView == view;
+    override fun isViewFromObject(view: View, objectHere: Any): Boolean {
+        return (objectHere as VH)!!.itemView === view
     }
 
-    @Override
-    public int getItemPosition(Object object) {
-        return POSITION_NONE;
+    override fun getItemPosition(objectHere: Any): Int {
+        return POSITION_NONE
     }
 
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-        if (this.dataSetListener != null) {
-            dataSetListener.dataSetChanged();
+    override fun notifyDataSetChanged() {
+        super.notifyDataSetChanged()
+        if (dataSetListener != null) {
+            dataSetListener!!.dataSetChanged()
         }
     }
 
@@ -69,7 +50,7 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
      * @param parent wrapper view
      * @return view holder
      */
-    public abstract VH onCreateViewHolder(ViewGroup parent);
+    abstract fun onCreateViewHolder(parent: ViewGroup?): VH
 
     /**
      * Bind data at position into viewHolder
@@ -77,14 +58,12 @@ public abstract class SliderViewAdapter<VH extends SliderViewAdapter.ViewHolder>
      * @param viewHolder item view holder
      * @param position   item position
      */
-    public abstract void onBindViewHolder(VH viewHolder, int position);
-
-    void dataSetChangedListener(SliderViewAdapter.DataSetListener dataSetListener) {
-        this.dataSetListener = dataSetListener;
+    abstract fun onBindViewHolder(viewHolder: VH, position: Int)
+    fun dataSetChangedListener(dataSetListener: DataSetListener?) {
+        this.dataSetListener = dataSetListener
     }
 
     interface DataSetListener {
-        void dataSetChanged();
+        fun dataSetChanged()
     }
-
 }

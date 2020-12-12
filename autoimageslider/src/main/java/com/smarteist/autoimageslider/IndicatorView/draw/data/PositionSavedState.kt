@@ -1,65 +1,37 @@
-package com.smarteist.autoimageslider.IndicatorView.draw.data;
+package com.smarteist.autoimageslider.IndicatorView.draw.data
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.view.View;
+import android.os.Parcel
+import android.os.Parcelable
+import android.view.View
 
-public class PositionSavedState extends View.BaseSavedState {
+class PositionSavedState : View.BaseSavedState {
+    var selectedPosition = 0
+    var selectingPosition = 0
+    var lastSelectedPosition = 0
 
-    private int selectedPosition;
-    private int selectingPosition;
-    private int lastSelectedPosition;
-
-    public PositionSavedState(Parcelable superState) {
-        super(superState);
+    constructor(superState: Parcelable?) : super(superState) {}
+    private constructor(`in`: Parcel) : super(`in`) {
+        selectedPosition = `in`.readInt()
+        selectingPosition = `in`.readInt()
+        lastSelectedPosition = `in`.readInt()
     }
 
-    private PositionSavedState(Parcel in) {
-        super(in);
-        this.selectedPosition = in.readInt();
-        this.selectingPosition = in.readInt();
-        this.lastSelectedPosition = in.readInt();
+    override fun writeToParcel(out: Parcel, flags: Int) {
+        super.writeToParcel(out, flags)
+        out.writeInt(selectedPosition)
+        out.writeInt(selectingPosition)
+        out.writeInt(lastSelectedPosition)
     }
 
-    public int getSelectedPosition() {
-        return selectedPosition;
-    }
+    companion object {
+        val CREATOR: Parcelable.Creator<PositionSavedState> = object : Parcelable.Creator<PositionSavedState> {
+            override fun createFromParcel(`in`: Parcel): PositionSavedState{
+                return PositionSavedState(`in`)
+            }
 
-    public void setSelectedPosition(int selectedPosition) {
-        this.selectedPosition = selectedPosition;
-    }
-
-    public int getSelectingPosition() {
-        return selectingPosition;
-    }
-
-    public void setSelectingPosition(int selectingPosition) {
-        this.selectingPosition = selectingPosition;
-    }
-
-    public int getLastSelectedPosition() {
-        return lastSelectedPosition;
-    }
-
-    public void setLastSelectedPosition(int lastSelectedPosition) {
-        this.lastSelectedPosition = lastSelectedPosition;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        super.writeToParcel(out, flags);
-        out.writeInt(this.selectedPosition);
-        out.writeInt(this.selectingPosition);
-        out.writeInt(this.lastSelectedPosition);
-    }
-
-    public static final Creator<PositionSavedState> CREATOR = new Creator<PositionSavedState>() {
-        public PositionSavedState createFromParcel(Parcel in) {
-            return new PositionSavedState(in);
+            override fun newArray(size: Int): Array<PositionSavedState?> {
+                return arrayOfNulls(size)
+            }
         }
-
-        public PositionSavedState[] newArray(int size) {
-            return new PositionSavedState[size];
-        }
-    };
+    }
 }

@@ -1,671 +1,544 @@
-package com.smarteist.autoimageslider.IndicatorView;
+package com.smarteist.autoimageslider.IndicatorView
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.database.DataSetObserver;
-import android.graphics.Canvas;
-import android.os.Build;
-import android.os.Parcelable;
+import android.annotation.SuppressLint
+import android.annotation.TargetApi
+import android.content.Context
+import android.database.DataSetObserver
+import android.graphics.Canvas
+import android.os.Build
+import android.os.Parcelable
+import android.util.AttributeSet
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewParent
+import androidx.core.text.TextUtilsCompat
+import androidx.core.view.ViewCompat
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
+import com.smarteist.autoimageslider.IndicatorView.animation.type.ScaleAnimation
+import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController.ClickListener
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator
+import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation
+import com.smarteist.autoimageslider.IndicatorView.draw.data.PositionSavedState
+import com.smarteist.autoimageslider.IndicatorView.draw.data.RtlMode
+import com.smarteist.autoimageslider.IndicatorView.utils.CoordinatesUtils.getProgress
+import com.smarteist.autoimageslider.IndicatorView.utils.DensityUtils.dpToPx
+import com.smarteist.autoimageslider.IndicatorView.utils.IdUtils
+import com.smarteist.autoimageslider.InfiniteAdapter.InfinitePagerAdapter
+import com.smarteist.autoimageslider.SliderPager
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.text.TextUtilsCompat;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.core.view.ViewCompat;
-import androidx.viewpager.widget.ViewPager;
+class PageIndicatorView : View, SliderPager.OnPageChangeListener, IndicatorManager.Listener, SliderPager.OnAdapterChangeListener {
+    private var manager: IndicatorManager? = null
+    private var setObserver: DataSetObserver? = null
+    private var viewPager: SliderPager? = null
+    private var isInteractionEnabled = false
 
-import android.util.AttributeSet;
-import android.util.Pair;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-
-import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
-import com.smarteist.autoimageslider.IndicatorView.animation.type.ScaleAnimation;
-import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Indicator;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.Orientation;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.PositionSavedState;
-import com.smarteist.autoimageslider.IndicatorView.draw.data.RtlMode;
-import com.smarteist.autoimageslider.IndicatorView.utils.CoordinatesUtils;
-import com.smarteist.autoimageslider.IndicatorView.utils.DensityUtils;
-import com.smarteist.autoimageslider.IndicatorView.utils.IdUtils;
-import com.smarteist.autoimageslider.InfiniteAdapter.InfinitePagerAdapter;
-import com.smarteist.autoimageslider.SliderPager;
-
-public class PageIndicatorView extends View implements SliderPager.OnPageChangeListener, IndicatorManager.Listener, SliderPager.OnAdapterChangeListener {
-
-    private IndicatorManager manager;
-    private DataSetObserver setObserver;
-    private SliderPager viewPager;
-    private boolean isInteractionEnabled;
-
-    public PageIndicatorView(Context context) {
-        super(context);
-        init(null);
+    constructor(context: Context?) : super(context) {
+        init(null)
     }
 
-    public PageIndicatorView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(attrs);
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+        init(attrs)
     }
 
-    public PageIndicatorView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(attrs);
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        init(attrs)
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public PageIndicatorView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        init(attrs);
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
+        init(attrs)
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        findViewPager(getParent());
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        findViewPager(parent)
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        unRegisterSetObserver();
-        super.onDetachedFromWindow();
+    override fun onDetachedFromWindow() {
+        unRegisterSetObserver()
+        super.onDetachedFromWindow()
     }
 
-    @Override
-    public Parcelable onSaveInstanceState() {
-        Indicator indicator = manager.indicator();
-        PositionSavedState positionSavedState = new PositionSavedState(super.onSaveInstanceState());
-        positionSavedState.setSelectedPosition(indicator.getSelectedPosition());
-        positionSavedState.setSelectingPosition(indicator.getSelectingPosition());
-        positionSavedState.setLastSelectedPosition(indicator.getLastSelectedPosition());
-
-        return positionSavedState;
+    public override fun onSaveInstanceState(): Parcelable? {
+        val indicator = manager!!.indicator()
+        val positionSavedState = PositionSavedState(super.onSaveInstanceState())
+        positionSavedState.selectedPosition = indicator.selectedPosition
+        positionSavedState.selectingPosition = indicator.selectingPosition
+        positionSavedState.lastSelectedPosition = indicator.lastSelectedPosition
+        return positionSavedState
     }
 
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        if (state instanceof PositionSavedState) {
-            Indicator indicator = manager.indicator();
-            PositionSavedState positionSavedState = (PositionSavedState) state;
-            indicator.setSelectedPosition(positionSavedState.getSelectedPosition());
-            indicator.setSelectingPosition(positionSavedState.getSelectingPosition());
-            indicator.setLastSelectedPosition(positionSavedState.getLastSelectedPosition());
-            super.onRestoreInstanceState(positionSavedState.getSuperState());
-
+    public override fun onRestoreInstanceState(state: Parcelable) {
+        if (state is PositionSavedState) {
+            val indicator = manager!!.indicator()
+            val positionSavedState = state
+            indicator.selectedPosition = positionSavedState.selectedPosition
+            indicator.selectingPosition = positionSavedState.selectingPosition
+            indicator.lastSelectedPosition = positionSavedState.lastSelectedPosition
+            super.onRestoreInstanceState(positionSavedState.superState)
         } else {
-            super.onRestoreInstanceState(state);
+            super.onRestoreInstanceState(state)
         }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Pair<Integer, Integer> pair = manager.drawer().measureViewSize(widthMeasureSpec, heightMeasureSpec);
-        setMeasuredDimension(pair.first, pair.second);
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val pair = manager!!.drawer().measureViewSize(widthMeasureSpec, heightMeasureSpec)
+        setMeasuredDimension(pair.first, pair.second)
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        manager.drawer().draw(canvas);
+    override fun onDraw(canvas: Canvas) {
+        manager!!.drawer().draw(canvas)
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        manager.drawer().touch(event);
-        return true;
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        manager!!.drawer().touch(event)
+        return true
     }
 
-    @Override
-    public void onIndicatorUpdated() {
-        invalidate();
+    override fun onIndicatorUpdated() {
+        invalidate()
     }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        onPageScroll(position, positionOffset);
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+        onPageScroll(position, positionOffset)
     }
 
-    @Override
-    public void onPageSelected(int position) {
-        onPageSelect(position);
+    override fun onPageSelected(position: Int) {
+        onPageSelect(position)
     }
 
-    @Override
-    public void onPageScrollStateChanged(int state) {
+    override fun onPageScrollStateChanged(state: Int) {
         if (state == ViewPager.SCROLL_STATE_IDLE) {
-            manager.indicator().setInteractiveAnimation(isInteractionEnabled);
+            manager!!.indicator().isInteractiveAnimation = isInteractionEnabled
         }
     }
 
-    @Override
-    public void onAdapterChanged(@NonNull SliderPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
-        updateState();
+    override fun onAdapterChanged(viewPager: SliderPager, oldAdapter: PagerAdapter?, newAdapter: PagerAdapter?) {
+        updateState()
     }
 
-
-    public void setCount(int count) {
-        if (count >= 0 && manager.indicator().getCount() != count) {
-            manager.indicator().setCount(count);
-            updateVisibility();
-            requestLayout();
+    var count: Int
+        get() = manager!!.indicator().count
+        set(count) {
+            if (count >= 0 && manager!!.indicator().count != count) {
+                manager!!.indicator().count = count
+                updateVisibility()
+                requestLayout()
+            }
         }
-    }
 
-
-    public int getCount() {
-        return manager.indicator().getCount();
-    }
-
-
-    public void setDynamicCount(boolean dynamicCount) {
-        manager.indicator().setDynamicCount(dynamicCount);
-
+    fun setDynamicCount(dynamicCount: Boolean) {
+        manager!!.indicator().isDynamicCount = dynamicCount
         if (dynamicCount) {
-            registerSetObserver();
+            registerSetObserver()
         } else {
-            unRegisterSetObserver();
+            unRegisterSetObserver()
         }
     }
 
-
-    public void setRadius(int radiusDp) {
-        if (radiusDp < 0) {
-            radiusDp = 0;
-        }
-
-        int radiusPx = DensityUtils.dpToPx(radiusDp);
-        manager.indicator().setRadius(radiusPx);
-        invalidate();
-    }
-
-
-    public void setRadius(float radiusPx) {
+    fun setRadius(radiusPx: Float) {
+        var radiusPx = radiusPx
         if (radiusPx < 0) {
-            radiusPx = 0;
+            radiusPx = 0f
+        }
+        manager!!.indicator().radius = radiusPx.toInt()
+        invalidate()
+    }
+
+    var radius: Int
+        get() = manager!!.indicator().radius
+        set(radiusDp) {
+            var radiusDp = radiusDp
+            if (radiusDp < 0) {
+                radiusDp = 0
+            }
+            val radiusPx = dpToPx(radiusDp)
+            manager!!.indicator().radius = radiusPx
+            invalidate()
         }
 
-        manager.indicator().setRadius((int) radiusPx);
-        invalidate();
-    }
-
-
-    public int getRadius() {
-        return manager.indicator().getRadius();
-    }
-
-
-    public void setPadding(int paddingDp) {
-        if (paddingDp < 0) {
-            paddingDp = 0;
-        }
-
-        int paddingPx = DensityUtils.dpToPx(paddingDp);
-        manager.indicator().setPadding(paddingPx);
-        invalidate();
-    }
-
-
-    public void setPadding(float paddingPx) {
+    fun setPadding(paddingPx: Float) {
+        var paddingPx = paddingPx
         if (paddingPx < 0) {
-            paddingPx = 0;
+            paddingPx = 0f
+        }
+        manager!!.indicator().padding = paddingPx.toInt()
+        invalidate()
+    }
+
+    var padding: Int
+        get() = manager!!.indicator().padding
+        set(paddingDp) {
+            var paddingDp = paddingDp
+            if (paddingDp < 0) {
+                paddingDp = 0
+            }
+            val paddingPx = dpToPx(paddingDp)
+            manager!!.indicator().padding = paddingPx
+            invalidate()
+        }
+    var scaleFactor: Float
+        get() = manager!!.indicator().scaleFactor
+        set(factor) {
+            var factor = factor
+            if (factor > ScaleAnimation.MAX_SCALE_FACTOR) {
+                factor = ScaleAnimation.MAX_SCALE_FACTOR
+            } else if (factor < ScaleAnimation.MIN_SCALE_FACTOR) {
+                factor = ScaleAnimation.MIN_SCALE_FACTOR
+            }
+            manager!!.indicator().scaleFactor = factor
         }
 
-        manager.indicator().setPadding((int) paddingPx);
-        invalidate();
-    }
-
-
-    public int getPadding() {
-        return manager.indicator().getPadding();
-    }
-
-
-    public void setScaleFactor(float factor) {
-        if (factor > ScaleAnimation.MAX_SCALE_FACTOR) {
-            factor = ScaleAnimation.MAX_SCALE_FACTOR;
-
-        } else if (factor < ScaleAnimation.MIN_SCALE_FACTOR) {
-            factor = ScaleAnimation.MIN_SCALE_FACTOR;
-        }
-
-        manager.indicator().setScaleFactor(factor);
-    }
-
-
-    public float getScaleFactor() {
-        return manager.indicator().getScaleFactor();
-    }
-
-
-    public void setStrokeWidth(float strokePx) {
-        int radiusPx = manager.indicator().getRadius();
-
+    fun setStrokeWidth(strokePx: Float) {
+        var strokePx = strokePx
+        val radiusPx = manager!!.indicator().radius
         if (strokePx < 0) {
-            strokePx = 0;
-
+            strokePx = 0f
         } else if (strokePx > radiusPx) {
-            strokePx = radiusPx;
+            strokePx = radiusPx.toFloat()
         }
-
-        manager.indicator().setStroke((int) strokePx);
-        invalidate();
+        manager!!.indicator().strokeHere = strokePx.toInt()
+        invalidate()
     }
 
-
-    public void setStrokeWidth(int strokeDp) {
-        int strokePx = DensityUtils.dpToPx(strokeDp);
-        int radiusPx = manager.indicator().getRadius();
-
+    fun setStrokeWidth(strokeDp: Int) {
+        var strokePx = dpToPx(strokeDp)
+        val radiusPx = manager!!.indicator().radius
         if (strokePx < 0) {
-            strokePx = 0;
-
+            strokePx = 0
         } else if (strokePx > radiusPx) {
-            strokePx = radiusPx;
+            strokePx = radiusPx
+        }
+        manager!!.indicator().strokeHere = (strokePx)
+        invalidate()
+    }
+
+    val strokeWidth: Int get() = manager!!.indicator().strokeHere
+    var selectedColor: Int
+        get() = manager!!.indicator().selectedColor
+        set(color) {
+            manager!!.indicator().selectedColor = color
+            invalidate()
+        }
+    var unselectedColor: Int
+        get() = manager!!.indicator().unselectedColor
+        set(color) {
+            manager!!.indicator().unselectedColor = color
+            invalidate()
         }
 
-        manager.indicator().setStroke(strokePx);
-        invalidate();
-    }
-
-
-    public int getStrokeWidth() {
-        return manager.indicator().getStroke();
-    }
-
-
-    public void setSelectedColor(int color) {
-        manager.indicator().setSelectedColor(color);
-        invalidate();
-    }
-
-
-    public int getSelectedColor() {
-        return manager.indicator().getSelectedColor();
-    }
-
-
-    public void setUnselectedColor(int color) {
-        manager.indicator().setUnselectedColor(color);
-        invalidate();
-    }
-
-
-    public int getUnselectedColor() {
-        return manager.indicator().getUnselectedColor();
-    }
-
-
-    public void setAutoVisibility(boolean autoVisibility) {
+    fun setAutoVisibility(autoVisibility: Boolean) {
         if (!autoVisibility) {
-            setVisibility(VISIBLE);
+            visibility = VISIBLE
         }
-
-        manager.indicator().setAutoVisibility(autoVisibility);
-        updateVisibility();
+        manager!!.indicator().isAutoVisibility = autoVisibility
+        updateVisibility()
     }
 
-
-    public void setOrientation(@Nullable Orientation orientation) {
+    fun setOrientation(orientation: Orientation?) {
         if (orientation != null) {
-            manager.indicator().setOrientation(orientation);
-            requestLayout();
+            manager!!.indicator().orientation = orientation
+            requestLayout()
         }
     }
 
+    var animationDuration: Long
+        get() = manager!!.indicator().animationDuration
+        set(duration) {
+            manager!!.indicator().animationDuration = duration
+        }
 
-    public void setAnimationDuration(long duration) {
-        manager.indicator().setAnimationDuration(duration);
-    }
-
-
-    public long getAnimationDuration() {
-        return manager.indicator().getAnimationDuration();
-    }
-
-
-    public void setAnimationType(@Nullable IndicatorAnimationType type) {
-        manager.onValueUpdated(null);
-
+    fun setAnimationType(type: IndicatorAnimationType?) {
+        manager!!.onValueUpdated(null)
         if (type != null) {
-            manager.indicator().setAnimationType(type);
+            manager!!.indicator().animationType = type
         } else {
-            manager.indicator().setAnimationType(IndicatorAnimationType.NONE);
+            manager!!.indicator().animationType = IndicatorAnimationType.NONE
         }
-        invalidate();
+        invalidate()
     }
 
-
-    public void setInteractiveAnimation(boolean isInteractive) {
-        manager.indicator().setInteractiveAnimation(isInteractive);
-        this.isInteractionEnabled = isInteractive;
+    fun setInteractiveAnimation(isInteractive: Boolean) {
+        manager!!.indicator().isInteractiveAnimation = isInteractive
+        isInteractionEnabled = isInteractive
     }
 
-
-    public void setViewPager(@Nullable SliderPager pager) {
-        releaseViewPager();
+    fun setViewPager(pager: SliderPager?) {
+        releaseViewPager()
         if (pager == null) {
-            return;
+            return
         }
-
-        viewPager = pager;
-        viewPager.addOnPageChangeListener(this);
-        viewPager.addOnAdapterChangeListener(this);
-        manager.indicator().setViewPagerId(viewPager.getId());
-
-        setDynamicCount(manager.indicator().isDynamicCount());
-        updateState();
+        viewPager = pager
+        viewPager!!.addOnPageChangeListener(this)
+        viewPager!!.addOnAdapterChangeListener(this)
+        manager!!.indicator().viewPagerId = viewPager!!.id
+        setDynamicCount(manager!!.indicator().isDynamicCount)
+        updateState()
     }
 
-
-    public void releaseViewPager() {
+    fun releaseViewPager() {
         if (viewPager != null) {
-            viewPager.removeOnPageChangeListener(this);
-            viewPager = null;
+            viewPager!!.removeOnPageChangeListener(this)
+            viewPager = null
         }
     }
 
-
-    public void setRtlMode(@Nullable RtlMode mode) {
-        Indicator indicator = manager.indicator();
+    fun setRtlMode(mode: RtlMode?) {
+        val indicator = manager!!.indicator()
         if (mode == null) {
-            indicator.setRtlMode(RtlMode.Off);
+            indicator.rtlMode = RtlMode.Off
         } else {
-            indicator.setRtlMode(mode);
+            indicator.rtlMode = mode
         }
-
         if (viewPager == null) {
-            return;
+            return
         }
-
-        int selectedPosition = indicator.getSelectedPosition();
-        int position = selectedPosition;
-
-        if (isRtl()) {
-            position = (indicator.getCount() - 1) - selectedPosition;
-
+        val selectedPosition = indicator.selectedPosition
+        var position = selectedPosition
+        if (isRtl) {
+            position = indicator.count - 1 - selectedPosition
         } else if (viewPager != null) {
-            position = viewPager.getCurrentItem();
+            position = viewPager!!.currentItem
+        }
+        indicator.lastSelectedPosition = position
+        indicator.selectingPosition = position
+        indicator.selectedPosition = position
+        invalidate()
+    }
+
+    var selection: Int
+        get() = manager!!.indicator().selectedPosition
+        set(position) {
+            var position = position
+            val indicator = manager!!.indicator()
+            position = adjustPosition(position)
+            if (position == indicator.selectedPosition || position == indicator.selectingPosition) {
+                return
+            }
+            indicator.isInteractiveAnimation = false
+            indicator.lastSelectedPosition = indicator.selectedPosition
+            indicator.selectingPosition = position
+            indicator.selectedPosition = position
+            manager!!.animate().basic()
         }
 
-        indicator.setLastSelectedPosition(position);
-        indicator.setSelectingPosition(position);
-        indicator.setSelectedPosition(position);
-        invalidate();
+    fun setSelected(position: Int) {
+        val indicator = manager!!.indicator()
+        val animationType = indicator.animationType
+        indicator.animationType = IndicatorAnimationType.NONE
+        selection = position
+        indicator.animationType = animationType
     }
 
-
-    public int getSelection() {
-        return manager.indicator().getSelectedPosition();
+    fun clearSelection() {
+        val indicator = manager!!.indicator()
+        indicator.isInteractiveAnimation = false
+        indicator.lastSelectedPosition = Indicator.COUNT_NONE
+        indicator.selectingPosition = Indicator.COUNT_NONE
+        indicator.selectedPosition = Indicator.COUNT_NONE
+        manager!!.animate().basic()
     }
 
-
-    public void setSelection(int position) {
-        Indicator indicator = manager.indicator();
-        position = adjustPosition(position);
-
-        if (position == indicator.getSelectedPosition() || position == indicator.getSelectingPosition()) {
-            return;
+    fun setProgress(selectingPosition: Int, progress: Float) {
+        var selectingPosition = selectingPosition
+        var progress = progress
+        val indicator = manager!!.indicator()
+        if (!indicator.isInteractiveAnimation) {
+            return
         }
-
-        indicator.setInteractiveAnimation(false);
-        indicator.setLastSelectedPosition(indicator.getSelectedPosition());
-        indicator.setSelectingPosition(position);
-        indicator.setSelectedPosition(position);
-        manager.animate().basic();
-    }
-
-    public void setSelected(int position) {
-        Indicator indicator = manager.indicator();
-        IndicatorAnimationType animationType = indicator.getAnimationType();
-        indicator.setAnimationType(IndicatorAnimationType.NONE);
-
-        setSelection(position);
-        indicator.setAnimationType(animationType);
-    }
-
-
-    public void clearSelection() {
-        Indicator indicator = manager.indicator();
-        indicator.setInteractiveAnimation(false);
-        indicator.setLastSelectedPosition(Indicator.COUNT_NONE);
-        indicator.setSelectingPosition(Indicator.COUNT_NONE);
-        indicator.setSelectedPosition(Indicator.COUNT_NONE);
-        manager.animate().basic();
-    }
-
-
-    public void setProgress(int selectingPosition, float progress) {
-        Indicator indicator = manager.indicator();
-        if (!indicator.isInteractiveAnimation()) {
-            return;
-        }
-
-        int count = indicator.getCount();
+        val count = indicator.count
         if (count <= 0 || selectingPosition < 0) {
-            selectingPosition = 0;
-
+            selectingPosition = 0
         } else if (selectingPosition > count - 1) {
-            selectingPosition = count - 1;
+            selectingPosition = count - 1
         }
-
         if (progress < 0) {
-            progress = 0;
-
+            progress = 0f
         } else if (progress > 1) {
-            progress = 1;
+            progress = 1f
         }
-
-        if (progress == 1) {
-            indicator.setLastSelectedPosition(indicator.getSelectedPosition());
-            indicator.setSelectedPosition(selectingPosition);
+        if (progress == 1f) {
+            indicator.lastSelectedPosition = indicator.selectedPosition
+            indicator.selectedPosition = selectingPosition
         }
-
-        indicator.setSelectingPosition(selectingPosition);
-        manager.animate().interactive(progress);
+        indicator.selectingPosition = selectingPosition
+        manager!!.animate().interactive(progress)
     }
 
-    public void setClickListener(@Nullable DrawController.ClickListener listener) {
-        manager.drawer().setClickListener(listener);
+    fun setClickListener(listener: ClickListener?) {
+        manager!!.drawer().setClickListener(listener)
     }
 
-    private void init(@Nullable AttributeSet attrs) {
-        setupId();
-        initIndicatorManager(attrs);
+    private fun init(attrs: AttributeSet?) {
+        setupId()
+        initIndicatorManager(attrs)
     }
 
-    private void setupId() {
-        if (getId() == NO_ID) {
-            setId(IdUtils.generateViewId());
+    private fun setupId() {
+        if (id == NO_ID) {
+            id = IdUtils.generateViewId()
         }
     }
 
-    private void initIndicatorManager(@Nullable AttributeSet attrs) {
-        manager = new IndicatorManager(this);
-        manager.drawer().initAttributes(getContext(), attrs);
-
-        Indicator indicator = manager.indicator();
-        indicator.setPaddingLeft(getPaddingLeft());
-        indicator.setPaddingTop(getPaddingTop());
-        indicator.setPaddingRight(getPaddingRight());
-        indicator.setPaddingBottom(getPaddingBottom());
-        isInteractionEnabled = indicator.isInteractiveAnimation();
+    private fun initIndicatorManager(attrs: AttributeSet?) {
+        manager = IndicatorManager(this)
+        manager!!.drawer().initAttributes(context, attrs)
+        val indicator = manager!!.indicator()
+        indicator.paddingLeft = paddingLeft
+        indicator.paddingTop = paddingTop
+        indicator.paddingRight = paddingRight
+        indicator.paddingBottom = paddingBottom
+        isInteractionEnabled = indicator.isInteractiveAnimation
     }
 
-    private void registerSetObserver() {
-        if (setObserver != null || viewPager == null || viewPager.getAdapter() == null) {
-            return;
+    private fun registerSetObserver() {
+        if (setObserver != null || viewPager == null || viewPager!!.adapter == null) {
+            return
         }
-
-        setObserver = new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                updateState();
+        setObserver = object : DataSetObserver() {
+            override fun onChanged() {
+                updateState()
             }
-        };
-
+        }
         try {
-            viewPager.getAdapter().registerDataSetObserver(setObserver);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+            viewPager!!.adapter!!.registerDataSetObserver(setObserver!!)
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
         }
     }
 
-    private void unRegisterSetObserver() {
-        if (setObserver == null || viewPager == null || viewPager.getAdapter() == null) {
-            return;
+    private fun unRegisterSetObserver() {
+        if (setObserver == null || viewPager == null || viewPager!!.adapter == null) {
+            return
         }
-
         try {
-            viewPager.getAdapter().unregisterDataSetObserver(setObserver);
-            setObserver = null;
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+            viewPager!!.adapter!!.unregisterDataSetObserver(setObserver!!)
+            setObserver = null
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
         }
     }
 
-    private void updateState() {
-        if (viewPager == null || viewPager.getAdapter() == null) {
-            return;
+    private fun updateState() {
+        if (viewPager == null || viewPager!!.adapter == null) {
+            return
         }
-        int count;
-        int position;
-        if (viewPager.getAdapter() instanceof InfinitePagerAdapter) {
-            count = ((InfinitePagerAdapter) viewPager.getAdapter()).getRealCount();
-            if (count > 0) {
-                position = viewPager.getCurrentItem() % count;
+        val count: Int
+        val position: Int
+        if (viewPager!!.adapter is InfinitePagerAdapter) {
+            count = (viewPager!!.adapter as InfinitePagerAdapter?)!!.realCount
+            position = if (count > 0) {
+                viewPager!!.currentItem % count
             } else {
-                position = 0;
+                0
             }
         } else {
-            count = viewPager.getAdapter().getCount();
-            position = viewPager.getCurrentItem();
+            count = viewPager!!.adapter!!.count
+            position = viewPager!!.currentItem
         }
-
-        int selectedPos = isRtl() ? (count - 1) - position : position;
-        manager.indicator().setSelectedPosition(selectedPos);
-        manager.indicator().setSelectingPosition(selectedPos);
-        manager.indicator().setLastSelectedPosition(selectedPos);
-        manager.indicator().setCount(count);
-        manager.animate().end();
-
-        updateVisibility();
-        requestLayout();
+        val selectedPos = if (isRtl) count - 1 - position else position
+        manager!!.indicator().selectedPosition = selectedPos
+        manager!!.indicator().selectingPosition = selectedPos
+        manager!!.indicator().lastSelectedPosition = selectedPos
+        manager!!.indicator().count = count
+        manager!!.animate().end()
+        updateVisibility()
+        requestLayout()
     }
 
-    private void updateVisibility() {
-        if (!manager.indicator().isAutoVisibility()) {
-            return;
+    private fun updateVisibility() {
+        if (!manager!!.indicator().isAutoVisibility) {
+            return
         }
-
-        int count = manager.indicator().getCount();
-        int visibility = getVisibility();
-
+        val count = manager!!.indicator().count
+        val visibility = visibility
         if (visibility != VISIBLE && count > Indicator.MIN_COUNT) {
-            setVisibility(VISIBLE);
-
+            setVisibility(VISIBLE)
         } else if (visibility != INVISIBLE && count <= Indicator.MIN_COUNT) {
-            setVisibility(View.INVISIBLE);
+            setVisibility(INVISIBLE)
         }
     }
 
-    private void onPageSelect(int position) {
-        Indicator indicator = manager.indicator();
-        boolean canSelectIndicator = isViewMeasured();
-        int count = indicator.getCount();
-
+    private fun onPageSelect(position: Int) {
+        var position = position
+        val indicator = manager!!.indicator()
+        val canSelectIndicator = isViewMeasured
+        val count = indicator.count
         if (canSelectIndicator) {
-            if (isRtl()) {
-                position = (count - 1) - position;
+            if (isRtl) {
+                position = count - 1 - position
             }
-
-            setSelection(position);
+            selection = position
         }
     }
 
-    private void onPageScroll(int position, float positionOffset) {
-        Indicator indicator = manager.indicator();
-        IndicatorAnimationType animationType = indicator.getAnimationType();
-        boolean interactiveAnimation = indicator.isInteractiveAnimation();
-        boolean canSelectIndicator = isViewMeasured() && interactiveAnimation && animationType != IndicatorAnimationType.NONE;
-
+    private fun onPageScroll(position: Int, positionOffset: Float) {
+        val indicator = manager!!.indicator()
+        val animationType = indicator.animationType
+        val interactiveAnimation = indicator.isInteractiveAnimation
+        val canSelectIndicator = isViewMeasured && interactiveAnimation && animationType !== IndicatorAnimationType.NONE
         if (!canSelectIndicator) {
-            return;
+            return
         }
-
-        Pair<Integer, Float> progressPair = CoordinatesUtils.getProgress(indicator, position, positionOffset, isRtl());
-        int selectingPosition = progressPair.first;
-        float selectingProgress = progressPair.second;
-        setProgress(selectingPosition, selectingProgress);
+        val progressPair = getProgress(indicator, position, positionOffset, isRtl)
+        val selectingPosition = progressPair.first
+        val selectingProgress = progressPair.second
+        setProgress(selectingPosition, selectingProgress)
     }
 
-    private boolean isRtl() {
-        switch (manager.indicator().getRtlMode()) {
-            case On:
-                return true;
-
-            case Off:
-                return false;
-
-            case Auto:
-                return TextUtilsCompat.getLayoutDirectionFromLocale(getContext().getResources().getConfiguration().locale) == ViewCompat.LAYOUT_DIRECTION_RTL;
+    private val isRtl: Boolean
+        private get() {
+            when (manager!!.indicator().rtlMode) {
+                RtlMode.On -> return true
+                RtlMode.Off -> return false
+                RtlMode.Auto -> return TextUtilsCompat.getLayoutDirectionFromLocale(context.resources.configuration.locale) == ViewCompat.LAYOUT_DIRECTION_RTL
+            }
+            return false
         }
+    private val isViewMeasured: Boolean
+        private get() = measuredHeight != 0 || measuredWidth != 0
 
-        return false;
-    }
-
-    private boolean isViewMeasured() {
-        return getMeasuredHeight() != 0 || getMeasuredWidth() != 0;
-    }
-
-    private void findViewPager(@Nullable ViewParent viewParent) {
-        boolean isValidParent = viewParent != null &&
-                viewParent instanceof ViewGroup &&
-                ((ViewGroup) viewParent).getChildCount() > 0;
-
+    private fun findViewPager(viewParent: ViewParent?) {
+        val isValidParent = viewParent != null &&
+                viewParent is ViewGroup && viewParent.childCount > 0
         if (!isValidParent) {
-            return;
+            return
         }
-
-        int viewPagerId = manager.indicator().getViewPagerId();
-        SliderPager viewPager = findViewPager((ViewGroup) viewParent, viewPagerId);
-
+        val viewPagerId = manager!!.indicator().viewPagerId
+        val viewPager = findViewPager((viewParent as ViewGroup?)!!, viewPagerId)
         if (viewPager != null) {
-            setViewPager(viewPager);
+            setViewPager(viewPager)
         } else {
-            findViewPager(viewParent.getParent());
+            findViewPager(viewParent!!.parent)
         }
     }
 
-    @Nullable
-    private SliderPager findViewPager(@NonNull ViewGroup viewGroup, int id) {
-        if (viewGroup.getChildCount() <= 0) {
-            return null;
+    private fun findViewPager(viewGroup: ViewGroup, id: Int): SliderPager? {
+        if (viewGroup.childCount <= 0) {
+            return null
         }
-
-        View view = viewGroup.findViewById(id);
-        if (view != null && view instanceof SliderPager) {
-            return (SliderPager) view;
+        val view = viewGroup.findViewById<View>(id)
+        return if (view != null && view is SliderPager) {
+            view
         } else {
-            return null;
+            null
         }
     }
 
-    private int adjustPosition(int position) {
-        Indicator indicator = manager.indicator();
-        int count = indicator.getCount();
-        int lastPosition = count - 1;
-
+    private fun adjustPosition(position: Int): Int {
+        var position = position
+        val indicator = manager!!.indicator()
+        val count = indicator.count
+        val lastPosition = count - 1
         if (position <= 0) {
-            position = 0;
-
+            position = 0
         } else if (position > lastPosition) {
-            position = lastPosition;
+            position = lastPosition
         }
-
-        return position;
+        return position
     }
 }
