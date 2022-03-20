@@ -88,7 +88,7 @@ Or you can put it inside the cardView to look more beautiful :
 ## Next step
 
 The new version requires an slider adapter plus your custom layout for slider items, Although its very similar to RecyclerView & RecyclerAdapter, and it's familiar and easy to implement this adapter... here is an example for adapter implementation :
-
+### Java
 ```java
 public class SliderAdapterExample extends
         SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
@@ -164,6 +164,76 @@ public class SliderAdapterExample extends
         }
     }
 
+}
+```
+
+###Kotlin
+```kotlin
+class ImageSliderAdapter(context: Context) :
+    SliderViewAdapter<ImageSliderAdapter.SliderAdapterVH>() {
+    private val context: Context
+    private var mSliderItems: MutableList<SliderItem> = ArrayList()
+    fun renewItems(sliderItems: MutableList<SliderItem>) {
+        mSliderItems = sliderItems
+        notifyDataSetChanged()
+    }
+
+    fun deleteItem(position: Int) {
+        mSliderItems.removeAt(position)
+        notifyDataSetChanged()
+    }
+
+    fun addItem(sliderItem: SliderItem) {
+        mSliderItems.add(sliderItem)
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup): SliderAdapterVH {
+        val inflate: View =
+            LayoutInflater.from(parent.context).inflate(R.layout.image_slider_layout_item, null)
+        return SliderAdapterVH(inflate)
+    }
+
+    override fun onBindViewHolder(viewHolder: SliderAdapterVH, position: Int) {
+        val sliderItem: SliderItem = mSliderItems[position]
+        viewHolder.textViewDescription.setText("Demo Description")
+        viewHolder.textViewDescription.textSize = 16f
+        viewHolder.textViewDescription.setTextColor(Color.WHITE)
+//        Glide.with(viewHolder.itemView)
+//            .load(sliderItem.image)
+//            .fitCenter()
+//            .into(viewHolder.imageViewBackground)
+
+        viewHolder.imageViewBackground.load(sliderItem.image_url)
+        
+        viewHolder.itemView.setOnClickListener {
+            Toast.makeText(context, "This is item in position $position", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    override fun getCount(): Int {
+        //slider view count could be dynamic size
+        return mSliderItems.size
+    }
+
+    inner class SliderAdapterVH(itemView: View) : ViewHolder(itemView) {
+        var _itemView: View
+        var imageViewBackground: ImageView
+        var imageGifContainer: ImageView
+        var textViewDescription: TextView
+
+        init {
+            imageViewBackground = itemView.findViewById(R.id.iv_auto_image_slider)
+            imageGifContainer = itemView.findViewById(R.id.iv_gif_container)
+            textViewDescription = itemView.findViewById(R.id.tv_auto_image_slider)
+            _itemView = itemView
+        }
+    }
+
+    init {
+        this.context = context
+    }
 }
 ```
 
