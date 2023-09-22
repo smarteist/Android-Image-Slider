@@ -652,6 +652,8 @@ public class SliderView extends FrameLayout
         }
     }
 
+    int currentContinuousPosition = 0;
+
     public void slideToNextPosition() {
 
         int currentPosition = mSliderPager.getCurrentItem();
@@ -666,15 +668,17 @@ public class SliderView extends FrameLayout
                 } else {
                     mSliderPager.setCurrentItem(currentPosition - 1, true);
                 }
+                mPreviousPosition = currentPosition;
             }
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-                mSliderPager.setCurrentItem(currentPosition - 1, true);
+                mSliderPager.setCurrentItem(currentContinuousPosition--, true);
+                mPreviousPosition = currentContinuousPosition;
             }
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_RIGHT) {
-                mSliderPager.setCurrentItem(currentPosition + 1, true);
+                mSliderPager.setCurrentItem(currentContinuousPosition++, true);
+                mPreviousPosition = currentContinuousPosition;
             }
         }
-        mPreviousPosition = currentPosition;
     }
 
 
