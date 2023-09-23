@@ -668,10 +668,10 @@ public class SliderView extends FrameLayout
                 }
             }
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_LEFT) {
-                mSliderPager.setCurrentItem(currentPosition - 1, true);
+                mSliderPager.setCurrentItem(currentPosition == 0 ? adapterItemsCount - 1 : currentPosition - 1, currentPosition != 0);
             }
             if (mAutoCycleDirection == AUTO_CYCLE_DIRECTION_RIGHT) {
-                mSliderPager.setCurrentItem(currentPosition + 1, true);
+                mSliderPager.setCurrentItem(currentPosition == adapterItemsCount - 1 ? 0 : currentPosition + 1, currentPosition != adapterItemsCount - 1);
             }
         }
         mPreviousPosition = currentPosition;
