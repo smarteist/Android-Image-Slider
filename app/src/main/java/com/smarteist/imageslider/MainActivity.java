@@ -19,6 +19,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+// declare variablr
     SliderView sliderView;
     private SliderAdapterExample adapter;
 
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         sliderView = findViewById(R.id.imageSlider);
 
+//initialize variable
 
         adapter = new SliderAdapterExample(this);
         sliderView.setSliderAdapter(adapter);
