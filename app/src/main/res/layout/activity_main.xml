@@ -27,8 +27,8 @@
             app:sliderIndicatorOrientation="horizontal"
             app:sliderIndicatorPadding="3dp"
             app:sliderIndicatorRadius="2dp"
-            app:sliderIndicatorSelectedColor="#5A5A5A"
-            app:sliderIndicatorUnselectedColor="#FFF"
+            app:sliderIndicatorSelectedColor="#FFF"
+            app:sliderIndicatorUnselectedColor="#5A5A5A"
             app:sliderScrollTimeInSec="1" />
 
     </androidx.cardview.widget.CardView>
@@ -44,19 +44,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="addNewItem"
-            android:text="Add An Item" />
+            android:text="Add An Item"
+            tools:ignore="OnClick" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="removeLastItem"
-            android:text="Rmove Last Item" />
+            android:text="Rmove Last Item"
+            tools:ignore="OnClick" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="renewItems"
-            android:text="Renew Items" />
+            android:text="Renew Items"
+            tools:ignore="OnClick" />
 
     </LinearLayout>
 

@@ -43,6 +43,9 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
             IndicatorAnimationType.DROP -> dropAnimation()
             IndicatorAnimationType.SWAP -> swapAnimation()
             IndicatorAnimationType.SCALE_DOWN -> scaleDownAnimation()
+            else -> {
+                wormAnimation()
+            }
         }
     }
 
@@ -51,9 +54,9 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
         val unselectedColor = indicator.unselectedColor
         val animationDuration = indicator.animationDuration
         val animation = valueController
-                .color()
-                .with(unselectedColor, selectedColor)
-                .duration(animationDuration)
+            .color()
+            .with(unselectedColor, selectedColor)
+            .duration(animationDuration)
         if (isInteractive) {
             animation.progress(progress)
         } else {
@@ -69,9 +72,9 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
         val scaleFactor = indicator.scaleFactor
         val animationDuration = indicator.animationDuration
         val animation = valueController
-                .scale()
-                .with(unselectedColor, selectedColor, radiusPx, scaleFactor)
-                .duration(animationDuration)
+            .scale()
+            .with(unselectedColor, selectedColor, radiusPx, scaleFactor)
+            .duration(animationDuration)
         if (isInteractive) {
             animation.progress(progress)
         } else {
@@ -81,17 +84,19 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
     }
 
     private fun wormAnimation() {
-        val fromPosition = if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
-        val toPosition = if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
+        val fromPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
+        val toPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
         val from = CoordinatesUtils.getCoordinate(indicator, fromPosition)
         val to = CoordinatesUtils.getCoordinate(indicator, toPosition)
         val isRightSide = toPosition > fromPosition
         val radiusPx = indicator.radius
         val animationDuration = indicator.animationDuration
         val animation: BaseAnimation<*> = valueController
-                .worm()
-                .with(from, to, radiusPx, isRightSide)
-                .duration(animationDuration)
+            .worm()
+            .with(from, to, radiusPx, isRightSide)
+            .duration(animationDuration)
         if (isInteractive) {
             animation.progress(progress)
         } else {
@@ -101,15 +106,17 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
     }
 
     private fun slideAnimation() {
-        val fromPosition = if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
-        val toPosition = if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
+        val fromPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
+        val toPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
         val from = CoordinatesUtils.getCoordinate(indicator, fromPosition)
         val to = CoordinatesUtils.getCoordinate(indicator, toPosition)
         val animationDuration = indicator.animationDuration
         val animation = valueController
-                .slide()
-                .with(from, to)
-                .duration(animationDuration)
+            .slide()
+            .with(from, to)
+            .duration(animationDuration)
         if (isInteractive) {
             animation.progress(progress)
         } else {
@@ -125,9 +132,9 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
         val strokePx = indicator.strokeHere
         val animationDuration = indicator.animationDuration
         val animation = valueController
-                .fill()
-                .with(unselectedColor, selectedColor, radiusPx, strokePx)
-                .duration(animationDuration)
+            .fill()
+            .with(unselectedColor, selectedColor, radiusPx, strokePx)
+            .duration(animationDuration)
         if (isInteractive) {
             animation.progress(progress)
         } else {
@@ -137,17 +144,19 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
     }
 
     private fun thinWormAnimation() {
-        val fromPosition = if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
-        val toPosition = if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
+        val fromPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
+        val toPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
         val from = CoordinatesUtils.getCoordinate(indicator, fromPosition)
         val to = CoordinatesUtils.getCoordinate(indicator, toPosition)
         val isRightSide = toPosition > fromPosition
         val radiusPx = indicator.radius
         val animationDuration = indicator.animationDuration
         val animation: BaseAnimation<*> = valueController
-                .thinWorm()
-                .with(from, to, radiusPx, isRightSide)
-                .duration(animationDuration)
+            .thinWorm()
+            .with(from, to, radiusPx, isRightSide)
+            .duration(animationDuration)
         if (isInteractive) {
             animation.progress(progress)
         } else {
@@ -157,21 +166,24 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
     }
 
     private fun dropAnimation() {
-        val fromPosition = if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
-        val toPosition = if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
+        val fromPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
+        val toPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
         val widthFrom = CoordinatesUtils.getCoordinate(indicator, fromPosition)
         val widthTo = CoordinatesUtils.getCoordinate(indicator, toPosition)
         val paddingTop = indicator.paddingTop
         val paddingLeft = indicator.paddingLeft
-        val padding = if (indicator.orientation == Orientation.HORIZONTAL) paddingTop else paddingLeft
+        val padding =
+            if (indicator.orientation == Orientation.HORIZONTAL) paddingTop else paddingLeft
         val radius = indicator.radius
         val heightFrom = radius * 3 + padding
         val heightTo = radius + padding
         val animationDuration = indicator.animationDuration
         val animation: BaseAnimation<*> = valueController
-                .drop()
-                .duration(animationDuration)
-                .with(widthFrom, widthTo, heightFrom, heightTo, radius)
+            .drop()
+            .duration(animationDuration)
+            .with(widthFrom, widthTo, heightFrom, heightTo, radius)
         if (isInteractive) {
             animation.progress(progress)
         } else {
@@ -181,15 +193,17 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
     }
 
     private fun swapAnimation() {
-        val fromPosition = if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
-        val toPosition = if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
+        val fromPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectedPosition else indicator.lastSelectedPosition
+        val toPosition =
+            if (indicator.isInteractiveAnimation) indicator.selectingPosition else indicator.selectedPosition
         val from = CoordinatesUtils.getCoordinate(indicator, fromPosition)
         val to = CoordinatesUtils.getCoordinate(indicator, toPosition)
         val animationDuration = indicator.animationDuration
         val animation = valueController
-                .swap()
-                .with(from, to)
-                .duration(animationDuration)
+            .swap()
+            .with(from, to)
+            .duration(animationDuration)
         if (isInteractive) {
             animation.progress(progress)
         } else {
@@ -205,9 +219,9 @@ class AnimationController(indicator: Indicator, private val listener: UpdateList
         val scaleFactor = indicator.scaleFactor
         val animationDuration = indicator.animationDuration
         val animation = valueController
-                .scaleDown()
-                .with(unselectedColor, selectedColor, radiusPx, scaleFactor)
-                .duration(animationDuration)
+            .scaleDown()
+            .with(unselectedColor, selectedColor, radiusPx, scaleFactor)
+            .duration(animationDuration)
         if (isInteractive) {
             animation.progress(progress)
         } else {

@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.smarteist.imageslider.test", appContext.packageName)
+        assertEquals("com.smarteist.imageslider", appContext.packageName)
     }
 }

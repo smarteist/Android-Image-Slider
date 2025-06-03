@@ -29,7 +29,8 @@ import com.smarteist.autoimageslider.IndicatorView.utils.IdUtils
 import com.smarteist.autoimageslider.InfiniteAdapter.InfinitePagerAdapter
 import com.smarteist.autoimageslider.SliderPager
 
-class PageIndicatorView : View, SliderPager.OnPageChangeListener, IndicatorManager.Listener, SliderPager.OnAdapterChangeListener {
+class PageIndicatorView : View, SliderPager.OnPageChangeListener, IndicatorManager.Listener,
+    SliderPager.OnAdapterChangeListener {
     private var manager: IndicatorManager? = null
     private var setObserver: DataSetObserver? = null
     private var viewPager: SliderPager? = null
@@ -43,12 +44,21 @@ class PageIndicatorView : View, SliderPager.OnPageChangeListener, IndicatorManag
         init(attrs)
     }
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         init(attrs)
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
+    constructor(
+        context: Context?,
+        attrs: AttributeSet?,
+        defStyleAttr: Int,
+        defStyleRes: Int
+    ) : super(context, attrs, defStyleAttr, defStyleRes) {
         init(attrs)
     }
 
@@ -117,7 +127,11 @@ class PageIndicatorView : View, SliderPager.OnPageChangeListener, IndicatorManag
         }
     }
 
-    override fun onAdapterChanged(viewPager: SliderPager, oldAdapter: PagerAdapter?, newAdapter: PagerAdapter?) {
+    override fun onAdapterChanged(
+        viewPager: SliderPager,
+        oldAdapter: PagerAdapter?,
+        newAdapter: PagerAdapter?
+    ) {
         updateState()
     }
 
@@ -310,6 +324,10 @@ class PageIndicatorView : View, SliderPager.OnPageChangeListener, IndicatorManag
         invalidate()
     }
 
+    fun getRtlMode(): RtlMode? {
+        return manager?.indicator()?.rtlMode
+    }
+
     var selection: Int
         get() = manager!!.indicator().selectedPosition
         set(position) {
@@ -480,7 +498,8 @@ class PageIndicatorView : View, SliderPager.OnPageChangeListener, IndicatorManag
         val indicator = manager!!.indicator()
         val animationType = indicator.animationType
         val interactiveAnimation = indicator.isInteractiveAnimation
-        val canSelectIndicator = isViewMeasured && interactiveAnimation && animationType !== IndicatorAnimationType.NONE
+        val canSelectIndicator =
+            isViewMeasured && interactiveAnimation && animationType !== IndicatorAnimationType.NONE
         if (!canSelectIndicator) {
             return
         }
@@ -492,12 +511,14 @@ class PageIndicatorView : View, SliderPager.OnPageChangeListener, IndicatorManag
 
     private val isRtl: Boolean
         private get() {
-            when (manager!!.indicator().rtlMode) {
+            return when (manager?.indicator()?.rtlMode) {
                 RtlMode.On -> return true
                 RtlMode.Off -> return false
                 RtlMode.Auto -> return TextUtilsCompat.getLayoutDirectionFromLocale(context.resources.configuration.locale) == ViewCompat.LAYOUT_DIRECTION_RTL
+                else -> {
+                    false
+                }
             }
-            return false
         }
     private val isViewMeasured: Boolean
         private get() = measuredHeight != 0 || measuredWidth != 0

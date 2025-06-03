@@ -53,16 +53,19 @@ class DrawController(private val indicator: Indicator) {
     }
 
     private fun drawIndicator(
-            canvas: Canvas,
-            position: Int,
-            coordinateX: Int,
-            coordinateY: Int) {
+        canvas: Canvas,
+        position: Int,
+        coordinateX: Int,
+        coordinateY: Int
+    ) {
         val interactiveAnimation = indicator.isInteractiveAnimation
         val selectedPosition = indicator.selectedPosition
         val selectingPosition = indicator.selectingPosition
         val lastSelectedPosition = indicator.lastSelectedPosition
-        val selectedItem = !interactiveAnimation && (position == selectedPosition || position == lastSelectedPosition)
-        val selectingItem = interactiveAnimation && (position == selectedPosition || position == selectingPosition)
+        val selectedItem =
+            !interactiveAnimation && (position == selectedPosition || position == lastSelectedPosition)
+        val selectingItem =
+            interactiveAnimation && (position == selectedPosition || position == selectingPosition)
         val isSelectedItem = selectedItem or selectingItem
         drawer.setup(position, coordinateX, coordinateY)
         if (value != null && isSelectedItem) {
@@ -85,6 +88,9 @@ class DrawController(private val indicator: Indicator) {
             IndicatorAnimationType.DROP -> drawer.drawDrop(canvas, value!!)
             IndicatorAnimationType.SWAP -> drawer.drawSwap(canvas, value!!)
             IndicatorAnimationType.SCALE_DOWN -> drawer.drawScaleDown(canvas, value!!)
+            else -> {
+                drawer.drawWorm(canvas, value!!)
+            }
         }
     }
 
