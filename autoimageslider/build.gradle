@@ -1,73 +1,71 @@
-apply plugin: 'com.android.library'
-
-
-ext {
-
-    bintrayRepo = 'android'
-    bintrayName = 'androidautoimageslider'
-
-    publishedGroupId = 'com.github.smarteist'
-    libraryName = 'autoimageslider'
-    artifact = 'autoimageslider'
-
-    libraryDescription = 'Simple, android image slider'
-
-    siteUrl = 'https://github.com/smarteist'
-    gitUrl = 'https://github.com/smarteist/android-image-slider.git'
-
-    libraryVersion = '1.4.0'
-    organization = 'smarteistbintray' // if you push to organization's repository.
-    developerId = 'smarteist'
-    developerName = 'Ali Hosseini'
-    developerEmail = 'ali.hosseini.sr@gmail.com'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-
+plugins {
+    id "com.android.library"
+    id 'org.jetbrains.kotlin.android'
+    id "maven-publish"
 }
 
 android {
-    compileSdkVersion 29
+    namespace "com.smarteist.autoimageslider"
+    compileSdkVersion 35
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 29
-        versionCode 5
-        versionName "1.3.9"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
+        minSdkVersion 21
+        targetSdkVersion 35
+        consumerProguardFiles "consumer-rules.pro"
+        // keep or set versionCode/versionName if you need them
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
-}
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 
-// Add a new configuration to hold your dependencies
-configurations {
-    libConfig
+    // (Optional) if you see Java toolchain warnings:
+    // compileOptions {
+    //     sourceCompatibility JavaVersion.VERSION_1_8
+    //     targetCompatibility JavaVersion.VERSION_1_8
+    // }
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    //noinspection GradleCompatible
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
+    implementation "androidx.appcompat:appcompat:1.7.1"
 }
 
-task copyLibs(type: Copy) {
-    from configurations.libConfig
-    into 'libs'
-}
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = "com.github.Shivgupta1031"
+                artifactId = "Android-Image-Slider"   // or "autoimageslider"
+                version = "1.4.2"
 
-apply from: 'https://raw.githubusercontent.com/smarteist/bintrayUpload/master/install.gradle'
-apply from: 'https://raw.githubusercontent.com/smarteist/bintrayUpload/master/bintray.gradle'
+                from components.release
+
+                pom {
+                    name = "Android Image Slider (Fork)"
+                    description = "Simple Android image slider (forked and updated)"
+                    url = "https://github.com/Shivgupta1031/Android-Image-Slider"
+                    licenses {
+                        license {
+                            name = "Apache-2.0"
+                            url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                        }
+                    }
+                    scm {
+                        url = "https://github.com/Shivgupta1031/Android-Image-Slider"
+                        connection = "scm:git:git://github.com/Shivgupta1031/Android-Image-Slider.git"
+                        developerConnection = "scm:git:ssh://github.com/Shivgupta1031/Android-Image-Slider.git"
+                    }
+                }
+            }
+        }
+    }
+}
